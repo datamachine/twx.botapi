@@ -13,24 +13,11 @@ from twx.mtproto import rpc
 from twx.mtproto import crypt
 from twx.mtproto import prime
 
+from hexdump import hexdump
+
 
 def crc32(data):
     return original_crc32(data) & 0xffffffff
-
-def vis(bs):
-    """
-    Function to visualize byte streams. Split into bytes, print to console.
-    :param bs: BYTE STRING
-    """
-    bs = bytearray(bs)
-    symbols_in_one_line = 8
-    n = len(bs) // symbols_in_one_line
-    i = 0
-    for i in range(n):
-        print(str(i*symbols_in_one_line)+" | "+" ".join(["%02X" % b for b in bs[i*symbols_in_one_line:(i+1)*symbols_in_one_line]])) # for every 8 symbols line
-    if not len(bs) % symbols_in_one_line == 0:
-        print(str((i+1)*symbols_in_one_line)+" | "+" ".join(["%02X" % b for b in bs[(i+1)*symbols_in_one_line:]])+"\n") # for last line
-
 
 class MTProto:
     def __init__(self, api_secret, api_id):
@@ -76,15 +63,18 @@ class Datacenter:
         self.auth_server_salt_set = []
         self.sock = socket()
         self.sock.connect((ipaddr, port))
+        self.sock.settimeout(5.0)
         self.message_queue = []
 
         self.last_msg_id = 0
         self.timedelta = 0
+        self.number = 0
 
         self.authorized = False
         self.auth_key = None
         self.auth_key_id = None
         self.server_salt = None
+        self.server_time = None
 
         self.MAX_RETRY = 5
         self.AUTH_MAX_RETRY = 5
@@ -108,6 +98,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         req_pq = rpc.req_pq(rand_nonce).get_bytes()
         self.send_message(req_pq)
         resPQ = rpc.resPQ(self.recv_message())
+        assert rand_nonce == resPQ.nonce
 
         public_key_fingerprint = resPQ.server_public_key_fingerprints[0]
         pq = bytes_to_long(resPQ.pq)
@@ -115,6 +106,9 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         [p, q] = prime.primefactors(pq)
         (p, q) = (q, p) if p > q else (p, q)
         assert p*q == pq and p < q
+
+        print("Factorization %d = %d * %d" % (pq, p, q))
+
         p_bytes = long_to_bytes(p)
         q_bytes = long_to_bytes(q)
         key = RSA.importKey(self.rsa_key)
@@ -126,6 +120,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                                             new_nonce=new_nonce)
 
         data = p_q_inner_data.get_bytes()
+        assert p_q_inner_data.nonce == resPQ.nonce
 
         sha_digest = SHA.new(data).digest()
         random_bytes = os.urandom(255-len(data)-len(sha_digest))
@@ -138,9 +133,11 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                                           public_key_fingerprint=public_key_fingerprint,
                                           encrypted_data=encrypted_data)
         data = req_DH_params.get_bytes()
-        vis(data)
+
         self.send_message(data)
-        server_DH_params = rpc.server_DH_params(self.recv_message())
+        data = self.recv_message(debug=False)
+
+        server_DH_params = rpc.server_DH_params(data)
         assert resPQ.nonce == server_DH_params.nonce
         assert resPQ.server_nonce == server_DH_params.server_nonce
 
@@ -175,10 +172,12 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
         g_b_str = long_to_bytes(g_b)
 
-        data = rpc.client_DH_inner_data(nonce=resPQ.nonce,
+        client_DH_inner_data = rpc.client_DH_inner_data(nonce=resPQ.nonce,
                                         server_nonce=resPQ.server_nonce,
                                         retry_id=retry_id,
                                         g_b=g_b_str)
+
+        data = client_DH_inner_data.get_bytes()
 
         data_with_sha = SHA.new(data).digest()+data
         data_with_sha_padded = data_with_sha + os.urandom(-len(data_with_sha) % 16)
@@ -204,7 +203,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             assert Set_client_DH_params_answer.nonce == resPQ.nonce
             assert Set_client_DH_params_answer.server_nonce == resPQ.server_nonce
 
-            if Set_client_DH_params_answer.status == '_ok':
+            if Set_client_DH_params_answer.status == 'ok':
                 assert Set_client_DH_params_answer.new_nonce_hash == new_nonce_hash1
                 print("Diffie Hellman key exchange processed successfully")
 
@@ -223,8 +222,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             else:
                 raise Exception("Response Error")
 
-
-
     def generate_message_id(self):
         msg_id = int(time() * 2**32)
         if self.last_msg_id > msg_id:
@@ -241,16 +238,21 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                    struct.pack('<I', len(message_data)) +
                    message_data)
 
-        message = struct.pack('<II', len(message)+12, 0) + message
+        message = struct.pack('<II', len(message)+12, self.number) + message
         msg_chksum = crc32(message)
         message += struct.pack('<I', msg_chksum)
 
         self.sock.send(message)
+        self.number += 1
 
-    def recv_message(self):
+    def recv_message(self, debug=False):
         """
         Reading socket and receiving message from server. Check the CRC32.
         """
+        if debug:
+            packet = self.sock.recv(1024)  # reads how many bytes to read
+            hexdump(packet)
+
         packet_length_data = self.sock.recv(4)  # reads how many bytes to read
 
         if len(packet_length_data) < 4:
@@ -282,6 +284,10 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         else:
             raise Exception("Got unknown auth_key id")
         return data
+
+    def __del__(self):
+        # cleanup
+        self.sock.close()
 
 
 

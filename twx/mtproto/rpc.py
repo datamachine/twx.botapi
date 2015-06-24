@@ -1,6 +1,7 @@
 from abc import ABCMeta
 import struct
 from io import BytesIO
+from hexdump import hexdump
 
 def vis(bs):
     """
@@ -115,11 +116,11 @@ class resPQ:
         assert struct.unpack('<I', bytes_io.read(4))[0] == 0x1cb5c415  # long vector
         count = struct.unpack('<l', bytes_io.read(4))[0]
         for _ in range(count):
-            self.server_public_key_fingerprints.append(struct.unpack('<Q', bytes_io.read(8))[0])
+            self.server_public_key_fingerprints.append(struct.unpack('<q', bytes_io.read(8))[0])
 
 
 class p_q_inner_data:
-    constructor = 0x083c95aec
+    constructor = 0x83c95aec
 
     def __init__(self, nonce=None, server_nonce=None, new_nonce=None, pq=None, p=None, q=None):
         self.nonce = nonce
@@ -132,8 +133,39 @@ class p_q_inner_data:
     def get_bytes(self):
         """ p_q_inner_data#83c95aec pq:bytes p:bytes q:bytes nonce:int128 server_nonce:int128 new_nonce:int256 = P_Q_inner_data """
 
-        return struct.pack("<I12s8s8s16s16s32s", req_pq.constructor, self.pq, self.p, self.q,
+        pq_io = BytesIO()
+        serialize_string(pq_io, self.pq)
+        serialize_string(pq_io, self.p)
+        serialize_string(pq_io, self.q)
+
+        print("\nPQ")
+        hexdump(self.pq)
+
+        print("\nP")
+        hexdump(self.p)
+
+        print("\nQ")
+        hexdump(self.q)
+
+        print("\nPQ_io")
+        hexdump(pq_io.getvalue())
+
+        print("\nnonce")
+        hexdump(self.nonce)
+
+        print("\nserver_nonce")
+        hexdump(self.server_nonce)
+
+        print("\nnew_nonce")
+        hexdump(self.new_nonce)
+
+        ret = struct.pack("<I28s16s16s32s", p_q_inner_data.constructor, pq_io.getvalue(),
                            self.nonce, self.server_nonce, self.new_nonce)
+
+        print("\np_q_inner_data")
+        hexdump(ret)
+
+        return ret
 
 class req_DH_params:
     constructor = 0xd712e4be
@@ -150,18 +182,18 @@ class req_DH_params:
     def get_bytes(self):
         """req_DH_params#d712e4be nonce:int128 server_nonce:int128 p:bytes q:bytes public_key_fingerprint:long encrypted_data:bytes = Server_DH_Params"""
 
-        p_io = BytesIO()
-        serialize_string(p_io, self.p)
-        q_io = BytesIO(self.q)
-        serialize_string(q_io, self.q)
+        pq_io = BytesIO()
+        serialize_string(pq_io, self.p)
+        serialize_string(pq_io, self.q)
 
-        ret = struct.pack("<I16s16s8s8sQ", req_DH_params.constructor, self.nonce, self.server_nonce,
-                          p_io.getvalue(), q_io.getvalue(), self.public_key_fingerprint)
+        ret = struct.pack("<I16s16s16sq", req_DH_params.constructor, self.nonce, self.server_nonce,
+                          pq_io.getvalue(), self.public_key_fingerprint)
 
         bytes_io = BytesIO()
         bytes_io.write(ret)
-        print_bytes(self.encrypted_data)
+
         serialize_string(bytes_io, self.encrypted_data)
+
         return bytes_io.getvalue()
 
 class server_DH_params:
@@ -208,6 +240,8 @@ class server_DH_inner_data:
         """server_DH_inner_data#b5890dba nonce:int128 server_nonce:int128 g:int dh_prime:bytes g_a:bytes server_time:int = Server_DH_inner_data"""
         bytes_io = BytesIO(data)
 
+        assert struct.unpack("<I", bytes_io.read(4))[0] == 0xb5890dba
+
         self.nonce = bytes_io.read(16)
         self.server_nonce = bytes_io.read(16)
 
@@ -234,7 +268,8 @@ class client_DH_inner_data:
         ret = struct.pack("<I16s16sQ", client_DH_inner_data.constructor, self.nonce, self.server_nonce,
                            self.retry_id)
 
-        bytes_io = BytesIO(ret)
+        bytes_io = BytesIO()
+        bytes_io.write(ret)
         serialize_string(bytes_io, self.g_b)
 
         return bytes_io.getvalue()
@@ -252,7 +287,8 @@ class set_client_DH_params:
 
         ret = struct.pack("<I16s16s", set_client_DH_params.constructor, self.nonce, self.server_nonce)
 
-        bytes_io = BytesIO(ret)
+        bytes_io = BytesIO()
+        bytes_io.write(ret)
         serialize_string(bytes_io, self.encrypted_data)
 
         return bytes_io.getvalue()
@@ -278,9 +314,9 @@ class set_client_DH_params_answer:
         self.server_nonce = bytes_io.read(16)
         self.new_nonce_hash = bytes_io.read(16)
 
-        if constructor is set_client_DH_params_answer.constructor_ok:
+        if constructor == set_client_DH_params_answer.constructor_ok:
             self.status = "ok"
-        elif constructor is set_client_DH_params_answer.constructor_retry:
+        elif constructor == set_client_DH_params_answer.constructor_retry:
             self.status = "retry"
         else:
             self.status = "fail"
