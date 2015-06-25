@@ -228,23 +228,23 @@ class sendPhotoRequest(TelegramBotRPCRequest):
 
 class TelegramBotRPC:
     @staticmethod
-    def get_me(token, callback=None, request_method :RequestMethod=RequestMethod.GET):
+    def get_me(token, callback=None, request_method: RequestMethod=RequestMethod.GET):
         return getMeRequest(token, callback, request_method).run()
 
     @staticmethod
-    def send_message(token, chat_id :int, text :str, disable_web_page_preview :bool=None, 
-                     reply_to_message_id :int=None, reply_markup :ReplyMarkup=None, 
-                     callback=None, request_method :RequestMethod=RequestMethod.GET):
+    def send_message(token, chat_id: int, text: str, disable_web_page_preview: bool=None, 
+                     reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, 
+                     callback=None, request_method: RequestMethod=RequestMethod.GET):
 
         return sendMessageRequest(token, chat_id, text, disable_web_page_preview, reply_to_message_id, reply_markup,
                                   callback, request_method).run()
 
     @staticmethod
-    def send_photo(token, chat_id :int, photo :str=None, photo_id :str=None, caption :str=None, reply_to_message_id :int=None,
-                   reply_markup :ReplyMarkup=None, callback=None, request_method :RequestMethod=RequestMethod.POST):
+    def send_photo(token, chat_id: int, photo: str=None, photo_id: str=None, caption: str=None, reply_to_message_id: int=None,
+                   reply_markup: ReplyMarkup=None, callback=None, request_method: RequestMethod=RequestMethod.POST):
 
         return sendPhotoRequest(token, chat_id, caption, reply_to_message_id, reply_markup,
-                                  callback, request_method, photo=photo, photo_id=photo_id).run()
+                                callback, request_method, photo=photo, photo_id=photo_id).run()
 
 
 
@@ -255,10 +255,10 @@ if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
     config.read("test.conf")
-    token = config['Test']['token']
+    test_token = config['Test']['token']
     test_chat_id = config['Test']['chat_id']
 
-    TelegramBotRPC.get_me(token, callback=print_result)
-    TelegramBotRPC.send_message(token, test_chat_id, 'testing', callback=print_result)
-    TelegramBotRPC.send_photo(token, test_chat_id, photo='test.jpg', callback=print_result)
-    TelegramBotRPC.send_photo(token, test_chat_id, photo_id='AgADAwADqacxGwpPWQaFLwABSzSkg2Bq-usqAASiGyniRUnk5BdEAAIC', callback=print_result)
+    TelegramBotRPC.get_me(test_token, callback=print_result)
+    TelegramBotRPC.send_message(test_token, test_chat_id, 'testing', callback=print_result)
+    TelegramBotRPC.send_photo(test_token, test_chat_id, photo='test.jpg', callback=print_result)
+    TelegramBotRPC.send_photo(test_token, test_chat_id, photo_id='AgADAwADqacxGwpPWQaFLwABSzSkg2Bq-usqAASiGyniRUnk5BdEAAIC', callback=print_result)
