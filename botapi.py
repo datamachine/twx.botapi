@@ -152,7 +152,7 @@ class sendMessageRequest(TelegramBotRPCRequest):
                  reply_to_message_id, reply_markup, 
                  callback=None, request_method=None):
 
-        params = self.cleanup_params(token=token, chat_id=chat_id, text=text, 
+        params = self.cleanup_params(chat_id=chat_id, text=text, 
                                      disable_web_page_preview=disable_web_page_preview, 
                                      reply_to_message_id=reply_to_message_id, reply_markup=reply_markup)
 
