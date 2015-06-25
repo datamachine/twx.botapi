@@ -1,4 +1,5 @@
 from requests import Request, Session
+import mimetypes
 from collections import namedtuple
 from enum import Enum
 from abc import ABCMeta, abstractmethod
@@ -86,6 +87,12 @@ class RequestMethod(str, Enum):
     GET = 'GET'
     POST = 'POST'
 
+class MediaType(str, Enum):
+    Photo = 'Photo'
+    Video = 'Video'
+    Audio = 'Audio'
+    Document = 'Document'
+
 class TelegramBotRPCRequest(metaclass=ABCMeta):
     api_url_base = 'https://api.telegram.org/bot'
 
@@ -134,6 +141,24 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
 
     def cleanup_params(self, **kwargs):
         return {name:val for name, val in kwargs.items() if val is not None}
+
+    def get_mimetype(self, media_type: MediaType, filename: str):
+        mimetype = mimetypes.guess_type(filename, strict=False)[0]
+        if media_type == MediaType.Photo:
+            if not mimetype:
+                mimetype = 'image/jpeg'
+        elif media_type == MediaType.Audio:
+            if not mimetype:
+                mimetype = 'audio/ogg'
+        elif media_type == MediaType.Video:
+            if not mimetype:
+                mimetype = 'video/mp4'
+
+        if not mimetype:
+            mimetype = 'application/octet-stream'
+
+        return mimetype
+
 
 class getMeRequest(TelegramBotRPCRequest):
     def __init__(self, token, callback=None, request_method=None):
@@ -191,7 +216,7 @@ class sendPhotoRequest(TelegramBotRPCRequest):
         if photo_id:
             photo = photo_id
         else:
-            files = {'photo': (photo, open(photo, 'rb'), 'image/jpeg')}
+            files = {'photo': (photo, open(photo, 'rb'), self.get_mimetype(MediaType.Photo, photo))}
 
         params = self.cleanup_params(token=token, chat_id=chat_id, photo=photo, caption=caption,
                                      reply_to_message_id=reply_to_message_id, reply_markup=reply_markup)
@@ -227,6 +252,188 @@ class sendPhotoRequest(TelegramBotRPCRequest):
             group_chat_created=result.get('group_chat_created')
         )
 
+
+class sendVideoRequest(TelegramBotRPCRequest):
+    def __init__(self, token, chat_id, caption, reply_to_message_id, reply_markup,
+                 callback=None, request_method=None, video_id=None, video=None):
+
+        files = None
+
+        if video_id:
+            video = video_id
+        else:
+            files = {'video': (video, open(video, 'rb'), self.get_mimetype(MediaType.Video, video))}
+
+        params = self.cleanup_params(token=token, chat_id=chat_id, video=video, caption=caption,
+                                     reply_to_message_id=reply_to_message_id, reply_markup=reply_markup)
+
+        print('sendVideoRequest', params)
+
+        super().__init__('sendVideo', token=token, params=params, callback=callback,
+                         files=files, request_method=request_method)
+
+    def _call_result(self, api_response):
+        result = api_response['result']
+        return Message(
+            message_id=result.get('message_id'),
+            sender=result.get('from'),
+            date=result.get('date'),
+            chat=result.get('chat'),
+            forward_from=result.get('forward_from'),
+            forward_date=result.get('forward_date'),
+            reply_to_message=result.get('reply_to_message'),
+            text=result.get('text'),
+            audio=result.get('audio'),
+            document=result.get('document'),
+            photo=result.get('photo'),
+            sticker=result.get('sticker'),
+            video=result.get('video'),
+            contact=result.get('contact'),
+            location=result.get('location'),
+            new_chat_participant=result.get('new_chat_participant'),
+            left_chat_participant=result.get('left_chat_participant'),
+            new_chat_title=result.get('new_chat_title'),
+            new_chat_photo=result.get('new_chat_photo'),
+            delete_chat_photo=result.get('delete_chat_photo'),
+            group_chat_created=result.get('group_chat_created')
+        )
+
+class sendAudioRequest(TelegramBotRPCRequest):
+    def __init__(self, token, chat_id, reply_to_message_id, reply_markup,
+                 callback=None, request_method=None, audio_id=None, audio=None):
+
+        files = None
+
+        if audio_id:
+            audio = audio_id
+        else:
+            files = {'audio': (audio, open(audio, 'rb'), self.get_mimetype(MediaType.Audio, audio))}
+
+        params = self.cleanup_params(token=token, chat_id=chat_id, audio=audio,
+                                     reply_to_message_id=reply_to_message_id, reply_markup=reply_markup)
+
+        print('sendAudioRequest', params)
+
+        super().__init__('sendAudio', token=token, params=params, callback=callback,
+                         files=files, request_method=request_method)
+
+    def _call_result(self, api_response):
+        result = api_response['result']
+        return Message(
+            message_id=result.get('message_id'),
+            sender=result.get('from'),
+            date=result.get('date'),
+            chat=result.get('chat'),
+            forward_from=result.get('forward_from'),
+            forward_date=result.get('forward_date'),
+            reply_to_message=result.get('reply_to_message'),
+            text=result.get('text'),
+            audio=result.get('audio'),
+            document=result.get('document'),
+            photo=result.get('photo'),
+            sticker=result.get('sticker'),
+            video=result.get('video'),
+            contact=result.get('contact'),
+            location=result.get('location'),
+            new_chat_participant=result.get('new_chat_participant'),
+            left_chat_participant=result.get('left_chat_participant'),
+            new_chat_title=result.get('new_chat_title'),
+            new_chat_photo=result.get('new_chat_photo'),
+            delete_chat_photo=result.get('delete_chat_photo'),
+            group_chat_created=result.get('group_chat_created')
+        )
+
+class sendDocumentRequest(TelegramBotRPCRequest):
+    def __init__(self, token, chat_id, caption, reply_to_message_id, reply_markup,
+                 callback=None, request_method=None, document_id=None, document=None):
+
+        files = None
+
+        if document_id:
+            document = document_id
+        else:
+            files = {'document': (document, open(document, 'rb'), self.get_mimetype(MediaType.Document, document))}
+
+        params = self.cleanup_params(token=token, chat_id=chat_id, document=document, caption=caption,
+                                     reply_to_message_id=reply_to_message_id, reply_markup=reply_markup)
+
+        print('sendDocumentRequest', params)
+
+        super().__init__('sendDocument', token=token, params=params, callback=callback,
+                         files=files, request_method=request_method)
+
+    def _call_result(self, api_response):
+        result = api_response['result']
+        return Message(
+            message_id=result.get('message_id'),
+            sender=result.get('from'),
+            date=result.get('date'),
+            chat=result.get('chat'),
+            forward_from=result.get('forward_from'),
+            forward_date=result.get('forward_date'),
+            reply_to_message=result.get('reply_to_message'),
+            text=result.get('text'),
+            audio=result.get('audio'),
+            document=result.get('document'),
+            photo=result.get('photo'),
+            sticker=result.get('sticker'),
+            video=result.get('video'),
+            contact=result.get('contact'),
+            location=result.get('location'),
+            new_chat_participant=result.get('new_chat_participant'),
+            left_chat_participant=result.get('left_chat_participant'),
+            new_chat_title=result.get('new_chat_title'),
+            new_chat_photo=result.get('new_chat_photo'),
+            delete_chat_photo=result.get('delete_chat_photo'),
+            group_chat_created=result.get('group_chat_created')
+        )
+
+class sendStickerRequest(TelegramBotRPCRequest):
+    def __init__(self, token, chat_id, caption, reply_to_message_id, reply_markup,
+                 callback=None, request_method=None, sticker_id=None, sticker=None):
+
+        files = None
+
+        if sticker_id:
+            sticker = sticker_id
+        else:
+            files = {'sticker': (sticker, open(sticker, 'rb'), 'image/webp')}
+
+        params = self.cleanup_params(token=token, chat_id=chat_id, sticker=sticker, caption=caption,
+                                     reply_to_message_id=reply_to_message_id, reply_markup=reply_markup)
+
+        print('sendStickerRequest', params)
+
+        super().__init__('sendSticker', token=token, params=params, callback=callback,
+                         files=files, request_method=request_method)
+
+    def _call_result(self, api_response):
+        result = api_response['result']
+        return Message(
+            message_id=result.get('message_id'),
+            sender=result.get('from'),
+            date=result.get('date'),
+            chat=result.get('chat'),
+            forward_from=result.get('forward_from'),
+            forward_date=result.get('forward_date'),
+            reply_to_message=result.get('reply_to_message'),
+            text=result.get('text'),
+            audio=result.get('audio'),
+            document=result.get('document'),
+            photo=result.get('photo'),
+            sticker=result.get('sticker'),
+            video=result.get('video'),
+            contact=result.get('contact'),
+            location=result.get('location'),
+            new_chat_participant=result.get('new_chat_participant'),
+            left_chat_participant=result.get('left_chat_participant'),
+            new_chat_title=result.get('new_chat_title'),
+            new_chat_photo=result.get('new_chat_photo'),
+            delete_chat_photo=result.get('delete_chat_photo'),
+            group_chat_created=result.get('group_chat_created')
+        )
+
+
 class TelegramBotRPC:
     @staticmethod
     def get_me(token, callback=None, request_method: RequestMethod=RequestMethod.GET):
@@ -250,6 +457,50 @@ class TelegramBotRPC:
 
         return sendPhotoRequest(token, chat_id, caption, reply_to_message_id, reply_markup,
                                 callback, request_method, photo=photo, photo_id=photo_id).run()
+    
+    @staticmethod
+    def send_video(token, chat_id: int, video: str=None, video_id: str=None, caption: str=None,
+                   reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, callback=None,
+                   request_method: RequestMethod=RequestMethod.POST):
+
+        if bool(video) == bool(video_id):
+            raise TypeError("sendVideoRequest() requires either video or video_id kwarg must be set.")
+
+        return sendVideoRequest(token, chat_id, caption, reply_to_message_id, reply_markup,
+                                callback, request_method, video=video, video_id=video_id).run()
+
+    @staticmethod
+    def send_audio(token, chat_id: int, audio: str=None, audio_id: str=None,
+                   reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, callback=None,
+                   request_method: RequestMethod=RequestMethod.POST):
+
+        if bool(audio) == bool(audio_id):
+            raise TypeError("sendAudioRequest() requires either audio or audio_id kwarg must be set.")
+
+        return sendAudioRequest(token, chat_id, reply_to_message_id, reply_markup,
+                                callback, request_method, audio=audio, audio_id=audio_id).run()
+
+    @staticmethod
+    def send_document(token, chat_id: int, document: str=None, document_id: str=None, caption: str=None,
+                   reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, callback=None,
+                   request_method: RequestMethod=RequestMethod.POST):
+
+        if bool(document) == bool(document_id):
+            raise TypeError("sendDocumentRequest() requires either document or document_id kwarg must be set.")
+
+        return sendDocumentRequest(token, chat_id, caption, reply_to_message_id, reply_markup,
+                                callback, request_method, document=document, document_id=document_id).run()
+    
+    @staticmethod
+    def send_sticker(token, chat_id: int, sticker: str=None, sticker_id: str=None, caption: str=None,
+                   reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, callback=None,
+                   request_method: RequestMethod=RequestMethod.POST):
+
+        if bool(sticker) == bool(sticker_id):
+            raise TypeError("sendStickerRequest() requires either sticker or sticker_id kwarg must be set.")
+
+        return sendStickerRequest(token, chat_id, caption, reply_to_message_id, reply_markup,
+                                callback, request_method, sticker=sticker, sticker_id=sticker_id).run()
 
 
 
@@ -265,9 +516,20 @@ if __name__ == '__main__':
 
     TelegramBotRPC.get_me(test_token, callback=print_result)
     TelegramBotRPC.send_message(test_token, test_chat_id, 'testing', callback=print_result)
-    TelegramBotRPC.send_photo(test_token, test_chat_id,
+    TelegramBotRPC.send_photo(test_token, test_chat_id, caption="BENDER",
                               photo='test.jpg',
                               callback=print_result)
     TelegramBotRPC.send_photo(test_token, test_chat_id,
                               photo_id='AgADAwADqacxGwpPWQaFLwABSzSkg2Bq-usqAASiGyniRUnk5BdEAAIC',
                               callback=print_result)
+    TelegramBotRPC.send_video(test_token, test_chat_id,
+                              video='test.mp4',
+                              callback=print_result)
+    # Returns 400: Bad Request, not sure why.
+    #TelegramBotRPC.send_audio(test_token, test_chat_id,
+    #                          audio='test.ogg',
+    #                          callback=print_result)
+
+    # Long poll for a request
+
+
