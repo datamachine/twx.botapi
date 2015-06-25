@@ -158,27 +158,27 @@ class sendMessageRequest(TelegramBotRPCRequest):
     def _call_result(self, api_response):
         result = api_response['result']
         return Message(
-                message_id=result.get('message_id'),
-                sender=result.get('from'),
-                date=result.get('date'),
-                chat=result.get('chat'),
-                forward_from=result.get('forward_from'),
-                forward_date=result.get('forward_date'),
-                reply_to_message=result.get('reply_to_message'),
-                text=result.get('text'),
-                audio=result.get('audio'),
-                document=result.get('document'),
-                photo=result.get('photo'),
-                sticker=result.get('sticker'),
-                video=result.get('video'),
-                contact=result.get('contact'),
-                location=result.get('location'),
-                new_chat_participant=result.get('new_chat_participant'),
-                left_chat_participant=result.get('left_chat_participant'),
-                new_chat_title=result.get('new_chat_title'),
-                new_chat_photo=result.get('new_chat_photo'),
-                delete_chat_photo=result.get('delete_chat_photo'),
-                group_chat_created=result.get('group_chat_created')
+            message_id=result.get('message_id'),
+            sender=result.get('from'),
+            date=result.get('date'),
+            chat=result.get('chat'),
+            forward_from=result.get('forward_from'),
+            forward_date=result.get('forward_date'),
+            reply_to_message=result.get('reply_to_message'),
+            text=result.get('text'),
+            audio=result.get('audio'),
+            document=result.get('document'),
+            photo=result.get('photo'),
+            sticker=result.get('sticker'),
+            video=result.get('video'),
+            contact=result.get('contact'),
+            location=result.get('location'),
+            new_chat_participant=result.get('new_chat_participant'),
+            left_chat_participant=result.get('left_chat_participant'),
+            new_chat_title=result.get('new_chat_title'),
+            new_chat_photo=result.get('new_chat_photo'),
+            delete_chat_photo=result.get('delete_chat_photo'),
+            group_chat_created=result.get('group_chat_created')
         )
 
 
@@ -206,28 +206,28 @@ class sendPhotoRequest(TelegramBotRPCRequest):
     def _call_result(self, api_response):
         result = api_response['result']
         return Message(
-                message_id=result.get('message_id'),
-                sender=result.get('from'),
-                date=result.get('date'),
-                chat=result.get('chat'),
-                forward_from=result.get('forward_from'),
-                forward_date=result.get('forward_date'),
-                reply_to_message=result.get('reply_to_message'),
-                text=result.get('text'),
-                audio=result.get('audio'),
-                document=result.get('document'),
-                photo=result.get('photo'),
-                sticker=result.get('sticker'),
-                video=result.get('video'),
-                contact=result.get('contact'),
-                location=result.get('location'),
-                new_chat_participant=result.get('new_chat_participant'),
-                left_chat_participant=result.get('left_chat_participant'),
-                new_chat_title=result.get('new_chat_title'),
-                new_chat_photo=result.get('new_chat_photo'),
-                delete_chat_photo=result.get('delete_chat_photo'),
-                group_chat_created=result.get('group_chat_created')
-            )
+            message_id=result.get('message_id'),
+            sender=result.get('from'),
+            date=result.get('date'),
+            chat=result.get('chat'),
+            forward_from=result.get('forward_from'),
+            forward_date=result.get('forward_date'),
+            reply_to_message=result.get('reply_to_message'),
+            text=result.get('text'),
+            audio=result.get('audio'),
+            document=result.get('document'),
+            photo=result.get('photo'),
+            sticker=result.get('sticker'),
+            video=result.get('video'),
+            contact=result.get('contact'),
+            location=result.get('location'),
+            new_chat_participant=result.get('new_chat_participant'),
+            left_chat_participant=result.get('left_chat_participant'),
+            new_chat_title=result.get('new_chat_title'),
+            new_chat_photo=result.get('new_chat_photo'),
+            delete_chat_photo=result.get('delete_chat_photo'),
+            group_chat_created=result.get('group_chat_created')
+        )
 
 class TelegramBotRPC:
     @staticmethod
