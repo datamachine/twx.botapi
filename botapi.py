@@ -346,7 +346,7 @@ def send_message(token, chat_id: int, text: str,
     return TelegramBotRPCRequest('sendMessage', token, params=params, request_method=request_method,
         on_result=Message.from_result, on_error=on_error, callback=callback).run()
 
-def forward_message(token, chat_id, from_chat_id, message_id
+def forward_message(token, chat_id, from_chat_id, message_id,
                     *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.GET):
     """
     Use this method to forward messages of any kind. 
@@ -434,7 +434,43 @@ def send_audio(token, chat_id: int, audio: InputFile, reply_to_message_id: int=N
     #TODO: implement
     return None
 
+def send_document(token, chat_id, document, reply_to_message_id=None, reply_markup=None):
+    """
+    :param chat_id: 
+    :param document: 
+    :param reply_to_message_id: 
+    :param reply_markup: 
 
+    :type chat_id: 
+    :type document: 
+    :type reply_to_message_id: 
+    :type reply_markup: 
+
+    :returns:
+    :rtype:
+    """
+    # TODO: Implement
+    return None
+
+def send_sticker(token, chat_id, sticker, reply_to_message_id, reply_markup):
+    """
+    :param token: 
+    :param chat_id: 
+    :param sticker: 
+    :param reply_to_message_id: 
+    :param reply_markup: 
+
+    :type token: 
+    :type chat_id: 
+    :type sticker: 
+    :type reply_to_message_id: 
+    :type reply_markup: 
+
+    :returns:
+    :rtype:
+    """
+    #TODO: implement
+    return None
 
 def print_result(result):
     print(result)
