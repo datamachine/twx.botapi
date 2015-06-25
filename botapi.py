@@ -1,8 +1,4 @@
-import json
-from urllib.parse import urlsplit, SplitResult, quote as urlquote, urlencode
-from urllib.request import Request, urlopen
-import requests
-import os
+from requests import Request, Session
 from collections import namedtuple
 from enum import Enum
 from abc import ABCMeta, abstractmethod
@@ -89,59 +85,45 @@ class RequestMethod(str, Enum):
     POST = 'POST'
 
 class TelegramBotRPCRequest(metaclass=ABCMeta):
-    api_url = 'https://api.telegram.org'
-    split_api_url = urlsplit(api_url)
+    api_url_base = 'https://api.telegram.org/bot'
 
     def __init__(self, api_method, token, params, callback, files=None, request_method=RequestMethod.GET):
-        """
-
-        :param api_method:
-        :param token:
-        :param params:
-        :param callback:
-        :param files:
-        :param request_method:
-        :return:
-        """
         self.api_method = api_method
         self.token = token
         self.callback = callback
         self.params = params
+        self.files = files
         self.request_method = request_method
         self.result = None
 
-    def _get_path(self):
-        return 'bot{}/{}'.format(self.token, self.api_method)
-
-    def _get_url(self, query):
-        return SplitResult(scheme=TelegramBotRPCRequest.split_api_url.scheme,
-                           netloc=TelegramBotRPCRequest.split_api_url.netloc,
-                           path=self._get_path(),
-                           query=query,
-                           fragment=None).geturl()
+    def _get_url(self):
+        return '{base_url}{token}/{method}'.format(base_url=TelegramBotRPCRequest.api_url_base,
+                                                   token=self.token,
+                                                   method=self.api_method)
 
     def _get_request(self):
-        data, query = None, None
+        data, files = None, None
         if self.params is not None:
-            if self.request_method == RequestMethod.POST:
-                data = urlencode(self.params).encode()
-            else:
-                query = urlencode(self.params)
+            data = self.params
+        if self.files is not None:
+            files = self.files
 
-        return Request(self._get_url(query), data)
+        return Request(self.request_method, self._get_url(), data=data, files=files).prepare()
 
     @abstractmethod
     def _call_result(self, api_response):
         raise NotImplemented
 
     def _async_call(self, callback):
+        s = Session()
         request = self._get_request()
-        print(request.get_full_url())
-        with urlopen(request) as f:
-            api_response = json.loads(f.read().decode())
-            self.result = self._call_result(api_response)
-            if callback is not None:
-                callback(self.result)
+        print(request.body)
+        resp = s.send(request)
+        api_response = resp.json()
+        print(api_response)
+        self.result = self._call_result(api_response)
+        if callback is not None:
+            callback(self.result)
         return None
 
     def run(self):
@@ -206,10 +188,10 @@ class sendPhotoRequest(TelegramBotRPCRequest):
                                      reply_to_message_id=reply_to_message_id, reply_markup=reply_markup)
 
         try:
-            photo = int(photo)
+            params['photo'] = int(photo)
         except ValueError:
             # we don't have a photo_id, send new file
-            files = {photo: open(photo)}
+            files = {'photo': (photo, open(photo, 'rb'), 'image/jpeg')}
 
         print('sendPhotoRequest', params)
 
@@ -273,6 +255,6 @@ if __name__ == '__main__':
     token = config['Test']['token']
     test_chat_id = config['Test']['chat_id']
 
-    #TelegramBotRPC.get_me(token, callback=print_result)
-    #TelegramBotRPC.send_message(token, test_chat_id, 'testing', callback=print_result)
+    TelegramBotRPC.get_me(token, callback=print_result)
+    TelegramBotRPC.send_message(token, test_chat_id, 'testing', callback=print_result)
     TelegramBotRPC.send_photo(token, test_chat_id, 'test.jpg', callback=print_result)
