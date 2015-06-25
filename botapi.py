@@ -306,7 +306,8 @@ def get_me(token, *, callback=None, on_error=None, request_method: RequestMethod
     A simple method for testing your bot's auth token. Requires no parameters. 
     Returns basic information about the bot in form of a User object.
 
-    :returns: User
+    :returns: Returns basic information about the bot in form of a User object.
+    :rtype: User
     """
     return TelegramBotRPCRequest('getMe', token, request_method=request_method,
         on_result=User.from_result, on_error=on_error, callback=callback).run()
@@ -315,7 +316,7 @@ def send_message(token, chat_id: int, text: str,
                  disable_web_page_preview: bool=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, 
                  *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.GET):
     """
-    Use this method to send text messages. On success, the sent Message is returned.
+    Use this method to send text messages. 
 
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
     :param text: Text of the message to be sent
@@ -324,7 +325,15 @@ def send_message(token, chat_id: int, text: str,
     :param reply_markup: Additional interface options. A JSON-serialized object for a 
                          custom reply keyboard, instructions to hide keyboard or to 
                          force a reply from the user.
-    :returns: Message
+
+    :type chat_id: int
+    :type text: str
+    :type disable_web_page_preview: bool
+    :type reply_to_message_id: int
+    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+
+    :returns: On success, the sent Message is returned.
+    :rtype: Message
     """    
     params = _cleanup_params(
         chat_id=chat_id, 
@@ -341,7 +350,7 @@ def send_photo(token, chat_id: int,  photo: InputFile,
                caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
                *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.POST):
     """
-    Use this method to send photos. On success, the sent Message is returned.
+    Use this method to send photos.
 
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
     :param photo: Photo to send. You can either pass a file_id as String to resend a 
@@ -352,7 +361,15 @@ def send_photo(token, chat_id: int,  photo: InputFile,
     :param reply_markup: Additional interface options. A JSON-serialized object for a 
                          custom reply keyboard, instructions to hide keyboard or to 
                          force a reply from the user.
-    :returns: Message
+
+    :type chat_id: int
+    :type photo: InputFile or str
+    :type caption: str
+    :type reply_to_message_id: int
+    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+
+    :returns: On success, the sent Message is returned.
+    :rtype: Message
     """
 
     files = None
@@ -372,6 +389,30 @@ def send_photo(token, chat_id: int,  photo: InputFile,
 
     return TelegramBotRPCRequest('sendPhoto', token, params=params, files=files, request_method=request_method,
         on_result=Message.from_result, on_error=on_error, callback=callback).run()
+
+def send_audio(token, chat_id: int, audio: InputFile, reply_to_message_id: int=None, reply_markup: ReplyKeyboardMarkup=None):
+    """
+    Use this method to send audio files, if you want Telegram clients to display the file as a playable voice
+    message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent 
+    as Document). 
+
+    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param audio: Audio file to send. You can either pass a file_id as String to resend an audio that is already on
+                  the Telegram servers, or upload a new audio file using multipart/form-data.
+    :param reply_to_message_id: If the message is a reply, ID of the original message
+    :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard, 
+                         instructions to hide keyboard or to force a reply from the user.
+
+    :type chat_id: int
+    :type audio: InputFile or str
+    :type reply_to_message_id: int
+    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+
+    :returns: On success, the sent Message is returned.
+    :rtype: Message
+    """
+    #TODO: implement
+    return None
 
 
 
