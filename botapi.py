@@ -23,7 +23,8 @@ _ReplyKeyboardMarkupBase = namedtuple('ReplyKeyboardMarkup', ['keyboard', 'resiz
                                                               'one_time_keyboard', 'selective'])
 _ReplyKeyboardHideBase = namedtuple('ReplyKeyboardHide', ['hide_keyboard', 'selective'])
 _ForceReplyBase = namedtuple('ForceReply', ['force_reply', 'selective'])
-_InputFile = namedtuple('InputFile', [])
+_InputFileInfoBase = namedtuple('InputFileInfo', ['file_name', 'fp', 'mime_type'])
+_InputFileBase = namedtuple('InputFile', ['form', 'file_info' ])
 
 _Error = namedtuple('Error', ['error_code', 'description'])
 
@@ -220,8 +221,12 @@ class ReplyKeyboardHide(_ReplyKeyboardHideBase, ReplyMarkup):
 class ForceReply(_ForceReplyBase, ReplyMarkup):
     __slots__ = ()
 
-class InputFile(_InputFile):
+class InputFileInfo(_InputFileInfoBase):
     __slots__ = ()
+
+class InputFile(_InputFileBase):
+    __slots__ = ()
+
 
 class Error(_Error):
     __slots__ = ()
@@ -320,15 +325,16 @@ class sendMessageRequest(TelegramBotRPCRequest):
 
 
 class sendPhotoRequest(TelegramBotRPCRequest):
-    def __init__(self, token, chat_id, caption, reply_to_message_id, reply_markup, photo_id=None, photo=None,
+    def __init__(self, token, chat_id, photo, caption=None, reply_to_message_id=None, reply_markup=None,
                  *, callback=None, on_error=None, request_method=None):
 
         files = None
+        if isinstance(photo, InputFile):
+            files = [photo]
+            photo = None
+        elif not isinstance(photo, str):
+            raise Exception('photo must be instance of InputFile or str')
 
-        if photo_id:
-            photo = photo_id
-        else:
-            files = {'photo': (photo, open(photo, 'rb'), 'image/jpeg')}
 
         params = self.cleanup_params(token=token, chat_id=chat_id, photo=photo, caption=caption,
                                      reply_to_message_id=reply_to_message_id, reply_markup=reply_markup)
@@ -337,9 +343,7 @@ class sendPhotoRequest(TelegramBotRPCRequest):
                          files=files, request_method=request_method)
 
     def _call_result(self, api_response):
-        print(api_response)
-        result = api_response['result']
-        return Message.from_result(result)
+        return Message.from_result(api_response['result'])
 
 class TelegramBotRPC:
     @staticmethod
@@ -355,14 +359,12 @@ class TelegramBotRPC:
                                   callback=callback, on_error=on_error, request_method=request_method).run()
 
     @staticmethod
-    def send_photo(token, chat_id: int,  caption: str=None, reply_to_message_id: int=None, 
-                   reply_markup: ReplyMarkup=None, photo: str=None, photo_id: str=None,
+    def send_photo(token, chat_id: int,  photo: InputFile, caption: str=None, 
+                   reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
                    *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.POST):
 
-        if bool(photo) == bool(photo_id):
-            raise TypeError("sendPhotoRequest() requires either photo or photo_id kwarg must be set.")
-
-        return sendPhotoRequest(token, chat_id, caption, reply_to_message_id, reply_markup, photo=photo, photo_id=photo_id,
+        return sendPhotoRequest(token, chat_id, photo, caption=caption, 
+                                reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
                                 callback=callback, on_error=on_error, request_method=request_method).run()
 
 
@@ -380,11 +382,10 @@ if __name__ == '__main__':
     test_token = config['Test']['token']
     test_chat_id = config['Test']['chat_id']
 
+    photo = InputFile('photo', InputFileInfo('test.jpg', open('test.jpg', 'rb'), 'image/jpeg'))
+
     TelegramBotRPC.get_me(test_token, callback=print_result)
     TelegramBotRPC.send_message(test_token, test_chat_id, 'testing', callback=print_result)
-    TelegramBotRPC.send_photo(test_token, test_chat_id,
-                              photo='test.jpg',
-                              callback=print_result)
-    TelegramBotRPC.send_photo(test_token, test_chat_id,
-                              photo_id='AgADAwADqacxGwpPWQaFLwABSzSkg2Bq-usqAASiGyniRUnk5BdEAAIC',
+    TelegramBotRPC.send_photo(test_token, test_chat_id, photo, callback=print_result)
+    TelegramBotRPC.send_photo(test_token, test_chat_id, 'AgADAwADqacxGwpPWQaFLwABSzSkg2Bq-usqAASiGyniRUnk5BdEAAIC',
                               callback=print_result, on_error=print_error)
