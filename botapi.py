@@ -31,181 +31,181 @@ class User(_UserBase):
     __slots__ = ()
 
     @staticmethod
-    def from_result(_dict):
-        if _dict is None:
+    def from_result(result):
+        if result is None:
             return None
 
         return User(
-            id=_dict.get('id'), 
-            first_name=_dict.get('first_name'),
-            last_name=_dict.get('last_name'),
-            username=_dict.get('username')
+            id=result.get('id'), 
+            first_name=result.get('first_name'),
+            last_name=result.get('last_name'),
+            username=result.get('username')
             )
 
 class GroupChat(_GroupChatBase):
     __slots__ = ()
 
     @staticmethod
-    def from_result(_dict):
-        if _dict is None:
+    def from_result(result):
+        if result is None:
             return None
 
         return GroupChat(
-            id=_dict.get('id'), 
-            title=_dict.get('title')
+            id=result.get('id'), 
+            title=result.get('title')
             )
 
 class Message(_MessageBase):
     __slots__ = ()
 
     @staticmethod
-    def from_result(_dict):
-        if _dict is None:
+    def from_result(result):
+        if result is None:
             return None
         return Message(
-            message_id=_dict.get('message_id'), 
-            sender=User.from_result(_dict.get('from')),
-            date=_dict.get('date'),
-            chat=_dict.get('chat'), # TODO: May be User or GroupChat
-            forward_from=User.from_result(_dict.get('forward_from')),
-            forward_date=_dict.get('forward_date'),
-            reply_to_message=Message.from_result(_dict.get('reply_to_message')),
-            text=_dict.get('text'),
-            audio=Audio.from_result(_dict.get('audio')),
-            document=Document.from_result(_dict.get('document')),
-            photo=_dict.get('photo'), # TODO: Array of PhotoSize
-            sticker=Sticker.from_result(_dict.get('sticker')),
-            video=Video.from_result(_dict.get('video')),
-            contact=Contact.from_result(_dict.get('contact')),
-            location=Location.from_result(_dict.get('location')),
-            new_chat_participant=User.from_result(_dict.get('new_chat_participant')),
-            left_chat_participant=User.from_result(_dict.get('left_chat_participant')),
-            new_chat_title=_dict.get('new_chat_title'),
-            new_chat_photo=_dict.get('new_chat_photo'),
-            delete_chat_photo=_dict.get('delete_chat_photo'),
-            group_chat_created=_dict.get('group_chat_created')
+            message_id=result.get('message_id'), 
+            sender=User.from_result(result.get('from')),
+            date=result.get('date'),
+            chat=result.get('chat'), # TODO: May be User or GroupChat
+            forward_from=User.from_result(result.get('forward_from')),
+            forward_date=result.get('forward_date'),
+            reply_to_message=Message.from_result(result.get('reply_to_message')),
+            text=result.get('text'),
+            audio=Audio.from_result(result.get('audio')),
+            document=Document.from_result(result.get('document')),
+            photo=result.get('photo'), # TODO: Array of PhotoSize
+            sticker=Sticker.from_result(result.get('sticker')),
+            video=Video.from_result(result.get('video')),
+            contact=Contact.from_result(result.get('contact')),
+            location=Location.from_result(result.get('location')),
+            new_chat_participant=User.from_result(result.get('new_chat_participant')),
+            left_chat_participant=User.from_result(result.get('left_chat_participant')),
+            new_chat_title=result.get('new_chat_title'),
+            new_chat_photo=result.get('new_chat_photo'),
+            delete_chat_photo=result.get('delete_chat_photo'),
+            group_chat_created=result.get('group_chat_created')
             )
 
 class PhotoSize(_PhotoSizeBase):
     __slots__ = ()
 
     @staticmethod
-    def from_result(_dict):
-        if _dict is None:
+    def from_result(result):
+        if result is None:
             return None
 
         return PhotoSize(
-            file_id=_dict.get('file_id'), 
-            width=_dict.get('width'), 
-            height=_dict.get('height'), 
-            file_size=_dict.get('file_size')
+            file_id=result.get('file_id'), 
+            width=result.get('width'), 
+            height=result.get('height'), 
+            file_size=result.get('file_size')
             )
 
 class Audio(_AudioBase):
     __slots__ = ()
 
     @staticmethod
-    def from_result(_dict):
-        if _dict is None:
+    def from_result(result):
+        if result is None:
             return None
 
         return Audio(
-            file_id=_dict.get('file_id'), 
-            duration=_dict.get('duration'), 
-            mime_type=_dict.get('mime_type'), 
-            file_size=_dict.get('file_size')
+            file_id=result.get('file_id'), 
+            duration=result.get('duration'), 
+            mime_type=result.get('mime_type'), 
+            file_size=result.get('file_size')
             )
 
 class Document(_DocumentBase):
     __slots__ = ()
 
     @staticmethod
-    def from_result(_dict):
-        if _dict is None:
+    def from_result(result):
+        if result is None:
             return None
 
         return Document(
-            file_id=_dict.get('file_id'), 
-            thumb=PhotoSize.from_result(_dict.get('thumb')), 
-            file_name=_dict.get('file_name'), 
-            mime_type=_dict.get('mime_type'), 
-            file_size=_dict.get('file_size') 
+            file_id=result.get('file_id'), 
+            thumb=PhotoSize.from_result(result.get('thumb')), 
+            file_name=result.get('file_name'), 
+            mime_type=result.get('mime_type'), 
+            file_size=result.get('file_size') 
             )
 
 class Sticker(_StickerBase):
     __slots__ = ()
 
     @staticmethod
-    def from_result(_dict):
-        if _dict is None:
+    def from_result(result):
+        if result is None:
             return None
 
         return Sticker(
-            file_id=_dict.get('file_id'), 
-            width=_dict.get('width'), 
-            height=_dict.get('height'), 
-            thumb=PhotoSize.from_result(_dict.get('thumb')), 
-            file_size=_dict.get('file_size')
+            file_id=result.get('file_id'), 
+            width=result.get('width'), 
+            height=result.get('height'), 
+            thumb=PhotoSize.from_result(result.get('thumb')), 
+            file_size=result.get('file_size')
             )
 
 class Video(_VideoBase):
     __slots__ = ()
 
     @staticmethod
-    def from_result(_dict):
-        if _dict is None:
+    def from_result(result):
+        if result is None:
             return None
 
         return Video(
-            file_id=_dict.get('file_id'), 
-            width=_dict.get('width'), 
-            height=_dict.get('height'), 
-            duration=_dict.get('duration'), 
-            thumb=PhotoSize.from_result(_dict.get('thumb')), 
-            mime_type=_dict.get('mime_type'), 
-            file_size=_dict.get('file_size'), 
-            caption=_dict.get('caption')
+            file_id=result.get('file_id'), 
+            width=result.get('width'), 
+            height=result.get('height'), 
+            duration=result.get('duration'), 
+            thumb=PhotoSize.from_result(result.get('thumb')), 
+            mime_type=result.get('mime_type'), 
+            file_size=result.get('file_size'), 
+            caption=result.get('caption')
             )
 
 class Contact(_ContactBase):
     __slots__ = ()
 
     @staticmethod
-    def from_result(_dict):
-        if _dict is None:
+    def from_result(result):
+        if result is None:
             return None
 
         return Contact(
-            phone_number=_dict.get('phone_number'), 
-            first_name=_dict.get('first_name'), 
-            last_name=_dict.get('last_name'), 
-            user_id=_dict.get('user_id')
+            phone_number=result.get('phone_number'), 
+            first_name=result.get('first_name'), 
+            last_name=result.get('last_name'), 
+            user_id=result.get('user_id')
             )
 
 class Location(_LocationBase):
     __slots__ = ()
 
     @staticmethod
-    def from_result(_dict):
-        if _dict is None:
+    def from_result(result):
+        if result is None:
             return None
 
         return Location(
-            longitude=_dict.get('longitude'), 
-            latitude=_dict.get('latitude')
+            longitude=result.get('longitude'), 
+            latitude=result.get('latitude')
             )
 
 class UserProfilePhotos(_UserProfilePhotosBase):
     __slots__ = ()
 
     @staticmethod
-    def from_result(_dict):
-        if _dict is None:
+    def from_result(result):
+        if result is None:
             return None
 
         return UserProfilePhotos(
-            total_count=_dict.get('total_count'), 
-            photos=_dict.get('photos') #TODO: Array of Array of PhotoSize
+            total_count=result.get('total_count'), 
+            photos=result.get('photos') #TODO: Array of Array of PhotoSize
             )
 
 class ReplyMarkup:
@@ -227,8 +227,8 @@ class Error(_Error):
     __slots__ = ()
 
     @staticmethod
-    def from_result(_dict):
-        return Error(error_code=_dict.get('error_code'), description=_dict.get('description'))
+    def from_result(result):
+        return Error(error_code=result.get('error_code'), description=result.get('description'))
 
 class RequestMethod(str, Enum):
     GET = 'GET'
