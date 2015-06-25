@@ -301,7 +301,7 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
 def _cleanup_params(**kwargs):
     return {name:val for name, val in kwargs.items() if val is not None}
 
-def get_me(token, *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.GET):
+def get_me(token, **kwargs):
     """
     A simple method for testing your bot's auth token. Requires no parameters. 
     Returns basic information about the bot in form of a User object.
@@ -309,12 +309,11 @@ def get_me(token, *, callback=None, on_error=None, request_method: RequestMethod
     :returns: Returns basic information about the bot in form of a User object.
     :rtype: User
     """
-    return TelegramBotRPCRequest('getMe', token, request_method=request_method,
-        on_result=User.from_result, on_error=on_error, callback=callback).run()
+    return TelegramBotRPCRequest('getMe', token, on_result=User.from_result, **kwargs).run()
 
 def send_message(token, chat_id: int, text: str, 
                  disable_web_page_preview: bool=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, 
-                 *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.GET):
+                 **kwargs):
     """
     Use this method to send text messages. 
 
@@ -343,11 +342,9 @@ def send_message(token, chat_id: int, text: str,
         reply_markup=reply_markup
         )
 
-    return TelegramBotRPCRequest('sendMessage', token, params=params, request_method=request_method,
-        on_result=Message.from_result, on_error=on_error, callback=callback).run()
+    return TelegramBotRPCRequest('sendMessage', token, params=params, on_result=Message.from_result, **kwargs).run()
 
-def forward_message(token, chat_id, from_chat_id, message_id,
-                    *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.GET):
+def forward_message(token, chat_id, from_chat_id, message_id, **kwargs):
     """
     Use this method to forward messages of any kind. 
 
@@ -368,7 +365,7 @@ def forward_message(token, chat_id, from_chat_id, message_id,
 
 def send_photo(token, chat_id: int,  photo: InputFile, 
                caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
-               *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.POST):
+               **kwargs):
     """
     Use this method to send photos.
 
@@ -407,10 +404,9 @@ def send_photo(token, chat_id: int,  photo: InputFile,
         reply_markup=reply_markup
         )
 
-    return TelegramBotRPCRequest('sendPhoto', token, params=params, files=files, request_method=request_method,
-        on_result=Message.from_result, on_error=on_error, callback=callback).run()
+    return TelegramBotRPCRequest('sendPhoto', token, params=params, files=files, on_result=Message.from_result, **kwargs).run()
 
-def send_audio(token, chat_id: int, audio: InputFile, reply_to_message_id: int=None, reply_markup: ReplyKeyboardMarkup=None):
+def send_audio(token, chat_id: int, audio: InputFile, reply_to_message_id: int=None, reply_markup: ReplyKeyboardMarkup=None, **kwargs):
     """
     Use this method to send audio files, if you want Telegram clients to display the file as a playable voice
     message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent 
@@ -434,7 +430,7 @@ def send_audio(token, chat_id: int, audio: InputFile, reply_to_message_id: int=N
     #TODO: implement
     return None
 
-def send_document(token, chat_id, document, reply_to_message_id=None, reply_markup=None):
+def send_document(token, chat_id, document, reply_to_message_id=None, reply_markup=None, **kwargs):
     """
     :param chat_id: 
     :param document: 
@@ -452,7 +448,7 @@ def send_document(token, chat_id, document, reply_to_message_id=None, reply_mark
     # TODO: Implement
     return None
 
-def send_sticker(token, chat_id, sticker, reply_to_message_id, reply_markup):
+def send_sticker(token, chat_id, sticker, reply_to_message_id, reply_markup, **kwargs):
     """
     :param token: 
     :param chat_id: 
