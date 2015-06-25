@@ -100,7 +100,7 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
         self.result = None
 
     def _get_path(self):
-        return os.path.join('bot{}'.format(self.token), self.api_method)
+        return 'bot{}/{}'.format(self.token, self.api_method)
 
     def _get_url(self, query):
         return SplitResult(scheme=TelegramBotRPCRequest.split_api_url.scheme,
