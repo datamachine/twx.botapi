@@ -14,11 +14,13 @@ _PhotoSizeBase = namedtuple('PhotoSize', ['file_id', 'width', 'height', 'file_si
 _AudioBase = namedtuple('Audio', ['file_id', 'duration', 'mime_type', 'file_size'])
 _DocumentBase = namedtuple('Document', ['file_id', 'thumb', 'file_name', 'mime_type', 'file_size'])
 _StickerBase = namedtuple('Sticker', ['file_id', 'width', 'height', 'thumb', 'file_size'])
-_VideoBase = namedtuple('Video', ['file_id', 'width', 'height', 'duration', 'thumb', 'mime_type', 'file_size', 'caption'])
+_VideoBase = namedtuple('Video', ['file_id', 'width', 'height', 'duration', 'thumb', 'mime_type',
+                                  'file_size', 'caption'])
 _ContactBase = namedtuple('Contact', ['phone_number', 'first_name', 'last_name', 'user_id'])
 _LocationBase = namedtuple('Location', ['longitude', 'latitude'])
 _UserProfilePhotosBase = namedtuple('UserProfilePhotos', ['total_count', 'photos'])
-_ReplyKeyboardMarkupBase = namedtuple('ReplyKeyboardMarkup', ['keyboard', 'resize_keyboard', 'one_time_keyboard', 'selective'])
+_ReplyKeyboardMarkupBase = namedtuple('ReplyKeyboardMarkup', ['keyboard', 'resize_keyboard',
+                                                              'one_time_keyboard', 'selective'])
 _ReplyKeyboardHideBase = namedtuple('ReplyKeyboardHide', ['hide_keyboard', 'selective'])
 _ForceReplyBase = namedtuple('ForceReply', ['force_reply', 'selective'])
 _InputFile = namedtuple('InputFile', [])
@@ -198,7 +200,8 @@ class sendPhotoRequest(TelegramBotRPCRequest):
 
         print('sendPhotoRequest', params)
 
-        super().__init__('sendPhoto', token=token, params=params, callback=callback, files=files, request_method=request_method)
+        super().__init__('sendPhoto', token=token, params=params, callback=callback,
+                         files=files, request_method=request_method)
 
     def _call_result(self, api_response):
         result = api_response['result']
