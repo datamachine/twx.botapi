@@ -1,6 +1,7 @@
 import json
 from urllib.parse import urlsplit, SplitResult, quote as urlquote, urlencode
 from urllib.request import Request, urlopen
+import requests
 import os
 from collections import namedtuple
 from enum import Enum
@@ -91,7 +92,17 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
     api_url = 'https://api.telegram.org'
     split_api_url = urlsplit(api_url)
 
-    def __init__(self, api_method, token, params, callback, request_method=RequestMethod.GET):
+    def __init__(self, api_method, token, params, callback, files=None, request_method=RequestMethod.GET):
+        """
+
+        :param api_method:
+        :param token:
+        :param params:
+        :param callback:
+        :param files:
+        :param request_method:
+        :return:
+        """
         self.api_method = api_method
         self.token = token
         self.callback = callback
@@ -184,6 +195,50 @@ class sendMessageRequest(TelegramBotRPCRequest):
                 new_chat_photo=result.get('new_chat_photo'),
                 delete_chat_photo=result.get('delete_chat_photo'),
                 group_chat_created=result.get('group_chat_created')
+        )
+
+
+class sendPhotoRequest(TelegramBotRPCRequest):
+    def __init__(self, token, chat_id, photo, caption, reply_to_message_id, reply_markup,
+                 callback=None, request_method=None):
+
+        params = self.cleanup_params(token=token, chat_id=chat_id, photo=photo, caption=caption,
+                                     reply_to_message_id=reply_to_message_id, reply_markup=reply_markup)
+
+        try:
+            photo = int(photo)
+        except ValueError:
+            # we don't have a photo_id, send new file
+            files = {photo: open(photo)}
+
+        print('sendPhotoRequest', params)
+
+        super().__init__('sendPhoto', token=token, params=params, callback=callback, files=files, request_method=request_method)
+
+    def _call_result(self, api_response):
+        result = api_response['result']
+        return Message(
+                message_id=result.get('message_id'),
+                sender=result.get('from'),
+                date=result.get('date'),
+                chat=result.get('chat'),
+                forward_from=result.get('forward_from'),
+                forward_date=result.get('forward_date'),
+                reply_to_message=result.get('reply_to_message'),
+                text=result.get('text'),
+                audio=result.get('audio'),
+                document=result.get('document'),
+                photo=result.get('photo'),
+                sticker=result.get('sticker'),
+                video=result.get('video'),
+                contact=result.get('contact'),
+                location=result.get('location'),
+                new_chat_participant=result.get('new_chat_participant'),
+                left_chat_participant=result.get('left_chat_participant'),
+                new_chat_title=result.get('new_chat_title'),
+                new_chat_photo=result.get('new_chat_photo'),
+                delete_chat_photo=result.get('delete_chat_photo'),
+                group_chat_created=result.get('group_chat_created')
             )
 
 class TelegramBotRPC:
@@ -196,7 +251,15 @@ class TelegramBotRPC:
                      reply_to_message_id :int=None, reply_markup :ReplyMarkup=None, 
                      callback=None, request_method :RequestMethod=RequestMethod.GET):
 
-        return sendMessageRequest(token, chat_id, text, disable_web_page_preview, reply_to_message_id, reply_markup, callback, request_method).run()
+        return sendMessageRequest(token, chat_id, text, disable_web_page_preview, reply_to_message_id, reply_markup,
+                                  callback, request_method).run()
+
+    @staticmethod
+    def send_photo(token, chat_id :int, photo :str, caption :str=None, reply_to_message_id :int=None,
+                   reply_markup :ReplyMarkup=None, callback=None, request_method :RequestMethod=RequestMethod.POST):
+
+        return sendPhotoRequest(token, chat_id, photo, caption, reply_to_message_id, reply_markup,
+                                  callback, request_method).run()
 
 
 
@@ -208,7 +271,8 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read("test.conf")
     token = config['Test']['token']
-    chat_id = config['Test']['chat_id']
+    test_chat_id = config['Test']['chat_id']
 
-    TelegramBotRPC.get_me(token, callback=print_result)
-    TelegramBotRPC.send_message(token, chat_id, 'testing', callback=print_result)
+    #TelegramBotRPC.get_me(token, callback=print_result)
+    #TelegramBotRPC.send_message(token, test_chat_id, 'testing', callback=print_result)
+    TelegramBotRPC.send_photo(token, test_chat_id, 'test.jpg', callback=print_result)
