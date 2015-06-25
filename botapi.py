@@ -302,13 +302,30 @@ def _cleanup_params(**kwargs):
     return {name:val for name, val in kwargs.items() if val is not None}
 
 def get_me(token, *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.GET):
+    """
+    A simple method for testing your bot's auth token. Requires no parameters. 
+    Returns basic information about the bot in form of a User object.
+
+    :returns: User
+    """
     return TelegramBotRPCRequest('getMe', token, request_method=request_method,
         on_result=User.from_result, on_error=on_error, callback=callback).run()
 
 def send_message(token, chat_id: int, text: str, 
                  disable_web_page_preview: bool=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, 
                  *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.GET):
+    """
+    Use this method to send text messages. On success, the sent Message is returned.
     
+    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param text: Text of the message to be sent
+    :param disable_web_page_preview: Disables link previews for links in this message
+    :param reply_to_message_id: If the message is a reply, ID of the original message
+    :param reply_markup: Additional interface options. A JSON-serialized object for a 
+                         custom reply keyboard, instructions to hide keyboard or to 
+                         force a reply from the user.
+    :returns: Message
+    """    
     params = _cleanup_params(
         chat_id=chat_id, 
         text=text, 
