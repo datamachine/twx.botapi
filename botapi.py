@@ -187,8 +187,6 @@ class sendPhotoRequest(TelegramBotRPCRequest):
                  callback=None, request_method=None, photo_id=None, photo=None):
 
         files = None
-        if bool(photo) == bool(photo_id):
-            raise TypeError("sendPhotoRequest() requires either photo or photo_id kwarg must be set.")
 
         if photo_id:
             photo = photo_id
@@ -243,8 +241,12 @@ class TelegramBotRPC:
                                   callback, request_method).run()
 
     @staticmethod
-    def send_photo(token, chat_id: int, photo: str=None, photo_id: str=None, caption: str=None, reply_to_message_id: int=None,
-                   reply_markup: ReplyMarkup=None, callback=None, request_method: RequestMethod=RequestMethod.POST):
+    def send_photo(token, chat_id: int, photo: str=None, photo_id: str=None, caption: str=None,
+                   reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, callback=None,
+                   request_method: RequestMethod=RequestMethod.POST):
+
+        if bool(photo) == bool(photo_id):
+            raise TypeError("sendPhotoRequest() requires either photo or photo_id kwarg must be set.")
 
         return sendPhotoRequest(token, chat_id, caption, reply_to_message_id, reply_markup,
                                 callback, request_method, photo=photo, photo_id=photo_id).run()
