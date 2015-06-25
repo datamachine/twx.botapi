@@ -181,17 +181,20 @@ class sendMessageRequest(TelegramBotRPCRequest):
 
 
 class sendPhotoRequest(TelegramBotRPCRequest):
-    def __init__(self, token, chat_id, photo, caption, reply_to_message_id, reply_markup,
-                 callback=None, request_method=None):
+    def __init__(self, token, chat_id, caption, reply_to_message_id, reply_markup,
+                 callback=None, request_method=None, photo_id=None, photo=None):
+
+        files = None
+        if bool(photo) == bool(photo_id):
+            raise TypeError("sendPhotoRequest() requires either photo or photo_id kwarg must be set.")
+
+        if photo_id:
+            photo = photo_id
+        else:
+            files = {'photo': (photo, open(photo, 'rb'), 'image/jpeg')}
 
         params = self.cleanup_params(token=token, chat_id=chat_id, photo=photo, caption=caption,
                                      reply_to_message_id=reply_to_message_id, reply_markup=reply_markup)
-
-        try:
-            params['photo'] = int(photo)
-        except ValueError:
-            # we don't have a photo_id, send new file
-            files = {'photo': (photo, open(photo, 'rb'), 'image/jpeg')}
 
         print('sendPhotoRequest', params)
 
@@ -237,11 +240,11 @@ class TelegramBotRPC:
                                   callback, request_method).run()
 
     @staticmethod
-    def send_photo(token, chat_id :int, photo :str, caption :str=None, reply_to_message_id :int=None,
+    def send_photo(token, chat_id :int, photo :str=None, photo_id :str=None, caption :str=None, reply_to_message_id :int=None,
                    reply_markup :ReplyMarkup=None, callback=None, request_method :RequestMethod=RequestMethod.POST):
 
-        return sendPhotoRequest(token, chat_id, photo, caption, reply_to_message_id, reply_markup,
-                                  callback, request_method).run()
+        return sendPhotoRequest(token, chat_id, caption, reply_to_message_id, reply_markup,
+                                  callback, request_method, photo=photo, photo_id=photo_id).run()
 
 
 
@@ -257,4 +260,5 @@ if __name__ == '__main__':
 
     TelegramBotRPC.get_me(token, callback=print_result)
     TelegramBotRPC.send_message(token, test_chat_id, 'testing', callback=print_result)
-    TelegramBotRPC.send_photo(token, test_chat_id, 'test.jpg', callback=print_result)
+    TelegramBotRPC.send_photo(token, test_chat_id, photo='test.jpg', callback=print_result)
+    TelegramBotRPC.send_photo(token, test_chat_id, photo_id='AgADAwADqacxGwpPWQaFLwABSzSkg2Bq-usqAASiGyniRUnk5BdEAAIC', callback=print_result)
