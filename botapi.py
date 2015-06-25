@@ -25,11 +25,16 @@ _ReplyKeyboardHideBase = namedtuple('ReplyKeyboardHide', ['hide_keyboard', 'sele
 _ForceReplyBase = namedtuple('ForceReply', ['force_reply', 'selective'])
 _InputFile = namedtuple('InputFile', [])
 
+_Error = namedtuple('Error', ['error_code', 'description'])
+
 class User(_UserBase):
     __slots__ = ()
 
     @staticmethod
     def from_dict(_dict):
+        if _dict is None:
+            return None
+
         return User(
             id=_dict.get('id'), 
             first_name=_dict.get('first_name'),
@@ -40,32 +45,168 @@ class User(_UserBase):
 class GroupChat(_GroupChatBase):
     __slots__ = ()
 
+    @staticmethod
+    def from_dict(_dict):
+        if _dict is None:
+            return None
+
+        return GroupChat(
+            id=_dict.get('id'), 
+            title=_dict.get('title')
+            )
+
 class Message(_MessageBase):
     __slots__ = ()
+
+    @staticmethod
+    def from_dict(_dict):
+        if _dict is None:
+            return None
+        return Message(
+            message_id=_dict.get('message_id'), 
+            sender=User.from_dict(_dict.get('from')),
+            date=_dict.get('date'),
+            chat=_dict.get('chat'), # TODO: May be User or GroupChat
+            forward_from=User.from_dict(_dict.get('forward_from')),
+            forward_date=_dict.get('forward_date'),
+            reply_to_message=Message.from_dict(_dict.get('reply_to_message')),
+            text=_dict.get('text'),
+            audio=Audio.from_dict(_dict.get('audio')),
+            document=Document.from_dict(_dict.get('document')),
+            photo=_dict.get('photo'), # TODO: Array of PhotoSize
+            sticker=Sticker.from_dict(_dict.get('sticker')),
+            video=Video.from_dict(_dict.get('video')),
+            contact=Contact.from_dict(_dict.get('contact')),
+            location=Location.from_dict(_dict.get('location')),
+            new_chat_participant=User.from_dict(_dict.get('new_chat_participant')),
+            left_chat_participant=User.from_dict(_dict.get('left_chat_participant')),
+            new_chat_title=_dict.get('new_chat_title'),
+            new_chat_photo=_dict.get('new_chat_photo'),
+            delete_chat_photo=_dict.get('delete_chat_photo'),
+            group_chat_created=_dict.get('group_chat_created')
+            )
 
 class PhotoSize(_PhotoSizeBase):
     __slots__ = ()
 
+    @staticmethod
+    def from_dict(_dict):
+        if _dict is None:
+            return None
+
+        return PhotoSize(
+            file_id=_dict.get('file_id'), 
+            width=_dict.get('width'), 
+            height=_dict.get('height'), 
+            file_size=_dict.get('file_size')
+            )
+
 class Audio(_AudioBase):
     __slots__ = ()
+
+    @staticmethod
+    def from_dict(_dict):
+        if _dict is None:
+            return None
+
+        return Audio(
+            file_id=_dict.get('file_id'), 
+            duration=_dict.get('duration'), 
+            mime_type=_dict.get('mime_type'), 
+            file_size=_dict.get('file_size')
+            )
 
 class Document(_DocumentBase):
     __slots__ = ()
 
+    @staticmethod
+    def from_dict(_dict):
+        if _dict is None:
+            return None
+
+        return Document(
+            file_id=_dict.get('file_id'), 
+            thumb=PhotoSize.from_dict(_dict.get('thumb')), 
+            file_name=_dict.get('file_name'), 
+            mime_type=_dict.get('mime_type'), 
+            file_size=_dict.get('file_size') 
+            )
+
 class Sticker(_StickerBase):
     __slots__ = ()
+
+    @staticmethod
+    def from_dict(_dict):
+        if _dict is None:
+            return None
+
+        return Sticker(
+            file_id=_dict.get('file_id'), 
+            width=_dict.get('width'), 
+            height=_dict.get('height'), 
+            thumb=PhotoSize.from_dict(_dict.get('thumb')), 
+            file_size=_dict.get('file_size')
+            )
 
 class Video(_VideoBase):
     __slots__ = ()
 
+    @staticmethod
+    def from_dict(_dict):
+        if _dict is None:
+            return None
+
+        return Video(
+            file_id=_dict.get('file_id'), 
+            width=_dict.get('width'), 
+            height=_dict.get('height'), 
+            duration=_dict.get('duration'), 
+            thumb=PhotoSize.from_dict(_dict.get('thumb')), 
+            mime_type=_dict.get('mime_type'), 
+            file_size=_dict.get('file_size'), 
+            caption=_dict.get('caption')
+            )
+
 class Contact(_ContactBase):
     __slots__ = ()
+
+    @staticmethod
+    def from_dict(_dict):
+        if _dict is None:
+            return None
+
+        return Contact(
+            phone_number=_dict.get('phone_number'), 
+            first_name=_dict.get('first_name'), 
+            last_name=_dict.get('last_name'), 
+            user_id=_dict.get('user_id')
+            )
 
 class Location(_LocationBase):
     __slots__ = ()
 
+    @staticmethod
+    def from_dict(_dict):
+        if _dict is None:
+            return None
+
+        return Location(
+            longitude=_dict.get('longitude'), 
+            latitude=_dict.get('latitude')
+            )
+
 class UserProfilePhotos(_UserProfilePhotosBase):
     __slots__ = ()
+
+    @staticmethod
+    def from_dict(_dict):
+        if _dict is None:
+            return None
+
+        return UserProfilePhotos(
+            total_count=_dict.get('total_count'), 
+            photos=_dict.get('photos') #TODO: Array of Array of PhotoSize
+            )
 
 class ReplyMarkup:
     __slots__ = ()
@@ -82,6 +223,13 @@ class ForceReply(_ForceReplyBase, ReplyMarkup):
 class InputFile(_InputFile):
     __slots__ = ()
 
+class Error(_Error):
+    __slots__ = ()
+
+    @staticmethod
+    def from_dict(_dict):
+        return Error(error_code=_dict.get('error_code'), description=_dict.get('description'))
+
 class RequestMethod(str, Enum):
     GET = 'GET'
     POST = 'POST'
@@ -89,14 +237,17 @@ class RequestMethod(str, Enum):
 class TelegramBotRPCRequest(metaclass=ABCMeta):
     api_url_base = 'https://api.telegram.org/bot'
 
-    def __init__(self, api_method, token, params, callback, files=None, request_method=RequestMethod.GET):
+    def __init__(self, api_method, token, *, params=None, callback=None, on_error=None, files=None, request_method=RequestMethod.GET):
         self.api_method = api_method
         self.token = token
-        self.callback = callback
         self.params = params
+        self.callback = callback
+        self.on_error = on_error
         self.files = files
-        self.request_method = request_method
+        self.request_method = RequestMethod(request_method)
+
         self.result = None
+        self.error = None
 
     def _get_url(self):
         return '{base_url}{token}/{method}'.format(base_url=TelegramBotRPCRequest.api_url_base,
@@ -116,75 +267,61 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
     def _call_result(self, api_response):
         raise NotImplemented
 
-    def _async_call(self, callback):
+    def _async_call(self):
+        self.error = None
+        self.response = None
+
         s = Session()
         request = self._get_request()
-        print(request.body)
         resp = s.send(request)
         api_response = resp.json()
-        print(api_response)
-        self.result = self._call_result(api_response)
-        if callback is not None:
-            callback(self.result)
+
+        if api_response.get('ok') == True:
+            self.result = self._call_result(api_response)
+
+            if self.callback is not None:
+                self.callback(self.result)
+        else:
+            self.error = Error.from_dict(api_response)
+            if self.on_error:
+                self.on_error(self.error)
+
         return None
 
     def run(self):
-        self._async_call(self.callback)
+        self._async_call()
         return self
 
     def cleanup_params(self, **kwargs):
         return {name:val for name, val in kwargs.items() if val is not None}
 
 class getMeRequest(TelegramBotRPCRequest):
-    def __init__(self, token, callback=None, request_method=None):
-        super().__init__('getMe', token=token, params=None, callback=callback, request_method=request_method)
+    def __init__(self, token:str, *, callback=None, on_error=None, request_method: RequestMethod=None):
+        super().__init__('getMe', token, callback=callback, on_error=on_error, request_method=request_method)
 
     def _call_result(self, api_response):
         return User.from_dict(api_response['result'])
 
 class sendMessageRequest(TelegramBotRPCRequest):
-    def __init__(self, token, chat_id, text, disable_web_page_preview, 
-                 reply_to_message_id, reply_markup, 
-                 callback=None, request_method=None):
+    def __init__(self, token:str, chat_id:int, text:str, 
+                 disable_web_page_preview: bool=None, 
+                 reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, 
+                 *, callback=None, on_error=None, request_method=None):
 
         params = self.cleanup_params(chat_id=chat_id, text=text, 
                                      disable_web_page_preview=disable_web_page_preview, 
                                      reply_to_message_id=reply_to_message_id, reply_markup=reply_markup)
 
-        print('sendMessageRequest', params)
-
-        super().__init__('sendMessage', token=token, params=params, callback=callback, request_method=request_method)
+        super().__init__('sendMessage', token, params=params, callback=callback, on_error=on_error, request_method=request_method)
 
     def _call_result(self, api_response):
         result = api_response['result']
-        return Message(
-            message_id=result.get('message_id'),
-            sender=result.get('from'),
-            date=result.get('date'),
-            chat=result.get('chat'),
-            forward_from=result.get('forward_from'),
-            forward_date=result.get('forward_date'),
-            reply_to_message=result.get('reply_to_message'),
-            text=result.get('text'),
-            audio=result.get('audio'),
-            document=result.get('document'),
-            photo=result.get('photo'),
-            sticker=result.get('sticker'),
-            video=result.get('video'),
-            contact=result.get('contact'),
-            location=result.get('location'),
-            new_chat_participant=result.get('new_chat_participant'),
-            left_chat_participant=result.get('left_chat_participant'),
-            new_chat_title=result.get('new_chat_title'),
-            new_chat_photo=result.get('new_chat_photo'),
-            delete_chat_photo=result.get('delete_chat_photo'),
-            group_chat_created=result.get('group_chat_created')
-        )
+        return Message.from_dict(result)
 
 
 class sendPhotoRequest(TelegramBotRPCRequest):
-    def __init__(self, token, chat_id, caption, reply_to_message_id, reply_markup,
-                 callback=None, request_method=None, photo_id=None, photo=None):
+    def __init__(self, token, chat_id, caption, reply_to_message_id, reply_markup, photo_id=None, photo=None,
+                 *, callback=None, on_error=None, request_method=None):
 
         files = None
 
@@ -196,64 +333,44 @@ class sendPhotoRequest(TelegramBotRPCRequest):
         params = self.cleanup_params(token=token, chat_id=chat_id, photo=photo, caption=caption,
                                      reply_to_message_id=reply_to_message_id, reply_markup=reply_markup)
 
-        print('sendPhotoRequest', params)
-
-        super().__init__('sendPhoto', token=token, params=params, callback=callback,
+        super().__init__('sendPhoto', token, params=params, callback=callback, on_error=on_error,
                          files=files, request_method=request_method)
 
     def _call_result(self, api_response):
+        print(api_response)
         result = api_response['result']
-        return Message(
-            message_id=result.get('message_id'),
-            sender=result.get('from'),
-            date=result.get('date'),
-            chat=result.get('chat'),
-            forward_from=result.get('forward_from'),
-            forward_date=result.get('forward_date'),
-            reply_to_message=result.get('reply_to_message'),
-            text=result.get('text'),
-            audio=result.get('audio'),
-            document=result.get('document'),
-            photo=result.get('photo'),
-            sticker=result.get('sticker'),
-            video=result.get('video'),
-            contact=result.get('contact'),
-            location=result.get('location'),
-            new_chat_participant=result.get('new_chat_participant'),
-            left_chat_participant=result.get('left_chat_participant'),
-            new_chat_title=result.get('new_chat_title'),
-            new_chat_photo=result.get('new_chat_photo'),
-            delete_chat_photo=result.get('delete_chat_photo'),
-            group_chat_created=result.get('group_chat_created')
-        )
+        return Message.from_dict(result)
 
 class TelegramBotRPC:
     @staticmethod
-    def get_me(token, callback=None, request_method: RequestMethod=RequestMethod.GET):
-        return getMeRequest(token, callback, request_method).run()
+    def get_me(token, *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.GET):
+        return getMeRequest(token, callback=callback, on_error=on_error, request_method=request_method).run()
 
     @staticmethod
     def send_message(token, chat_id: int, text: str, disable_web_page_preview: bool=None, 
                      reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, 
-                     callback=None, request_method: RequestMethod=RequestMethod.GET):
+                     *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.GET):
 
         return sendMessageRequest(token, chat_id, text, disable_web_page_preview, reply_to_message_id, reply_markup,
-                                  callback, request_method).run()
+                                  callback=callback, on_error=on_error, request_method=request_method).run()
 
     @staticmethod
-    def send_photo(token, chat_id: int, photo: str=None, photo_id: str=None, caption: str=None,
-                   reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, callback=None,
-                   request_method: RequestMethod=RequestMethod.POST):
+    def send_photo(token, chat_id: int,  caption: str=None, reply_to_message_id: int=None, 
+                   reply_markup: ReplyMarkup=None, photo: str=None, photo_id: str=None,
+                   *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.POST):
 
         if bool(photo) == bool(photo_id):
             raise TypeError("sendPhotoRequest() requires either photo or photo_id kwarg must be set.")
 
-        return sendPhotoRequest(token, chat_id, caption, reply_to_message_id, reply_markup,
-                                callback, request_method, photo=photo, photo_id=photo_id).run()
+        return sendPhotoRequest(token, chat_id, caption, reply_to_message_id, reply_markup, photo=photo, photo_id=photo_id,
+                                callback=callback, on_error=on_error, request_method=request_method).run()
 
 
 
 def print_result(result):
+    print(result)
+
+def print_error(result):
     print(result)
 
 if __name__ == '__main__':
@@ -270,4 +387,4 @@ if __name__ == '__main__':
                               callback=print_result)
     TelegramBotRPC.send_photo(test_token, test_chat_id,
                               photo_id='AgADAwADqacxGwpPWQaFLwABSzSkg2Bq-usqAASiGyniRUnk5BdEAAIC',
-                              callback=print_result)
+                              callback=print_result, on_error=print_error)
