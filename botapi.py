@@ -204,7 +204,11 @@ def print_result(result):
     print(result)
 
 if __name__ == '__main__':
-    token ='84147671:AAGm0Oid-mQxfMs6_9IlnYSLqXVS-dumytE'
+    import configparser
+    config = configparser.ConfigParser()
+    config.read("test.conf")
+    token = config['Test']['token']
+    chat_id = config['Test']['chat_id']
 
     TelegramBotRPC.get_me(token, callback=print_result)
-    TelegramBotRPC.send_message(token, 96846582, 'testing', callback=print_result)
+    TelegramBotRPC.send_message(token, chat_id, 'testing', callback=print_result)
