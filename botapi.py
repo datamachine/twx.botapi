@@ -346,6 +346,26 @@ def send_message(token, chat_id: int, text: str,
     return TelegramBotRPCRequest('sendMessage', token, params=params, request_method=request_method,
         on_result=Message.from_result, on_error=on_error, callback=callback).run()
 
+def forward_message(token, chat_id, from_chat_id, message_id
+                    *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.GET):
+    """
+    Use this method to forward messages of any kind. 
+
+    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param from_chat_id: Unique identifier for the chat where the original message was sent — User or GroupChat id
+    :param message_id: Unique message identifier
+
+
+    :type chat_id: int
+    :type from_chat_id: int
+    :type message_id: int
+
+    :returns: On success, the sent Message is returned.
+    :rtype: Message
+    """
+    #TODO: implement
+    return None
+
 def send_photo(token, chat_id: int,  photo: InputFile, 
                caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
                *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.POST):
