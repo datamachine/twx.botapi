@@ -316,7 +316,7 @@ def send_message(token, chat_id: int, text: str,
                  *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.GET):
     """
     Use this method to send text messages. On success, the sent Message is returned.
-    
+
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
     :param text: Text of the message to be sent
     :param disable_web_page_preview: Disables link previews for links in this message
@@ -340,6 +340,20 @@ def send_message(token, chat_id: int, text: str,
 def send_photo(token, chat_id: int,  photo: InputFile, 
                caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
                *, callback=None, on_error=None, request_method: RequestMethod=RequestMethod.POST):
+    """
+    Use this method to send photos. On success, the sent Message is returned.
+
+    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param photo: Photo to send. You can either pass a file_id as String to resend a 
+                  photo that is already on the Telegram servers, or upload a new photo 
+                  using multipart/form-data.
+    :param caption: Photo caption (may also be used when resending photos by file_id).
+    :param reply_to_message_id: If the message is a reply, ID of the original message
+    :param reply_markup: Additional interface options. A JSON-serialized object for a 
+                         custom reply keyboard, instructions to hide keyboard or to 
+                         force a reply from the user.
+    :returns: Message
+    """
 
     files = None
     if isinstance(photo, InputFile):
