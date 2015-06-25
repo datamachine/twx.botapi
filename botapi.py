@@ -31,7 +31,7 @@ class User(_UserBase):
     __slots__ = ()
 
     @staticmethod
-    def from_dict(_dict):
+    def from_result(_dict):
         if _dict is None:
             return None
 
@@ -46,7 +46,7 @@ class GroupChat(_GroupChatBase):
     __slots__ = ()
 
     @staticmethod
-    def from_dict(_dict):
+    def from_result(_dict):
         if _dict is None:
             return None
 
@@ -59,27 +59,27 @@ class Message(_MessageBase):
     __slots__ = ()
 
     @staticmethod
-    def from_dict(_dict):
+    def from_result(_dict):
         if _dict is None:
             return None
         return Message(
             message_id=_dict.get('message_id'), 
-            sender=User.from_dict(_dict.get('from')),
+            sender=User.from_result(_dict.get('from')),
             date=_dict.get('date'),
             chat=_dict.get('chat'), # TODO: May be User or GroupChat
-            forward_from=User.from_dict(_dict.get('forward_from')),
+            forward_from=User.from_result(_dict.get('forward_from')),
             forward_date=_dict.get('forward_date'),
-            reply_to_message=Message.from_dict(_dict.get('reply_to_message')),
+            reply_to_message=Message.from_result(_dict.get('reply_to_message')),
             text=_dict.get('text'),
-            audio=Audio.from_dict(_dict.get('audio')),
-            document=Document.from_dict(_dict.get('document')),
+            audio=Audio.from_result(_dict.get('audio')),
+            document=Document.from_result(_dict.get('document')),
             photo=_dict.get('photo'), # TODO: Array of PhotoSize
-            sticker=Sticker.from_dict(_dict.get('sticker')),
-            video=Video.from_dict(_dict.get('video')),
-            contact=Contact.from_dict(_dict.get('contact')),
-            location=Location.from_dict(_dict.get('location')),
-            new_chat_participant=User.from_dict(_dict.get('new_chat_participant')),
-            left_chat_participant=User.from_dict(_dict.get('left_chat_participant')),
+            sticker=Sticker.from_result(_dict.get('sticker')),
+            video=Video.from_result(_dict.get('video')),
+            contact=Contact.from_result(_dict.get('contact')),
+            location=Location.from_result(_dict.get('location')),
+            new_chat_participant=User.from_result(_dict.get('new_chat_participant')),
+            left_chat_participant=User.from_result(_dict.get('left_chat_participant')),
             new_chat_title=_dict.get('new_chat_title'),
             new_chat_photo=_dict.get('new_chat_photo'),
             delete_chat_photo=_dict.get('delete_chat_photo'),
@@ -90,7 +90,7 @@ class PhotoSize(_PhotoSizeBase):
     __slots__ = ()
 
     @staticmethod
-    def from_dict(_dict):
+    def from_result(_dict):
         if _dict is None:
             return None
 
@@ -105,7 +105,7 @@ class Audio(_AudioBase):
     __slots__ = ()
 
     @staticmethod
-    def from_dict(_dict):
+    def from_result(_dict):
         if _dict is None:
             return None
 
@@ -120,13 +120,13 @@ class Document(_DocumentBase):
     __slots__ = ()
 
     @staticmethod
-    def from_dict(_dict):
+    def from_result(_dict):
         if _dict is None:
             return None
 
         return Document(
             file_id=_dict.get('file_id'), 
-            thumb=PhotoSize.from_dict(_dict.get('thumb')), 
+            thumb=PhotoSize.from_result(_dict.get('thumb')), 
             file_name=_dict.get('file_name'), 
             mime_type=_dict.get('mime_type'), 
             file_size=_dict.get('file_size') 
@@ -136,7 +136,7 @@ class Sticker(_StickerBase):
     __slots__ = ()
 
     @staticmethod
-    def from_dict(_dict):
+    def from_result(_dict):
         if _dict is None:
             return None
 
@@ -144,7 +144,7 @@ class Sticker(_StickerBase):
             file_id=_dict.get('file_id'), 
             width=_dict.get('width'), 
             height=_dict.get('height'), 
-            thumb=PhotoSize.from_dict(_dict.get('thumb')), 
+            thumb=PhotoSize.from_result(_dict.get('thumb')), 
             file_size=_dict.get('file_size')
             )
 
@@ -152,7 +152,7 @@ class Video(_VideoBase):
     __slots__ = ()
 
     @staticmethod
-    def from_dict(_dict):
+    def from_result(_dict):
         if _dict is None:
             return None
 
@@ -161,7 +161,7 @@ class Video(_VideoBase):
             width=_dict.get('width'), 
             height=_dict.get('height'), 
             duration=_dict.get('duration'), 
-            thumb=PhotoSize.from_dict(_dict.get('thumb')), 
+            thumb=PhotoSize.from_result(_dict.get('thumb')), 
             mime_type=_dict.get('mime_type'), 
             file_size=_dict.get('file_size'), 
             caption=_dict.get('caption')
@@ -171,7 +171,7 @@ class Contact(_ContactBase):
     __slots__ = ()
 
     @staticmethod
-    def from_dict(_dict):
+    def from_result(_dict):
         if _dict is None:
             return None
 
@@ -186,7 +186,7 @@ class Location(_LocationBase):
     __slots__ = ()
 
     @staticmethod
-    def from_dict(_dict):
+    def from_result(_dict):
         if _dict is None:
             return None
 
@@ -199,7 +199,7 @@ class UserProfilePhotos(_UserProfilePhotosBase):
     __slots__ = ()
 
     @staticmethod
-    def from_dict(_dict):
+    def from_result(_dict):
         if _dict is None:
             return None
 
@@ -227,7 +227,7 @@ class Error(_Error):
     __slots__ = ()
 
     @staticmethod
-    def from_dict(_dict):
+    def from_result(_dict):
         return Error(error_code=_dict.get('error_code'), description=_dict.get('description'))
 
 class RequestMethod(str, Enum):
@@ -282,7 +282,7 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
             if self.callback is not None:
                 self.callback(self.result)
         else:
-            self.error = Error.from_dict(api_response)
+            self.error = Error.from_result(api_response)
             if self.on_error:
                 self.on_error(self.error)
 
@@ -300,7 +300,7 @@ class getMeRequest(TelegramBotRPCRequest):
         super().__init__('getMe', token, callback=callback, on_error=on_error, request_method=request_method)
 
     def _call_result(self, api_response):
-        return User.from_dict(api_response['result'])
+        return User.from_result(api_response['result'])
 
 class sendMessageRequest(TelegramBotRPCRequest):
     def __init__(self, token:str, chat_id:int, text:str, 
@@ -316,7 +316,7 @@ class sendMessageRequest(TelegramBotRPCRequest):
 
     def _call_result(self, api_response):
         result = api_response['result']
-        return Message.from_dict(result)
+        return Message.from_result(result)
 
 
 class sendPhotoRequest(TelegramBotRPCRequest):
@@ -339,7 +339,7 @@ class sendPhotoRequest(TelegramBotRPCRequest):
     def _call_result(self, api_response):
         print(api_response)
         result = api_response['result']
-        return Message.from_dict(result)
+        return Message.from_result(result)
 
 class TelegramBotRPC:
     @staticmethod
