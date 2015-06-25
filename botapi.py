@@ -263,5 +263,9 @@ if __name__ == '__main__':
 
     TelegramBotRPC.get_me(test_token, callback=print_result)
     TelegramBotRPC.send_message(test_token, test_chat_id, 'testing', callback=print_result)
-    TelegramBotRPC.send_photo(test_token, test_chat_id, photo='test.jpg', callback=print_result)
-    TelegramBotRPC.send_photo(test_token, test_chat_id, photo_id='AgADAwADqacxGwpPWQaFLwABSzSkg2Bq-usqAASiGyniRUnk5BdEAAIC', callback=print_result)
+    TelegramBotRPC.send_photo(test_token, test_chat_id,
+                              photo='test.jpg',
+                              callback=print_result)
+    TelegramBotRPC.send_photo(test_token, test_chat_id,
+                              photo_id='AgADAwADqacxGwpPWQaFLwABSzSkg2Bq-usqAASiGyniRUnk5BdEAAIC',
+                              callback=print_result)
