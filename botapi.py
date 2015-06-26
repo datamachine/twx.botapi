@@ -423,8 +423,7 @@ def forward_message(chat_id, from_chat_id, message_id,
 
     request_args = _merge_dict(request_args, kwargs)
 
-    return TelegramBotRPCRequest('forwardMessage', params=params, on_result=Message.from_result, 
-                                 **request_args).run()
+    return TelegramBotRPCRequest('forwardMessage', params=params, on_result=Message.from_result, **request_args).run()
 
 def send_photo(chat_id: int,  photo: InputFile, 
                caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
