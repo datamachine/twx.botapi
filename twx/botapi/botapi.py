@@ -10,6 +10,10 @@ Telegram Bot API Types as defined at https://core.telegram.org/bots/api#availabl
 """
 _UserBase = namedtuple('User', ['id', 'first_name', 'last_name', 'username'])
 class User(_UserBase):
+    """This object represents a Telegram user or bot.
+
+
+    """
     __slots__ = ()
 
     @staticmethod
@@ -375,7 +379,7 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
 def _clean_params(**params):
     return {name: val for name, val in params.items() if val is not None}
 
-def _merge_dict(request_args, kwargs):
+def _merge_user_overrides(request_args, **kwargs):
     result = request_args.copy() if request_args is not None else {}
     if kwargs is not None:
         result.update(kwargs)
@@ -395,7 +399,7 @@ def get_me(*, request_args=None, **kwargs):
     :rtype: User
     """
 
-    request_args = _merge_dict(request_args, kwargs)
+    request_args = _merge_user_overrides(request_args, **kwargs)
 
     return TelegramBotRPCRequest('getMe', on_result=User.from_result, **request_args).run()
 
@@ -435,8 +439,9 @@ def send_message(chat_id: int, text: str,
         )
     )
 
-    return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result,
-                                 **(_merge_dict(request_args, kwargs))).run()
+    request_args = _merge_user_overrides(request_args, **kwargs)
+
+    return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result, **request_args).run()
 
 def forward_message(chat_id, from_chat_id, message_id,
                     *, request_args=None, **kwargs):
@@ -464,7 +469,7 @@ def forward_message(chat_id, from_chat_id, message_id,
         message_id=message_id
     )
 
-    request_args = _merge_dict(request_args, kwargs)
+    request_args = _merge_user_overrides(request_args, **kwargs)
 
     return TelegramBotRPCRequest('forwardMessage', params=params, on_result=Message.from_result, **request_args).run()
 
@@ -517,8 +522,10 @@ def send_photo(chat_id: int,  photo: InputFile,
         )
     )
 
-    return TelegramBotRPCRequest('sendPhoto', params=params, files=files, on_result=Message.from_result,
-                                 **(_merge_dict(request_args, kwargs))).run()
+    request_args = _merge_user_overrides(request_args, **kwargs)
+
+    return TelegramBotRPCRequest('sendPhoto', params=params, files=files, on_result=Message.from_result, 
+        **request_args).run()
 
 def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None,
                reply_markup: ReplyKeyboardMarkup=None,
@@ -564,9 +571,11 @@ def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None,
             reply_markup=reply_markup
         )
     )
+
+    request_args = _merge_user_overrides(request_args, **kwargs)
     
     return TelegramBotRPCRequest('sendAudio', params=params, files=files, on_result=Message.from_result,
-                                 **(_merge_dict(request_args, kwargs))).run()
+                                 **request_args).run()
 
 
 
@@ -612,8 +621,11 @@ def send_document(chat_id: int, document: InputFile, reply_to_message_id: int=No
             reply_markup=reply_markup
         )
     )
+
+    request_args = _merge_user_overrides(request_args, **kwargs)
+
     return TelegramBotRPCRequest('sendDocument', params=params, files=files, on_result=Message.from_result,
-                                 **(_merge_dict(request_args, kwargs))).run()
+                                 **request_args).run()
 
 def send_sticker(chat_id: int, sticker: InputFile, reply_to_message_id: int=None,
                  reply_markup: ReplyKeyboardMarkup=None,
@@ -656,8 +668,10 @@ def send_sticker(chat_id: int, sticker: InputFile, reply_to_message_id: int=None
         )
     )
 
+    request_args = _merge_user_overrides(request_args, **kwargs)
+
     return TelegramBotRPCRequest('sendSticker', params=params, files=files, on_result=Message.from_result,
-                                 **(_merge_dict(request_args, kwargs))).run()
+                                 **request_args).run()
 
 def send_video(chat_id: int, video: InputFile, reply_to_message_id: int=None,
                reply_markup: ReplyKeyboardMarkup=None,
@@ -703,9 +717,11 @@ def send_video(chat_id: int, video: InputFile, reply_to_message_id: int=None,
             reply_markup=reply_markup
         )
     )
+
+    request_args = _merge_user_overrides(request_args, **kwargs)
     
     return TelegramBotRPCRequest('sendVideo', params=params, files=files, on_result=Message.from_result,
-                                 **(_merge_dict(request_args, kwargs))).run()
+                                 **request_args).run()
 
 def send_location(chat_id: int, latitude: float, longitude: float, reply_to_message_id: int=None,
                   reply_markup: ReplyKeyboardMarkup=None,
@@ -747,8 +763,10 @@ def send_location(chat_id: int, latitude: float, longitude: float, reply_to_mess
         )
     )
 
+    request_args = _merge_user_overrides(request_args, **kwargs)
+
     return TelegramBotRPCRequest('sendLocation', params=params, on_result=Message.from_result,
-                                 **(_merge_dict(request_args, kwargs))).run()
+                                 **request_args).run()
 
 class ChatAction(str, Enum):
     TEXT = 'typing'
@@ -792,7 +810,7 @@ def send_chat_action(chat_id: int, action: ChatAction,
     )
 
     # merge bot args with user overrides
-    request_args = _merge_dict(request_args, kwargs)
+    request_args = _merge_user_overrides(request_args, **kwargs)
 
     return TelegramBotRPCRequest('sendChatAction', params=params, on_result=lambda result: result, **request_args).run()
 
@@ -824,7 +842,7 @@ def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, *, 
     )
 
     # merge bot args with user overrides
-    request_args = _merge_dict(request_args, kwargs)
+    request_args = _merge_user_overrides(request_args, **kwargs)
 
     return TelegramBotRPCRequest('getUserProfilePhotos', params=params, 
                                  on_result=UserProfilePhotos.from_result, **request_args).run()
@@ -865,7 +883,7 @@ def get_updates(offset: int=None, limit: int=None, timeout: int=None, *, request
         )
 
     # merge bot args with user overrides
-    request_args = _merge_dict(request_args, kwargs)
+    request_args = _merge_user_overrides(request_args, **kwargs)
 
     return TelegramBotRPCRequest('getUpdates', params=params, on_result=MessageUpdate.from_result, **request_args).run()
 
@@ -890,7 +908,7 @@ def set_webhook(url: str=None, *, request_args=None, **kwargs) -> TelegramBotRPC
     params = _clean_params(url=url)
 
     # merge bot args with user overrides
-    request_args = _merge_dict(request_args, kwargs)
+    request_args = _merge_user_overrides(request_args, **kwargs)
 
     return TelegramBotRPCRequest('setWebhook', params=params,
                                  on_result=lambda result: result, **request_args).run()
