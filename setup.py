@@ -41,9 +41,11 @@ setup(
     url = 'https://github.com/datamachine/twx', 
     download_url = download_url, 
     keywords = ['datamachine', 'telex', 'telegram', 'bot', 'api', 'rpc'],
+    platforms = ['Linux', 'Unix', 'MacOsX', 'Windows'],
     classifiers = [
       'Development Status :: 4 - Beta',
       'Intended Audience :: Developers',
+      'Operating System :: OS Independent',
       'Programming Language :: Python :: 3.4',
   ]
 )
