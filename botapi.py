@@ -65,6 +65,9 @@ class Message(_MessageBase):
     def from_result(result):
         if result is None:
             return None
+
+        print(result)
+
         return Message(
             message_id=result.get('message_id'), 
             sender=User.from_result(result.get('from')),
@@ -537,12 +540,48 @@ def send_chat_action(request_args, **kwargs):
     #TODO: implement
     raise NotImplemented
 
-def get_user_profile_photos(request_args, **kwargs):
+def _process_get_user_profile_photos_result(result):
+    if result is None:
+        return None
+
+    photo_lists = []
+    for photo_list in result.get('photos'):
+        photo_lists.append([PhotoSize.from_result(photo) for photo in photo_list])
+
+    return photo_lists
+
+
+def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, *, request_args: dict=None, **kwargs):
     """
+    Use this method to get a list of profile pictures for a user. Returns a UserProfilePhotos object.
+
+    :param user_id: Unique identifier of the target user
+    :param offset: Sequential number of the first photo to be returned. By default, all photos are returned.
+    :param limit: Limits the number of photos to be retrieved. Values between 1—100 are accepted. Defaults to 100.
     :param request_args, **kwargs: Args passed down to the TelegramBotRPCRequest
+
+    :type user_id: int
+    :type offset: int
+    :type limit: int
+
+    :returns: Returns a UserProfilePhotos object.
+    :rtype: TelegramBotRPCRequest
     """
-    #TODO: implement
-    raise NotImplemented
+    # required args
+    params = dict(user_id=user_id)
+
+    # optional args
+    params.update(
+        _clean_params(
+            offset=offset,
+            limit=limit
+        )
+    )
+
+    # merge bot args with user overrides
+    request_args = _merge_dict(request_args, kwargs)
+
+    return TelegramBotRPCRequest('getUserProfilePhotos', params=params, on_result=_process_get_user_profile_photos_result, **request_args).run()
 
 def get_updates(request_args, **kwargs):
     """
@@ -615,8 +654,7 @@ def print_result(result):
     pass
 
 def print_error(result):
-    #print(result)
-    pass
+    print(result)
 
 if __name__ == '__main__':
     import configparser
@@ -633,9 +671,11 @@ if __name__ == '__main__':
     
     # 97704886
 
-    msg = bot.send_message(test_chat_id, 'testing1', callback=print_result).join()
+    #msg = bot.send_message(test_chat_id, 'testing1', callback=print_result).join()
 
-    result = bot.forward_message(97704886, 96846582, msg.message_id).join()
+    #result = bot.forward_message(97704886, 96846582, msg.message_id).join()
+
+    result = bot.get_user_profile_photos(97704886, on_error=print_error, request_method=RequestMethod.GET).join()
 
     print(result)
 
