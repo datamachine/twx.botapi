@@ -2,22 +2,22 @@ from distutils.core import setup
 
 from subprocess import Popen, PIPE
 
-short_rev = None
+revlist_count = None
 long_rev = None
 
-with Popen(['git', 'rev-parse', '--short', 'HEAD'], stdout=PIPE) as f:
-    short_rev = f.stdout.read().decode().strip()
+with Popen(['git', 'rev-list', 'HEAD', '--count'], stdout=PIPE) as f:
+    revlist_count = f.stdout.read().decode().strip()
 
 with Popen(['git', 'rev-parse', 'HEAD'], stdout=PIPE) as f:
     long_rev = f.stdout.read().decode().strip()
 
-if short_rev is None:
+if revlist_count is None:
   raise Exception('Unable to determine short revision')
 
 if long_rev is None:
   raise Exception('Unable to determine long revision')
 
-version = '0.9.{short_rev}'.format(short_rev=short_rev)
+version = '1.0b.dev{revlist_count}'.format(revlist_count=revlist_count)
 download_url = 'https://github.com/datamachine/twx/archive/{long_rev}.tar.gz'.format(long_rev=long_rev)
 
 setup(
