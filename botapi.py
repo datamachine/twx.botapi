@@ -894,6 +894,18 @@ class TelegramBot:
         self.request_args['request_method'] = val
 
     @property
+    def id(self):
+        return self._bot_user.id   
+
+    @property
+    def first_name(self):
+        return self._bot_user.first_name   
+
+    @property
+    def last_name(self):
+        return self._bot_user.last_name   
+
+    @property
     def username(self):
         return self._bot_user.username    
 
