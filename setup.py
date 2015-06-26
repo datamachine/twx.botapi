@@ -17,7 +17,7 @@ if revlist_count is None:
 if long_rev is None:
   raise Exception('Unable to determine long revision')
 
-version = '1.0b.dev{revlist_count}'.format(revlist_count=revlist_count)
+version = '1.0b1.dev{revlist_count}'.format(revlist_count=revlist_count)
 download_url = 'https://github.com/datamachine/twx/archive/{long_rev}.tar.gz'.format(long_rev=long_rev)
 
 setup(
