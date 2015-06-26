@@ -352,7 +352,9 @@ def get_me(*, request_args=None, **kwargs):
     :rtype: User
     """
 
-    return TelegramBotRPCRequest('getMe', on_result=User.from_result, **(_merge_dict(request_args, kwargs))).run()
+    request_args = _merge_dict(request_args, kwargs)
+
+    return TelegramBotRPCRequest('getMe', on_result=User.from_result, **request_args).run()
 
 def send_message(chat_id: int, text: str, 
                  disable_web_page_preview: bool=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, 
