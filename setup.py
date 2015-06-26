@@ -34,7 +34,6 @@ download_url = 'https://github.com/datamachine/twx/archive/{long_rev}.tar.gz'.fo
 
 setup(
     name = 'twx',
-    package_dir = {'':'src'},
     packages = ['twx'],
     version = version,
     description = 'Unofficial Telegram Bot API Client',
