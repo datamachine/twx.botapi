@@ -309,10 +309,16 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
         self._async_call()
         return self
 
-def _cleanup_params(**params):
+def _clean_params(**params):
     return {name: val for name, val in params.items() if val is not None}
 
-def get_me(request_args):
+def _merge_dict(request_args, kwargs):
+    result = request_args.copy() if request_args is not None else {}
+    if kwargs is not None:
+        result.update(kwargs)
+    return result
+
+def get_me(*, request_args=None, **kwargs):
     """
     A simple method for testing your bot's auth token. Requires no parameters. 
     Returns basic information about the bot in form of a User object.
@@ -322,12 +328,12 @@ def get_me(request_args):
     :returns: Returns basic information about the bot in form of a User object.
     :rtype: User
     """
-    return TelegramBotRPCRequest('getMe', on_result=User.from_result,
-                                 **(request_args if request_args is not None else {})).run()
+
+    return TelegramBotRPCRequest('getMe', on_result=User.from_result, **(_merge_dict(request_args, kwargs))).run()
 
 def send_message(chat_id: int, text: str, 
                  disable_web_page_preview: bool=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, 
-                 request_args=None):
+                 *, request_args=None, **kwargs):
     """
     Use this method to send text messages. 
 
@@ -349,18 +355,20 @@ def send_message(chat_id: int, text: str,
     :returns: On success, the sent Message is returned.
     :rtype: Message
     """    
-    params = _cleanup_params(
+    params = _clean_params(
         chat_id=chat_id, 
         text=text, 
         disable_web_page_preview=disable_web_page_preview,
         reply_to_message_id=reply_to_message_id,
-        reply_markup=reply_markup
+        reply_markup=reply_markup,
+        **kwargs
         )
 
     return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result,
-                                 **(request_args if request_args is not None else {})).run()
+                                 **(_merge_dict(request_args, kwargs))).run()
 
-def forward_message(chat_id, from_chat_id, message_id, request_args):
+def forward_message(chat_id, from_chat_id, message_id,
+                    *, request_args=None, **kwargs):
     """
     Use this method to forward messages of any kind. 
 
@@ -381,7 +389,7 @@ def forward_message(chat_id, from_chat_id, message_id, request_args):
 
 def send_photo(chat_id: int,  photo: InputFile, 
                caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
-               request_args: dict=None):
+               *, request_args=None, **kwargs):
     """
     Use this method to send photos.
 
@@ -413,7 +421,7 @@ def send_photo(chat_id: int,  photo: InputFile,
     elif not isinstance(photo, str):
         raise Exception('photo must be instance of InputFile or str')
 
-    params = _cleanup_params(
+    params = _clean_params(
         chat_id=chat_id,
         photo=photo,
         caption=caption,
@@ -422,10 +430,11 @@ def send_photo(chat_id: int,  photo: InputFile,
         )
 
     return TelegramBotRPCRequest('sendPhoto', params=params, files=files, on_result=Message.from_result,
-                                 **(request_args if request_args is not None else {})).run()
+                                 **(_merge_dict(request_args, kwargs))).run()
 
 def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None,
-               reply_markup: ReplyKeyboardMarkup=None, request_args=None):
+               reply_markup: ReplyKeyboardMarkup=None,
+               *, request_args=None, **kwargs):
     """
     Use this method to send audio files, if you want Telegram clients to display the file as a playable voice
     message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent 
@@ -450,7 +459,8 @@ def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None,
     #TODO: implement
     raise NotImplemented
 
-def send_document(chat_id, document, reply_to_message_id=None, reply_markup=None, request_args=None):
+def send_document(chat_id, document, reply_to_message_id=None, reply_markup=None,
+                  *, request_args=None, **kwargs):
     """
     :param chat_id: 
     :param document: 
@@ -469,7 +479,8 @@ def send_document(chat_id, document, reply_to_message_id=None, reply_markup=None
     # TODO: Implement
     raise NotImplemented
 
-def send_sticker(chat_id, sticker, reply_to_message_id, reply_markup=None, request_args=None):
+def send_sticker(chat_id, sticker, reply_to_message_id, reply_markup=None,
+                 *, request_args=None, **kwargs):
     """
     :param token: 
     :param chat_id: 
@@ -490,44 +501,44 @@ def send_sticker(chat_id, sticker, reply_to_message_id, reply_markup=None, reque
     #TODO: implement
     raise NotImplemented
 
-def send_video(request_args):
+def send_video(request_args, **kwargs):
     """
-    :param request_args: Args passed down to the TelegramBotRPCRequest
-    """
-    #TODO: implement
-    raise NotImplemented
-
-def send_location(request_args):
-    """
-    :param request_args: Args passed down to the TelegramBotRPCRequest
+    :param request_args, **kwargs: Args passed down to the TelegramBotRPCRequest
     """
     #TODO: implement
     raise NotImplemented
 
-def send_chat_action(request_args):
+def send_location(request_args, **kwargs):
     """
-    :param request_args: Args passed down to the TelegramBotRPCRequest
-    """
-    #TODO: implement
-    raise NotImplemented
-
-def get_user_profile_photos(request_args):
-    """
-    :param request_args: Args passed down to the TelegramBotRPCRequest
+    :param request_args, **kwargs: Args passed down to the TelegramBotRPCRequest
     """
     #TODO: implement
     raise NotImplemented
 
-def get_updates(request_args):
+def send_chat_action(request_args, **kwargs):
     """
-    :param request_args: Args passed down to the TelegramBotRPCRequest
+    :param request_args, **kwargs: Args passed down to the TelegramBotRPCRequest
     """
     #TODO: implement
     raise NotImplemented
 
-def set_webhook(request_args):
+def get_user_profile_photos(request_args, **kwargs):
     """
-    :param request_args: Args passed down to the TelegramBotRPCRequest
+    :param request_args, **kwargs: Args passed down to the TelegramBotRPCRequest
+    """
+    #TODO: implement
+    raise NotImplemented
+
+def get_updates(request_args, **kwargs):
+    """
+    :param request_args, **kwargs: Args passed down to the TelegramBotRPCRequest
+    """
+    #TODO: implement
+    raise NotImplemented
+
+def set_webhook(request_args, **kwargs):
+    """
+    :param request_args, **kwargs: Args passed down to the TelegramBotRPCRequest
     """
     #TODO: implement
     raise NotImplemented
@@ -545,20 +556,20 @@ class TelegramBot:
             request_method=self.request_method
         )
 
-        self.get_me = partial(get_me, self.request_args)
-        self.send_message = partial(send_message, self.request_args)
-        self.forward_message = partial(forward_message, self.request_args)
-        self.send_photo = partial(send_photo, self.request_args)
-        self.send_audio = partial(send_audio, self.request_args)
-        self.send_document = partial(send_document, self.request_args)
-        self.send_sticker = partial(send_sticker, self.request_args)
-        self.send_video = partial(send_video, self.request_args)
-        self.send_location = partial(send_location, self.request_args)
-        self.send_chat_action = partial(send_chat_action, self.request_args)
-        self.get_user_profile_photos = partial(get_user_profile_photos, self.request_args)
-        self.get_updates = partial(get_updates, self.request_args)
-        self.set_webhook = partial(set_webhook, self.request_args)
-        self.update_bot_info = partial(get_me, self.request_args, callback=self._update_bot_info)
+        self.get_me = partial(get_me, request_args=self.request_args)
+        self.send_message = partial(send_message, request_args=self.request_args)
+        self.forward_message = partial(forward_message, request_args=self.request_args)
+        self.send_photo = partial(send_photo, request_args=self.request_args)
+        self.send_audio = partial(send_audio, request_args=self.request_args)
+        self.send_document = partial(send_document, request_args=self.request_args)
+        self.send_sticker = partial(send_sticker, request_args=self.request_args)
+        self.send_video = partial(send_video, request_args=self.request_args)
+        self.send_location = partial(send_location, request_args=self.request_args)
+        self.send_chat_action = partial(send_chat_action, request_args=self.request_args)
+        self.get_user_profile_photos = partial(get_user_profile_photos, request_args=self.request_args)
+        self.get_updates = partial(get_updates, request_args=self.request_args)
+        self.set_webhook = partial(set_webhook, request_args=self.request_args)
+        self.update_bot_info = partial(get_me, request_args=self.request_args, callback=self._update_bot_info)
 
     def __str__(self):
         return self.token
@@ -603,9 +614,7 @@ if __name__ == '__main__':
 
     print(bot.username)
     
-    bot.send_message(test_chat_id, 'testing', callback=print_result)
-    bot.token = "112473874:AAEmFD6PxTGw0gM7J7eDYQpqMGXFz4xyZ60"
-    bot.send_message(test_chat_id, 'testing', callback=print_result)
+    bot.send_message(test_chat_id, 'testing1', callback=print_result)
 
     #send_message(test_chat_id, 'testing', token=test_token, callback=print_result)
     #bot.send_photo(test_chat_id, photo, callback=print_result)
