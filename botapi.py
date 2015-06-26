@@ -848,7 +848,11 @@ def set_webhook(url: str=None, *, request_args=None, **kwargs) -> TelegramBotRPC
     :returns: Returns True on success.
     :rtype:  TelegramBotRPCRequest
     """
+    # optional args
     params = _clean_params(url=url)
+
+    # merge bot args with user overrides
+    request_args = _merge_dict(request_args, kwargs)
 
     return TelegramBotRPCRequest('setWebhook', params=params,
                                  on_result=lambda result: result, **request_args).run()
