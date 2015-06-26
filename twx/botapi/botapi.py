@@ -54,11 +54,17 @@ class Message(_MessageBase):
         if photo is not None:
             photo = [PhotoSize.from_result(photo_size) for photo_size in result.get('photo')]
 
+        chat = result.get('chat')
+        if 'id' in chat and 'title' in chat:
+            chat = GroupChat.from_result(chat)
+        else:
+            chat = User.from_result(chat)
+
         return Message(
             message_id=result.get('message_id'), 
             sender=User.from_result(result.get('from')),
             date=result.get('date'),
-            chat=result.get('chat'), # TODO: May be User or GroupChat
+            chat=chat,
             forward_from=User.from_result(result.get('forward_from')),
             forward_date=result.get('forward_date'),
             reply_to_message=Message.from_result(result.get('reply_to_message')),
