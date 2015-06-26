@@ -742,13 +742,16 @@ def send_chat_action(chat_id: int, action: ChatAction,
     :returns: Returns True on success.
     :rtype:  bool
     """
+    # required args
     params = dict(
         chat_id=chat_id,
         action=action
     )
 
-    return TelegramBotRPCRequest('sendChatAction', params=params, on_result=lambda result: result,
-                                 **(_merge_dict(request_args, kwargs))).run()
+    # merge bot args with user overrides
+    request_args = _merge_dict(request_args, kwargs)
+
+    return TelegramBotRPCRequest('sendChatAction', params=params, on_result=lambda result: result, **request_args).run()
 
 def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, *, request_args: dict=None, **kwargs):
     """
