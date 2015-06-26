@@ -43,6 +43,7 @@ setup(
     download_url = download_url, 
     keywords = ['datamachine', 'telex', 'telegram', 'bot', 'api', 'rpc'],
     platforms = ['Linux', 'Unix', 'MacOsX', 'Windows'],
+    long_description = open("README.rst").read(),
     classifiers = [
       'Development Status :: 4 - Beta',
       'Intended Audience :: Developers',
