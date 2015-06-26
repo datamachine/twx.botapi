@@ -3,6 +3,7 @@ from collections import namedtuple
 from enum import Enum
 from functools import partial
 from abc import ABCMeta
+from threading import Thread
 
 _UserBase = namedtuple('User', ['id', 'first_name', 'last_name', 'username'])
 _GroupChatBase = namedtuple('GroupChat', ['id', 'title'])
@@ -266,6 +267,8 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
         self.result = None
         self.error = None
 
+        self.thread = Thread(target=self._async_call)
+
     def _get_url(self):
         return '{base_url}{token}/{method}'.format(base_url=TelegramBotRPCRequest.api_url_base,
                                                    token=self.token,
@@ -306,8 +309,13 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
         return None
 
     def run(self):
-        self._async_call()
+        self.thread.start()
+
         return self
+
+    def join(self, timeout=None):
+        self.thread.join(timeout)
+        return self.result
 
 def _clean_params(**params):
     return {name: val for name, val in params.items() if val is not None}
@@ -360,8 +368,7 @@ def send_message(chat_id: int, text: str,
         text=text, 
         disable_web_page_preview=disable_web_page_preview,
         reply_to_message_id=reply_to_message_id,
-        reply_markup=reply_markup,
-        **kwargs
+        reply_markup=reply_markup
         )
 
     return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result,
@@ -384,8 +391,16 @@ def forward_message(chat_id, from_chat_id, message_id,
     :returns: On success, the sent Message is returned.
     :rtype: Message
     """
-    #TODO: implement
-    raise NotImplemented
+
+    params = dict(
+        chat_id=chat_id, 
+        from_chat_id=from_chat_id, 
+        message_id=message_id
+        )
+
+    request_args = _merge_dict(request_args, kwargs)
+
+    return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result, **request_args).run()
 
 def send_photo(chat_id: int,  photo: InputFile, 
                caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
@@ -596,10 +611,12 @@ class TelegramBot:
         self._bot_user = bot_user
 
 def print_result(result):
-    print(result)
+    #print(result)
+    pass
 
 def print_error(result):
-    print(result)
+    #print(result)
+    pass
 
 if __name__ == '__main__':
     import configparser
@@ -613,10 +630,14 @@ if __name__ == '__main__':
     bot = TelegramBot(test_token)
     bot.get_me(callback=print_result)
     bot.update_bot_info()
-
-    print(bot.username)
     
-    bot.send_message(test_chat_id, 'testing1', callback=print_result)
+    # 97704886
+
+    msg = bot.send_message(test_chat_id, 'testing1', callback=print_result)
+
+    print(msg.join())
+
+    #bot.forward_message(test_chat_id, 'testing1', callback=print_result)
 
     #send_message(test_chat_id, 'testing', token=test_token, callback=print_result)
     #bot.send_photo(test_chat_id, photo, callback=print_result)
