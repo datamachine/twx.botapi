@@ -330,6 +330,18 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
 
     def join(self, timeout=None):
         self.thread.join(timeout)
+        return self
+
+    def wait(self):
+        """
+        Wait for the request to finish and return the result or error when finished
+
+        :returns: result or error
+        :type: result tyoe or Error
+        """
+        self.thread.join()
+        if self.error is not None:
+            return self.error        
         return self.result
 
 def _clean_params(**params):
