@@ -50,15 +50,17 @@ class Message(_MessageBase):
         if result is None:
             return None
 
-        photo = result.get('photo')
-        if photo is not None:
-            photo = [PhotoSize.from_result(photo_size) for photo_size in result.get('photo')]
-
+        # Determine whether chat is GroupChat or User type
         chat = result.get('chat')
         if 'id' in chat and 'title' in chat:
             chat = GroupChat.from_result(chat)
         else:
             chat = User.from_result(chat)
+
+        # photo is a list of PhotoSize
+        photo = result.get('photo')
+        if photo is not None:
+            photo = [PhotoSize.from_result(photo_size) for photo_size in result.get('photo')]
 
         return Message(
             message_id=result.get('message_id'), 
