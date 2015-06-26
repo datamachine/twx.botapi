@@ -307,6 +307,8 @@ def get_me(**request_args):
     A simple method for testing your bot's auth token. Requires no parameters. 
     Returns basic information about the bot in form of a User object.
 
+    :param request_args: Args passed down to TelegramBotRPCRequest
+
     :returns: Returns basic information about the bot in form of a User object.
     :rtype: User
     """
@@ -325,6 +327,7 @@ def send_message(chat_id: int, text: str,
     :param reply_markup: Additional interface options. A JSON-serialized object for a 
                          custom reply keyboard, instructions to hide keyboard or to 
                          force a reply from the user.
+    :param request_args: Args passed down to TelegramBotRPCRequest
 
     :type chat_id: int
     :type text: str
@@ -352,7 +355,7 @@ def forward_message(chat_id, from_chat_id, message_id, **request_args):
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
     :param from_chat_id: Unique identifier for the chat where the original message was sent — User or GroupChat id
     :param message_id: Unique message identifier
-
+    :param request_args: Args passed down to TelegramBotRPCRequest
 
     :type chat_id: int
     :type from_chat_id: int
@@ -379,6 +382,7 @@ def send_photo(chat_id: int,  photo: InputFile,
     :param reply_markup: Additional interface options. A JSON-serialized object for a 
                          custom reply keyboard, instructions to hide keyboard or to 
                          force a reply from the user.
+    :param request_args: Args passed down to TelegramBotRPCRequest
 
     :type chat_id: int
     :type photo: InputFile or str
@@ -419,6 +423,7 @@ def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None, re
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard, 
                          instructions to hide keyboard or to force a reply from the user.
+    :param request_args: Args passed down to TelegramBotRPCRequest
 
     :type chat_id: int
     :type audio: InputFile or str
@@ -437,6 +442,7 @@ def send_document(chat_id, document, reply_to_message_id=None, reply_markup=None
     :param document: 
     :param reply_to_message_id: 
     :param reply_markup: 
+    :param request_args: Args passed down to TelegramBotRPCRequest
 
     :type chat_id: 
     :type document: 
@@ -456,6 +462,7 @@ def send_sticker(chat_id, sticker, reply_to_message_id, reply_markup, **request_
     :param sticker: 
     :param reply_to_message_id: 
     :param reply_markup: 
+    :param request_args: Args passed down to TelegramBotRPCRequest
 
     :type token: 
     :type chat_id: 
