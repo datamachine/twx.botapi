@@ -8,7 +8,7 @@ setup(
   author = 'Vince Castellano, Phillip Lopo',
   author_email = 'surye80@gmail.com, philliplopo@gmail.com',
   url = 'https://github.com/datamachine/twx', # use the URL to the github repo
-  download_url = 'https://github.com/datamachine/twx/tarball/1.0', # I'll explain this in a second
+  download_url = 'https://github.com/datamachine/twx/archive/master.tar.gz', # I'll explain this in a second
   keywords = ['datamachine', 'telex', 'telegram', 'bot', 'api'], # arbitrary keywords
   classifiers = []
 )
