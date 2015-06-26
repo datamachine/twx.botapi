@@ -3,6 +3,7 @@ from collections import namedtuple
 from enum import Enum
 from functools import partial
 from abc import ABCMeta
+from threading import Thread
 
 _UserBase = namedtuple('User', ['id', 'first_name', 'last_name', 'username'])
 _GroupChatBase = namedtuple('GroupChat', ['id', 'title'])
@@ -64,6 +65,9 @@ class Message(_MessageBase):
     def from_result(result):
         if result is None:
             return None
+
+        print(result)
+
         return Message(
             message_id=result.get('message_id'), 
             sender=User.from_result(result.get('from')),
@@ -266,6 +270,8 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
         self.result = None
         self.error = None
 
+        self.thread = Thread(target=self._async_call)
+
     def _get_url(self):
         return '{base_url}{token}/{method}'.format(base_url=TelegramBotRPCRequest.api_url_base,
                                                    token=self.token,
@@ -306,8 +312,13 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
         return None
 
     def run(self):
-        self._async_call()
+        self.thread.start()
+
         return self
+
+    def join(self, timeout=None):
+        self.thread.join(timeout)
+        return self.result
 
 def _clean_params(**params):
     return {name: val for name, val in params.items() if val is not None}
@@ -354,15 +365,17 @@ def send_message(chat_id: int, text: str,
 
     :returns: On success, the sent Message is returned.
     :rtype: Message
-    """    
-    params = _clean_params(
-        chat_id=chat_id, 
-        text=text, 
+    """
+    # mandatory params
+    params = dict(chat_id=chat_id, text=text)
+
+    # optional params
+    params.update(_clean_params(
         disable_web_page_preview=disable_web_page_preview,
         reply_to_message_id=reply_to_message_id,
-        reply_markup=reply_markup,
-        **kwargs
+        reply_markup=reply_markup
         )
+    )
 
     return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result,
                                  **(_merge_dict(request_args, kwargs))).run()
@@ -384,8 +397,17 @@ def forward_message(chat_id, from_chat_id, message_id,
     :returns: On success, the sent Message is returned.
     :rtype: Message
     """
-    #TODO: implement
-    raise NotImplemented
+
+    # mandatory params
+    params = dict(
+        chat_id=chat_id, 
+        from_chat_id=from_chat_id, 
+        message_id=message_id
+        )
+
+    request_args = _merge_dict(request_args, kwargs)
+
+    return TelegramBotRPCRequest('forwardMessage', params=params, on_result=Message.from_result, **request_args).run()
 
 def send_photo(chat_id: int,  photo: InputFile, 
                caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
@@ -670,12 +692,48 @@ def send_chat_action(chat_id: int, action: ChatAction,
     return TelegramBotRPCRequest('sendChatAction', params=params, on_result=lambda result: result,
                                  **(_merge_dict(request_args, kwargs))).run()
 
-def get_user_profile_photos(request_args, **kwargs):
+def _process_get_user_profile_photos_result(result):
+    if result is None:
+        return None
+
+    photo_lists = []
+    for photo_list in result.get('photos'):
+        photo_lists.append([PhotoSize.from_result(photo) for photo in photo_list])
+
+    return photo_lists
+
+
+def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, *, request_args: dict=None, **kwargs):
     """
+    Use this method to get a list of profile pictures for a user. Returns a UserProfilePhotos object.
+
+    :param user_id: Unique identifier of the target user
+    :param offset: Sequential number of the first photo to be returned. By default, all photos are returned.
+    :param limit: Limits the number of photos to be retrieved. Values between 1—100 are accepted. Defaults to 100.
     :param request_args, **kwargs: Args passed down to the TelegramBotRPCRequest
+
+    :type user_id: int
+    :type offset: int
+    :type limit: int
+
+    :returns: Returns a UserProfilePhotos object.
+    :rtype: TelegramBotRPCRequest
     """
-    #TODO: implement
-    raise NotImplemented
+    # required args
+    params = dict(user_id=user_id)
+
+    # optional args
+    params.update(
+        _clean_params(
+            offset=offset,
+            limit=limit
+        )
+    )
+
+    # merge bot args with user overrides
+    request_args = _merge_dict(request_args, kwargs)
+
+    return TelegramBotRPCRequest('getUserProfilePhotos', params=params, on_result=_process_get_user_profile_photos_result, **request_args).run()
 
 def get_updates(request_args, **kwargs):
     """
@@ -744,7 +802,8 @@ class TelegramBot:
         self._bot_user = bot_user
 
 def print_result(result):
-    print(result)
+    #print(result)
+    pass
 
 def print_error(result):
     print(result)
@@ -763,10 +822,18 @@ if __name__ == '__main__':
     bot = TelegramBot(test_token)
     bot.get_me(callback=print_result)
     bot.update_bot_info()
-
-    print(bot.username)
     
-    bot.send_message(test_chat_id, 'testing1', callback=print_result)
+    # 97704886
+
+    #msg = bot.send_message(test_chat_id, 'testing1', callback=print_result).join()
+
+    #result = bot.forward_message(97704886, 96846582, msg.message_id).join()
+
+    result = bot.get_user_profile_photos(97704886, on_error=print_error, request_method=RequestMethod.GET).join()
+
+    print(result)
+
+    #bot.forward_message(test_chat_id, 'testing1', callback=print_result)
 
     bot.send_photo(test_chat_id, photo, callback=print_result)
     bot.send_audio(test_chat_id, audio, callback=print_result)
