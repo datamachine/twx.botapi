@@ -365,7 +365,7 @@ def forward_message(chat_id, from_chat_id, message_id, **request_args):
     :rtype: Message
     """
     #TODO: implement
-    return None
+    raise NotImplemented
 
 def send_photo(chat_id: int,  photo: InputFile, 
                caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
