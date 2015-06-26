@@ -8,11 +8,11 @@ from threading import Thread
 # Explicitly definied Telegram bot API types
 _UserBase = namedtuple('User', ['id', 'first_name', 'last_name', 'username'])
 _GroupChatBase = namedtuple('GroupChat', ['id', 'title'])
-_MessageBase = namedtuple('Message', ['message_id', 'sender', 'date', 
-                                      'chat', 'forward_from', 'forward_date', 'reply_to_message', 
-                                      'text', 'audio', 'document', 'photo', 'sticker', 'video', 'contact', 'location', 
-                                      'new_chat_participant', 'left_chat_participant', 'new_chat_title', 
-                                      'new_chat_photo', 'delete_chat_photo', 'group_chat_created'])
+_MessageBase = namedtuple('Message', ['message_id', 'sender', 'date', 'chat', 'forward_from', 'forward_date', 
+                                      'reply_to_message', 'text', 'audio', 'document', 'photo', 'sticker', 
+                                      'video', 'contact', 'location', 'new_chat_participant', 
+                                      'left_chat_participant', 'new_chat_title', 'new_chat_photo', 
+                                      'delete_chat_photo', 'group_chat_created'])
 _PhotoSizeBase = namedtuple('PhotoSize', ['file_id', 'width', 'height', 'file_size'])
 _AudioBase = namedtuple('Audio', ['file_id', 'duration', 'mime_type', 'file_size'])
 _DocumentBase = namedtuple('Document', ['file_id', 'thumb', 'file_name', 'mime_type', 'file_size'])
@@ -257,11 +257,12 @@ class RequestMethod(str, Enum):
 class TelegramBotRPCRequest(metaclass=ABCMeta):
     api_url_base = 'https://api.telegram.org/bot'
 
-    def __init__(self, api_method: str, *, token, params: dict=None, on_result=None, callback=None, on_error=None,
-                 files=None, request_method=RequestMethod.POST):
+    def __init__(self, api_method: str, *, token, params: dict=None, on_result=None, callback=None, 
+                 on_error=None, files=None, request_method=RequestMethod.POST):
         """
         :param api_method: The API method to call. See https://core.telegram.org/bots/api#available-methods
-        :param token: The API token generated following the instructions at https://core.telegram.org/bots#botfather
+        :param token: The API token generated following the instructions at 
+                      https://core.telegram.org/bots#botfather
         :param params: The api method parameters.
 
         :type api_method: str
