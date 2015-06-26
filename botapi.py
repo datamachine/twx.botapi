@@ -478,29 +478,41 @@ def send_sticker(chat_id, sticker, reply_to_message_id, reply_markup, **request_
 
 class TelegramBot:
 
-    def __init__(self, token):
+    def __init__(self, token, request_method: RequestMethod=RequestMethod.GET):
         from functools import partial
-        self.token = token
-        self.id = None
-        self.first_name = None
-        self.last_name = None
-        self.username = None
+        self._token = token
+        self._request_method = request_method
 
-        setattr(self, 'get_me', partial(get_me, token=self.token))
-        setattr(self, 'send_message', partial(send_message, token=self.token))
-        setattr(self, 'send_photo', partial(send_photo, token=self.token))
+        self._bot_user = User(None, None, None, None)
 
-        setattr(self, 'update_bot_info', partial(self.get_me, callback=self._update_bot_info))
+        request_args = dict(
+            token=self.token,
+            request_method=self.request_method
+            )
+
+        setattr(self, 'get_me', partial(get_me, **request_args))
+        setattr(self, 'send_message', partial(send_message, **request_args))
+        setattr(self, 'send_photo', partial(send_photo, **request_args))
+
+        setattr(self, 'update_bot_info', partial(get_me, callback=self._update_bot_info, **request_args))
 
     def __str__(self):
         return self.token
 
+    @property
+    def token(self):
+        return self._token
+
+    @property
+    def request_method(self):
+        return self._request_method
+
+    @property
+    def username(self):
+        return self._bot_user.username    
+
     def _update_bot_info(self, bot_user):
-        print('update_mae', bot_user)
-        self.id = bot_user.id
-        self.first_name = bot_user.first_name
-        self.last_name = bot_user.last_name
-        self.username = bot_user.username
+        self._bot_user = bot_user
 
 def print_result(result):
     print(result)
