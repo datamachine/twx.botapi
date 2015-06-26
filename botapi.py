@@ -372,10 +372,10 @@ def send_message(chat_id: int, text: str,
     :returns: On success, the sent Message is returned.
     :rtype: Message
     """
-    # mandatory params
+    # required args
     params = dict(chat_id=chat_id, text=text)
 
-    # optional params
+    # optional args
     params.update(_clean_params(
         disable_web_page_preview=disable_web_page_preview,
         reply_to_message_id=reply_to_message_id,
@@ -404,12 +404,12 @@ def forward_message(chat_id, from_chat_id, message_id,
     :rtype: Message
     """
 
-    # mandatory params
+    # required args
     params = dict(
         chat_id=chat_id, 
         from_chat_id=from_chat_id, 
         message_id=message_id
-        )
+    )
 
     request_args = _merge_dict(request_args, kwargs)
 
@@ -449,13 +449,20 @@ def send_photo(chat_id: int,  photo: InputFile,
     elif not isinstance(photo, str):
         raise Exception('photo must be instance of InputFile or str')
 
-    params = _clean_params(
+    # required args
+    params = dict(
         chat_id=chat_id,
-        photo=photo,
-        caption=caption,
-        reply_to_message_id=reply_to_message_id,
-        reply_markup=reply_markup
+        photo=photo
+    )
+
+    # optional args
+    params.update(
+        _clean_params(
+            caption=caption,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup
         )
+    )
 
     return TelegramBotRPCRequest('sendPhoto', params=params, files=files, on_result=Message.from_result,
                                  **(_merge_dict(request_args, kwargs))).run()
@@ -491,11 +498,18 @@ def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None,
     elif not isinstance(audio, str):
         raise Exception('audio must be instance of InputFile or str')
 
-    params = _clean_params(
+    # required args
+    params = dict(
         chat_id=chat_id,
-        audio=audio,
-        reply_to_message_id=reply_to_message_id,
-        reply_markup=reply_markup
+        audio=audio
+    )
+
+    # optional args
+    params.update(
+        _clean_params(
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup
+        )
     )
     
     return TelegramBotRPCRequest('sendAudio', params=params, files=files, on_result=Message.from_result,
@@ -532,13 +546,19 @@ def send_document(chat_id: int, document: InputFile, reply_to_message_id: int=No
     elif not isinstance(document, str):
         raise Exception('document must be instance of InputFile or str')
 
-    params = _clean_params(
+    # required args
+    params = dict(
         chat_id=chat_id,
-        document=document,
-        reply_to_message_id=reply_to_message_id,
-        reply_markup=reply_markup
+        document=document
     )
-    
+
+    # optional args
+    params.update(
+        _clean_params(
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup
+        )
+    )
     return TelegramBotRPCRequest('sendDocument', params=params, files=files, on_result=Message.from_result,
                                  **(_merge_dict(request_args, kwargs))).run()
 
@@ -569,13 +589,20 @@ def send_sticker(chat_id: int, sticker: InputFile, reply_to_message_id: int=None
     elif not isinstance(sticker, str):
         raise Exception('sticker must be instance of InputFile or str')
 
-    params = _clean_params(
+    # required args
+    params = dict(
         chat_id=chat_id,
-        sticker=sticker,
-        reply_to_message_id=reply_to_message_id,
-        reply_markup=reply_markup
+        sticker=sticker
     )
-    
+
+    # optional args
+    params.update(
+        _clean_params(
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup
+        )
+    )
+
     return TelegramBotRPCRequest('sendSticker', params=params, files=files, on_result=Message.from_result,
                                  **(_merge_dict(request_args, kwargs))).run()
 
@@ -610,11 +637,18 @@ def send_video(chat_id: int, video: InputFile, reply_to_message_id: int=None,
     elif not isinstance(video, str):
         raise Exception('video must be instance of InputFile or str')
 
-    params = _clean_params(
+    # required args
+    params = dict(
         chat_id=chat_id,
-        video=video,
-        reply_to_message_id=reply_to_message_id,
-        reply_markup=reply_markup
+        video=video
+    )
+
+    # optional args
+    params.update(
+        _clean_params(
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup
+        )
     )
     
     return TelegramBotRPCRequest('sendVideo', params=params, files=files, on_result=Message.from_result,
@@ -644,12 +678,20 @@ def send_location(chat_id: int, latitude: float, longitude: float, reply_to_mess
     :returns: On success, the sent Message is returned.
     :rtype:  TelegramBotRPCRequest
     """
-    params = _clean_params(
+
+    # required args
+    params = dict(
         chat_id=chat_id,
         latitude=latitude,
-        longitude=longitude,
-        reply_to_message_id=reply_to_message_id,
-        reply_markup=reply_markup
+        longitude=longitude
+    )
+
+    # optional args
+    params.update(
+        _clean_params(
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup
+        )
     )
 
     return TelegramBotRPCRequest('sendLocation', params=params, on_result=Message.from_result,
@@ -690,10 +732,10 @@ def send_chat_action(chat_id: int, action: ChatAction,
     :returns: On success, the sent Message is returned.
     :rtype:  TelegramBotRPCRequest
     """
-    params = {
-        'chat_id': chat_id,
-        'action': action
-    }
+    params = dict(
+        chat_id=chat_id,
+        action=action
+    )
 
     return TelegramBotRPCRequest('sendChatAction', params=params, on_result=lambda result: result,
                                  **(_merge_dict(request_args, kwargs))).run()
