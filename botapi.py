@@ -247,7 +247,8 @@ class RequestMethod(str, Enum):
 class TelegramBotRPCRequest(metaclass=ABCMeta):
     api_url_base = 'https://api.telegram.org/bot'
 
-    def __init__(self, api_method: str, *, token, params: dict=None, on_result=None, callback=None, on_error=None, files=None, request_method=RequestMethod.POST):
+    def __init__(self, api_method: str, *, token, params: dict=None, on_result=None, callback=None, on_error=None,
+                 files=None, request_method=RequestMethod.POST):
         """
         :param api_method: The API method to call. See https://core.telegram.org/bots/api#available-methods
         :param token: The API token generated following the instructions at https://core.telegram.org/bots#botfather
@@ -723,8 +724,8 @@ def send_chat_action(chat_id: int, action: ChatAction,
     :type chat_id: int
     :type action: ChatAction
 
-    :returns: On success, the sent Message is returned.
-    :rtype:  TelegramBotRPCRequest
+    :returns: Returns True on success.
+    :rtype:  bool
     """
     params = dict(
         chat_id=chat_id,
@@ -775,7 +776,8 @@ def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, *, 
     # merge bot args with user overrides
     request_args = _merge_dict(request_args, kwargs)
 
-    return TelegramBotRPCRequest('getUserProfilePhotos', params=params, on_result=_process_get_user_profile_photos_result, **request_args).run()
+    return TelegramBotRPCRequest('getUserProfilePhotos', params=params,
+                                 on_result=_process_get_user_profile_photos_result, **request_args).run()
 
 def get_updates(offset: int=None, limit: int=None, timeout: int=None, *, request_args, **kwargs):
     """
@@ -810,12 +812,27 @@ def get_updates(offset: int=None, limit: int=None, timeout: int=None, *, request
     #TODO: implement
     raise NotImplemented
 
-def set_webhook(request_args, **kwargs):
+def set_webhook(url: str=None, *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
     """
-    :param request_args, **kwargs: Args passed down to the TelegramBotRPCRequest
+    Use this method to specify a url and receive incoming updates via an outgoing webhook.
+    Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a
+    JSON-serialized Update. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
+
+    Please note that you will not be able to receive updates using getUpdates for as long as an outgoing
+    webhook is set up.
+
+    :param url: HTTPS url to send updates to. Use an empty string to remove webhook integration
+    :param request_args: Args passed down to TelegramBotRPCRequest
+
+    :type url: str
+
+    :returns: Returns True on success.
+    :rtype:  TelegramBotRPCRequest
     """
-    #TODO: implement
-    raise NotImplemented
+    params = _clean_params(url=url)
+
+    return TelegramBotRPCRequest('setWebhook', params=params,
+                                 on_result=lambda result: result, **request_args).run()
 
 
 class TelegramBot:
@@ -894,7 +911,6 @@ if __name__ == '__main__':
     # 97704886
 
     #msg = bot.send_message(test_chat_id, 'testing1', callback=print_result).join()
-
     #result = bot.forward_message(97704886, 96846582, msg.message_id).join()
 
     result = bot.get_user_profile_photos(97704886, on_error=print_error, request_method=RequestMethod.GET).join()
