@@ -242,7 +242,17 @@ class RequestMethod(str, Enum):
 class TelegramBotRPCRequest(metaclass=ABCMeta):
     api_url_base = 'https://api.telegram.org/bot'
 
-    def __init__(self, api_method, *, token, params=None, on_result=None, callback=None, on_error=None, files=None, request_method=RequestMethod.GET):
+    def __init__(self, api_method: str, *, token, params: dict=None, on_result=None, callback=None, on_error=None, files=None, request_method=RequestMethod.GET):
+        """
+        :param api_method: The API method to call. See https://core.telegram.org/bots/api#available-methods
+        :param token: The API token generated following the instructions at https://core.telegram.org/bots#botfather
+        :param params: The api method parameters.
+
+        :type api_method: str
+        :type token: str
+        :type params: dict
+        """
+
         self.api_method = api_method
         self.token = token
         self.params = params
