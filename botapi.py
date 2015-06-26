@@ -1,7 +1,8 @@
 from requests import Request, Session
 from collections import namedtuple
 from enum import Enum
-from abc import ABCMeta, abstractmethod
+from functools import partial
+from abc import ABCMeta
 
 _UserBase = namedtuple('User', ['id', 'first_name', 'last_name', 'username'])
 _GroupChatBase = namedtuple('GroupChat', ['id', 'title'])
@@ -242,7 +243,7 @@ class RequestMethod(str, Enum):
 class TelegramBotRPCRequest(metaclass=ABCMeta):
     api_url_base = 'https://api.telegram.org/bot'
 
-    def __init__(self, api_method: str, *, token, params: dict=None, on_result=None, callback=None, on_error=None, files=None, request_method=RequestMethod.GET):
+    def __init__(self, api_method: str, *, token, params: dict=None, on_result=None, callback=None, on_error=None, files=None, request_method=RequestMethod.POST):
         """
         :param api_method: The API method to call. See https://core.telegram.org/bots/api#available-methods
         :param token: The API token generated following the instructions at https://core.telegram.org/bots#botfather
@@ -288,13 +289,12 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
         resp = s.send(request)
         api_response = resp.json()
 
-        if api_response.get('ok') == True:
+        if api_response.get('ok'):
             result = api_response['result']
             if self.on_result is None:
                 self.result = result
             else:
                 self.result = self.on_result(result)
-
 
             if self.callback is not None:
                 self.callback(self.result)
@@ -310,9 +310,9 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
         return self
 
 def _cleanup_params(**params):
-    return {name:val for name, val in params.items() if val is not None}
+    return {name: val for name, val in params.items() if val is not None}
 
-def get_me(**request_args):
+def get_me(request_args):
     """
     A simple method for testing your bot's auth token. Requires no parameters. 
     Returns basic information about the bot in form of a User object.
@@ -322,11 +322,12 @@ def get_me(**request_args):
     :returns: Returns basic information about the bot in form of a User object.
     :rtype: User
     """
-    return TelegramBotRPCRequest('getMe', on_result=User.from_result, **request_args).run()
+    return TelegramBotRPCRequest('getMe', on_result=User.from_result,
+                                 **(request_args if request_args is not None else {})).run()
 
 def send_message(chat_id: int, text: str, 
                  disable_web_page_preview: bool=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, 
-                 **request_args):
+                 request_args=None):
     """
     Use this method to send text messages. 
 
@@ -356,9 +357,10 @@ def send_message(chat_id: int, text: str,
         reply_markup=reply_markup
         )
 
-    return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result, **request_args).run()
+    return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result,
+                                 **(request_args if request_args is not None else {})).run()
 
-def forward_message(chat_id, from_chat_id, message_id, **request_args):
+def forward_message(chat_id, from_chat_id, message_id, request_args):
     """
     Use this method to forward messages of any kind. 
 
@@ -379,7 +381,7 @@ def forward_message(chat_id, from_chat_id, message_id, **request_args):
 
 def send_photo(chat_id: int,  photo: InputFile, 
                caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
-               **request_args):
+               request_args: dict=None):
     """
     Use this method to send photos.
 
@@ -419,9 +421,11 @@ def send_photo(chat_id: int,  photo: InputFile,
         reply_markup=reply_markup
         )
 
-    return TelegramBotRPCRequest('sendPhoto', params=params, files=files, on_result=Message.from_result, **request_args).run()
+    return TelegramBotRPCRequest('sendPhoto', params=params, files=files, on_result=Message.from_result,
+                                 **(request_args if request_args is not None else {})).run()
 
-def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None, reply_markup: ReplyKeyboardMarkup=None, **request_args):
+def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None,
+               reply_markup: ReplyKeyboardMarkup=None, request_args=None):
     """
     Use this method to send audio files, if you want Telegram clients to display the file as a playable voice
     message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent 
@@ -446,7 +450,7 @@ def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None, re
     #TODO: implement
     raise NotImplemented
 
-def send_document(chat_id, document, reply_to_message_id=None, reply_markup=None, **request_args):
+def send_document(chat_id, document, reply_to_message_id=None, reply_markup=None, request_args=None):
     """
     :param chat_id: 
     :param document: 
@@ -465,7 +469,7 @@ def send_document(chat_id, document, reply_to_message_id=None, reply_markup=None
     # TODO: Implement
     raise NotImplemented
 
-def send_sticker(chat_id, sticker, reply_to_message_id, reply_markup, **request_args):
+def send_sticker(chat_id, sticker, reply_to_message_id, reply_markup=None, request_args=None):
     """
     :param token: 
     :param chat_id: 
@@ -486,42 +490,42 @@ def send_sticker(chat_id, sticker, reply_to_message_id, reply_markup, **request_
     #TODO: implement
     raise NotImplemented
 
-def send_video(**request_args):
+def send_video(request_args):
     """
     :param request_args: Args passed down to the TelegramBotRPCRequest
     """
     #TODO: implement
     raise NotImplemented
 
-def send_location(**request_args):
+def send_location(request_args):
     """
     :param request_args: Args passed down to the TelegramBotRPCRequest
     """
     #TODO: implement
     raise NotImplemented
 
-def send_chat_action(**request_args):
+def send_chat_action(request_args):
     """
     :param request_args: Args passed down to the TelegramBotRPCRequest
     """
     #TODO: implement
     raise NotImplemented
 
-def get_user_profile_photos(**request_args):
+def get_user_profile_photos(request_args):
     """
     :param request_args: Args passed down to the TelegramBotRPCRequest
     """
     #TODO: implement
     raise NotImplemented
 
-def get_updates(**request_args):
+def get_updates(request_args):
     """
     :param request_args: Args passed down to the TelegramBotRPCRequest
     """
     #TODO: implement
     raise NotImplemented
 
-def set_webhook(**request_args):
+def set_webhook(request_args):
     """
     :param request_args: Args passed down to the TelegramBotRPCRequest
     """
@@ -531,40 +535,41 @@ def set_webhook(**request_args):
 
 class TelegramBot:
 
-    def __init__(self, token, request_method: RequestMethod=RequestMethod.GET):
-        from functools import partial
-        self._token = token
+    def __init__(self, token, request_method: RequestMethod=RequestMethod.POST):
         self._request_method = request_method
 
         self._bot_user = User(None, None, None, None)
 
-        request_args = dict(
-            token=self.token,
+        self.request_args = dict(
+            token=token,
             request_method=self.request_method
-            )
+        )
 
-        setattr(self, 'get_me', partial(get_me, **request_args))
-        setattr(self, 'send_message', partial(send_message, **request_args))
-        setattr(self, 'forward_message', partial(forward_message, **request_args))
-        setattr(self, 'send_photo', partial(send_photo, **request_args))
-        setattr(self, 'send_audio', partial(send_audio, **request_args))
-        setattr(self, 'send_document', partial(send_document, **request_args))
-        setattr(self, 'send_sticker', partial(send_sticker, **request_args))
-        setattr(self, 'send_video', partial(send_video, **request_args))
-        setattr(self, 'send_location', partial(send_location, **request_args))
-        setattr(self, 'send_chat_action', partial(send_chat_action, **request_args))
-        setattr(self, 'get_user_profile_photos', partial(get_user_profile_photos, **request_args))
-        setattr(self, 'get_updates', partial(get_updates, **request_args))
-        setattr(self, 'set_webhook', partial(set_webhook, **request_args))
-
-        setattr(self, 'update_bot_info', partial(get_me, callback=self._update_bot_info, **request_args))
+        self.get_me = partial(get_me, self.request_args)
+        self.send_message = partial(send_message, self.request_args)
+        self.forward_message = partial(forward_message, self.request_args)
+        self.send_photo = partial(send_photo, self.request_args)
+        self.send_audio = partial(send_audio, self.request_args)
+        self.send_document = partial(send_document, self.request_args)
+        self.send_sticker = partial(send_sticker, self.request_args)
+        self.send_video = partial(send_video, self.request_args)
+        self.send_location = partial(send_location, self.request_args)
+        self.send_chat_action = partial(send_chat_action, self.request_args)
+        self.get_user_profile_photos = partial(get_user_profile_photos, self.request_args)
+        self.get_updates = partial(get_updates, self.request_args)
+        self.set_webhook = partial(set_webhook, self.request_args)
+        self.update_bot_info = partial(get_me, self.request_args, callback=self._update_bot_info)
 
     def __str__(self):
         return self.token
 
     @property
     def token(self):
-        return self._token
+        return self.request_args['token']
+
+    @token.setter
+    def token(self, val):
+        self.request_args['token'] = val
 
     @property
     def request_method(self):
@@ -599,7 +604,10 @@ if __name__ == '__main__':
     print(bot.username)
     
     bot.send_message(test_chat_id, 'testing', callback=print_result)
-    send_message(test_chat_id, 'testing', token=test_token, callback=print_result)
+    bot.token = "112473874:AAEmFD6PxTGw0gM7J7eDYQpqMGXFz4xyZ60"
+    bot.send_message(test_chat_id, 'testing', callback=print_result)
+
+    #send_message(test_chat_id, 'testing', token=test_token, callback=print_result)
     #bot.send_photo(test_chat_id, photo, callback=print_result)
 
     #TelegramBotRPC.send_photo(test_token, test_chat_id, 'AgADAwADqacxGwpPWQaFLwABSzSkg2Bq-usqAASiGyniRUnk5BdEAAIC',
