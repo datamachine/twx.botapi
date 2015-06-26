@@ -299,10 +299,10 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
         self._async_call()
         return self
 
-def _cleanup_params(**kwargs):
-    return {name:val for name, val in kwargs.items() if val is not None}
+def _cleanup_params(**params):
+    return {name:val for name, val in params.items() if val is not None}
 
-def get_me(**kwargs):
+def get_me(**request_args):
     """
     A simple method for testing your bot's auth token. Requires no parameters. 
     Returns basic information about the bot in form of a User object.
@@ -310,11 +310,11 @@ def get_me(**kwargs):
     :returns: Returns basic information about the bot in form of a User object.
     :rtype: User
     """
-    return TelegramBotRPCRequest('getMe', on_result=User.from_result, **kwargs).run()
+    return TelegramBotRPCRequest('getMe', on_result=User.from_result, **request_args).run()
 
 def send_message(chat_id: int, text: str, 
                  disable_web_page_preview: bool=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, 
-                 **kwargs):
+                 **request_args):
     """
     Use this method to send text messages. 
 
@@ -343,9 +343,9 @@ def send_message(chat_id: int, text: str,
         reply_markup=reply_markup
         )
 
-    return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result, **kwargs).run()
+    return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result, **request_args).run()
 
-def forward_message(chat_id, from_chat_id, message_id, **kwargs):
+def forward_message(chat_id, from_chat_id, message_id, **request_args):
     """
     Use this method to forward messages of any kind. 
 
@@ -366,7 +366,7 @@ def forward_message(chat_id, from_chat_id, message_id, **kwargs):
 
 def send_photo(chat_id: int,  photo: InputFile, 
                caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
-               **kwargs):
+               **request_args):
     """
     Use this method to send photos.
 
@@ -405,9 +405,9 @@ def send_photo(chat_id: int,  photo: InputFile,
         reply_markup=reply_markup
         )
 
-    return TelegramBotRPCRequest('sendPhoto', params=params, files=files, on_result=Message.from_result, **kwargs).run()
+    return TelegramBotRPCRequest('sendPhoto', params=params, files=files, on_result=Message.from_result, **request_args).run()
 
-def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None, reply_markup: ReplyKeyboardMarkup=None, **kwargs):
+def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None, reply_markup: ReplyKeyboardMarkup=None, **request_args):
     """
     Use this method to send audio files, if you want Telegram clients to display the file as a playable voice
     message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent 
@@ -431,7 +431,7 @@ def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None, re
     #TODO: implement
     return None
 
-def send_document(chat_id, document, reply_to_message_id=None, reply_markup=None, **kwargs):
+def send_document(chat_id, document, reply_to_message_id=None, reply_markup=None, **request_args):
     """
     :param chat_id: 
     :param document: 
@@ -449,7 +449,7 @@ def send_document(chat_id, document, reply_to_message_id=None, reply_markup=None
     # TODO: Implement
     return None
 
-def send_sticker(chat_id, sticker, reply_to_message_id, reply_markup, **kwargs):
+def send_sticker(chat_id, sticker, reply_to_message_id, reply_markup, **request_args):
     """
     :param token: 
     :param chat_id: 
