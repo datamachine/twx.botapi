@@ -5,6 +5,10 @@ from subprocess import Popen, PIPE
 revlist_count = None
 long_rev = None
 
+VERSION_MAJOR=1
+VERSION_MINOR=0
+VERSION_BETA=1
+
 with Popen(['git', 'rev-list', 'HEAD', '--count'], stdout=PIPE) as f:
     revlist_count = f.stdout.read().decode().strip()
 
@@ -17,7 +21,14 @@ if revlist_count is None:
 if long_rev is None:
   raise Exception('Unable to determine long revision')
 
-version = '1.0b1.dev{revlist_count}'.format(revlist_count=revlist_count)
+import sys
+
+version = '{}.{}'.format(VERSION_MAJOR, VERSION_MINOR)
+if VERSION_BETA is not None:
+  version = '{}b{}'.format(version, VERSION_BETA)
+if 'pypitest' in sys.argv:
+  version = '{}.dev{}'.format(version, revlist_count)
+
 download_url = 'https://github.com/datamachine/twx/archive/{long_rev}.tar.gz'.format(long_rev=long_rev)
 
 setup(
