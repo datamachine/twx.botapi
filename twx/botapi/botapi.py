@@ -144,6 +144,17 @@ class Message(_MessageBase):
 
 _PhotoSizeBase = namedtuple('PhotoSize', ['file_id', 'width', 'height', 'file_size'])
 class PhotoSize(_PhotoSizeBase):
+    """This object represents one size of a photo or a file / sticker thumbnail.
+
+    =============  =====  ===============================
+    Field          Type   Description
+    =============  =====  ===============================
+    ``file_id``    `str`  Unique identifier for this file
+    ``width``      `int`  Photo width
+    ``height``     `int`  Photo height
+    ``file_size``  `int`  Optional. File size
+    =============  =====  ===============================
+    """
     __slots__ = ()
 
     @staticmethod
