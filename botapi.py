@@ -365,14 +365,17 @@ def send_message(chat_id: int, text: str,
 
     :returns: On success, the sent Message is returned.
     :rtype: Message
-    """    
-    params = _clean_params(
-        chat_id=chat_id, 
-        text=text, 
+    """
+    # mandatory params
+    params = dict(chat_id=chat_id, text=text)
+
+    # optional params
+    params.update(_clean_params(
         disable_web_page_preview=disable_web_page_preview,
         reply_to_message_id=reply_to_message_id,
         reply_markup=reply_markup
         )
+    )
 
     return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result,
                                  **(_merge_dict(request_args, kwargs))).run()
@@ -395,6 +398,7 @@ def forward_message(chat_id, from_chat_id, message_id,
     :rtype: Message
     """
 
+    # mandatory params
     params = dict(
         chat_id=chat_id, 
         from_chat_id=from_chat_id, 
