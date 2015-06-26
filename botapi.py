@@ -357,7 +357,8 @@ def get_me(*, request_args=None, **kwargs):
     return TelegramBotRPCRequest('getMe', on_result=User.from_result, **request_args).run()
 
 def send_message(chat_id: int, text: str, 
-                 disable_web_page_preview: bool=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, 
+                 disable_web_page_preview: bool=None, reply_to_message_id: int=None, 
+                 reply_markup: ReplyMarkup=None, 
                  *, request_args=None, **kwargs):
     """
     Use this method to send text messages. 
@@ -400,7 +401,8 @@ def forward_message(chat_id, from_chat_id, message_id,
     Use this method to forward messages of any kind. 
 
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
-    :param from_chat_id: Unique identifier for the chat where the original message was sent — User or GroupChat id
+    :param from_chat_id: Unique identifier for the chat where the original message was sent — User or 
+                         GroupChat id
     :param message_id: Unique message identifier
     :param request_args: Args passed down to TelegramBotRPCRequest
 
@@ -421,7 +423,8 @@ def forward_message(chat_id, from_chat_id, message_id,
 
     request_args = _merge_dict(request_args, kwargs)
 
-    return TelegramBotRPCRequest('forwardMessage', params=params, on_result=Message.from_result, **request_args).run()
+    return TelegramBotRPCRequest('forwardMessage', params=params, on_result=Message.from_result, 
+                                 **request_args).run()
 
 def send_photo(chat_id: int,  photo: InputFile, 
                caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
