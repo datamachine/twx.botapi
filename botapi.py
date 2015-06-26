@@ -389,7 +389,7 @@ def forward_message(chat_id, from_chat_id, message_id,
 
 def send_photo(chat_id: int,  photo: InputFile, 
                caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
-               *, request_args=None, **kwargs):
+               *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
     """
     Use this method to send photos.
 
@@ -411,7 +411,7 @@ def send_photo(chat_id: int,  photo: InputFile,
     :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
 
     :returns: On success, the sent Message is returned.
-    :rtype: Message
+    :rtype: TelegramBotRPCRequest
     """
 
     files = None
@@ -434,7 +434,7 @@ def send_photo(chat_id: int,  photo: InputFile,
 
 def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None,
                reply_markup: ReplyKeyboardMarkup=None,
-               *, request_args=None, **kwargs):
+               *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
     """
     Use this method to send audio files, if you want Telegram clients to display the file as a playable voice
     message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent 
@@ -454,73 +454,221 @@ def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None,
     :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
 
     :returns: On success, the sent Message is returned.
-    :rtype: Message
+    :rtype: TelegramBotRPCRequest
     """
-    #TODO: implement
-    raise NotImplemented
+    files = None
+    if isinstance(audio, InputFile):
+        files = [audio]
+        audio = None
+    elif not isinstance(audio, str):
+        raise Exception('audio must be instance of InputFile or str')
 
-def send_document(chat_id, document, reply_to_message_id=None, reply_markup=None,
-                  *, request_args=None, **kwargs):
+    params = _clean_params(
+        chat_id=chat_id,
+        audio=audio,
+        reply_to_message_id=reply_to_message_id,
+        reply_markup=reply_markup
+    )
+    
+    return TelegramBotRPCRequest('sendAudio', params=params, files=files, on_result=Message.from_result,
+                                 **(_merge_dict(request_args, kwargs))).run()
+
+
+
+def send_document(chat_id: int, document: InputFile, reply_to_message_id: int=None,
+                  reply_markup: ReplyKeyboardMarkup=None,
+                  *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
     """
-    :param chat_id: 
-    :param document: 
-    :param reply_to_message_id: 
-    :param reply_markup: 
+    Use this method to send general files.
+
+    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param document: File to send. You can either pass a file_id as String to resend a file that is already on
+                     the Telegram servers, or upload a new file using multipart/form-data.
+    :param reply_to_message_id: If the message is a reply, ID of the original message
+    :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
+                         instructions to hide keyboard or to force a reply from the user.
     :param request_args: Args passed down to TelegramBotRPCRequest
 
-    :type chat_id: 
-    :type document: 
-    :type reply_to_message_id: 
-    :type reply_markup: 
+    :type chat_id: int
+    :type document: InputFile or str
+    :type reply_to_message_id: int
+    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
 
-    :returns:
-    :rtype:
+    :returns: On success, the sent Message is returned.
+    :rtype: TelegramBotRPCRequest
     """
-    # TODO: Implement
-    raise NotImplemented
+    files = None
+    if isinstance(document, InputFile):
+        files = [document]
+        document = None
+    elif not isinstance(document, str):
+        raise Exception('document must be instance of InputFile or str')
 
-def send_sticker(chat_id, sticker, reply_to_message_id, reply_markup=None,
-                 *, request_args=None, **kwargs):
+    params = _clean_params(
+        chat_id=chat_id,
+        document=document,
+        reply_to_message_id=reply_to_message_id,
+        reply_markup=reply_markup
+    )
+    
+    return TelegramBotRPCRequest('sendDocument', params=params, files=files, on_result=Message.from_result,
+                                 **(_merge_dict(request_args, kwargs))).run()
+
+def send_sticker(chat_id: int, sticker: InputFile, reply_to_message_id: int=None,
+                 reply_markup: ReplyKeyboardMarkup=None,
+                 *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
     """
-    :param token: 
-    :param chat_id: 
-    :param sticker: 
-    :param reply_to_message_id: 
-    :param reply_markup: 
+    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param sticker: Sticker to send. You can either pass a file_id as String to resend a sticker
+                    that is already on the Telegram servers, or upload a new sticker using multipart/form-data.
+    :param reply_to_message_id: If the message is a reply, ID of the original message
+    :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
+                         instructions to hide keyboard or to force a reply from the user.
     :param request_args: Args passed down to TelegramBotRPCRequest
 
-    :type token: 
-    :type chat_id: 
-    :type sticker: 
-    :type reply_to_message_id: 
-    :type reply_markup: 
+    :type chat_id: int
+    :type sticker: InputFile or str
+    :type reply_to_message_id: int
+    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
 
-    :returns:
-    :rtype:
+    :returns: On success, the sent Message is returned.
+    :rtype: TelegramBotRPCRequest
     """
-    #TODO: implement
-    raise NotImplemented
+    files = None
+    if isinstance(sticker, InputFile):
+        files = [sticker]
+        sticker = None
+    elif not isinstance(sticker, str):
+        raise Exception('sticker must be instance of InputFile or str')
 
-def send_video(request_args, **kwargs):
-    """
-    :param request_args, **kwargs: Args passed down to the TelegramBotRPCRequest
-    """
-    #TODO: implement
-    raise NotImplemented
+    params = _clean_params(
+        chat_id=chat_id,
+        sticker=sticker,
+        reply_to_message_id=reply_to_message_id,
+        reply_markup=reply_markup
+    )
+    
+    return TelegramBotRPCRequest('sendSticker', params=params, files=files, on_result=Message.from_result,
+                                 **(_merge_dict(request_args, kwargs))).run()
 
-def send_location(request_args, **kwargs):
+def send_video(chat_id: int, video: InputFile, reply_to_message_id: int=None,
+               reply_markup: ReplyKeyboardMarkup=None,
+               *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
     """
-    :param request_args, **kwargs: Args passed down to the TelegramBotRPCRequest
-    """
-    #TODO: implement
-    raise NotImplemented
+    Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as Document).
 
-def send_chat_action(request_args, **kwargs):
+    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param video: Video to send. You can either pass a file_id as String to resend a
+                  video that is already on the Telegram servers, or upload a new video
+                  using multipart/form-data.
+    :param reply_to_message_id: If the message is a reply, ID of the original message
+    :param reply_markup: Additional interface options. A JSON-serialized object for a
+                         custom reply keyboard, instructions to hide keyboard or to
+                         force a reply from the user.
+    :param request_args: Args passed down to TelegramBotRPCRequest
+
+    :type chat_id: int
+    :type video: InputFile or str
+    :type reply_to_message_id: int
+    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+
+    :returns: On success, the sent Message is returned.
+    :rtype:  TelegramBotRPCRequest
     """
-    :param request_args, **kwargs: Args passed down to the TelegramBotRPCRequest
+    files = None
+    if isinstance(video, InputFile):
+        files = [video]
+        video = None
+    elif not isinstance(video, str):
+        raise Exception('video must be instance of InputFile or str')
+
+    params = _clean_params(
+        chat_id=chat_id,
+        video=video,
+        reply_to_message_id=reply_to_message_id,
+        reply_markup=reply_markup
+    )
+    
+    return TelegramBotRPCRequest('sendVideo', params=params, files=files, on_result=Message.from_result,
+                                 **(_merge_dict(request_args, kwargs))).run()
+
+def send_location(chat_id: int, latitude: float, longitude: float, reply_to_message_id: int=None,
+                  reply_markup: ReplyKeyboardMarkup=None,
+                  *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
     """
-    #TODO: implement
-    raise NotImplemented
+    Use this method to send point on the map.
+
+    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param latitude: Latitude of location.
+    :param longitude: Longitude of location.
+    :param reply_to_message_id: If the message is a reply, ID of the original message
+    :param reply_markup: Additional interface options. A JSON-serialized object for a
+                         custom reply keyboard, instructions to hide keyboard or to
+                         force a reply from the user.
+    :param request_args: Args passed down to TelegramBotRPCRequest
+
+    :type chat_id: int
+    :type latitude: float
+    :type longitude: float
+    :type reply_to_message_id: int
+    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+
+    :returns: On success, the sent Message is returned.
+    :rtype:  TelegramBotRPCRequest
+    """
+    params = _clean_params(
+        chat_id=chat_id,
+        latitude=latitude,
+        longitude=longitude,
+        reply_to_message_id=reply_to_message_id,
+        reply_markup=reply_markup
+    )
+
+    return TelegramBotRPCRequest('sendLocation', params=params, on_result=Message.from_result,
+                                 **(_merge_dict(request_args, kwargs))).run()
+
+class ChatAction(str, Enum):
+    TEXT = 'typing'
+    PHOTO = 'upload_photo'
+    RECORD_VIDEO = 'record_video'
+    VIDEO = 'upload_video'
+    RECORD_AUDIO = 'record_audio'
+    AUDIO = 'upload_audio'
+    DOCUMENT = 'upload_document'
+    LOCATION = 'find_location'
+
+def send_chat_action(chat_id: int, action: ChatAction,
+                     *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
+    """
+    Use this method when you need to tell the user that something is happening on the bot's side. The status is set
+     for 5 seconds or less (when a message arrives from your bot, Telegram clients clear its typing status).
+
+    Example: The ImageBot needs some time to process a request and upload the image. Instead of sending a text message
+    along the lines of “Retrieving image, please wait…”, the bot may use sendChatAction with action = upload_photo.
+    The user will see a “sending photo” status for the bot.
+
+    We only recommend using this method when a response from the bot will take a noticeable amount of time to arrive.
+
+    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param action: Type of action to broadcast.  Choose one, depending on what the user is about to receive:
+                   typing for text messages, upload_photo for photos, record_video or upload_video for videos,
+                   record_audio or upload_audio for audio files, upload_document for general files,
+                   find_location for location data.
+    :param request_args: Args passed down to TelegramBotRPCRequest
+
+    :type chat_id: int
+    :type action: ChatAction
+
+    :returns: On success, the sent Message is returned.
+    :rtype:  TelegramBotRPCRequest
+    """
+    params = {
+        'chat_id': chat_id,
+        'action': action
+    }
+
+    return TelegramBotRPCRequest('sendChatAction', params=params, on_result=lambda result: result,
+                                 **(_merge_dict(request_args, kwargs))).run()
 
 def get_user_profile_photos(request_args, **kwargs):
     """
@@ -609,6 +757,8 @@ if __name__ == '__main__':
     test_chat_id = config['Test']['chat_id']
 
     photo = InputFile('photo', InputFileInfo('test.jpg', open('test.jpg', 'rb'), 'image/jpeg'))
+    audio = InputFile('audio', InputFileInfo('test.ogg', open('test.ogg', 'rb'), 'audio/ogg'))
+    video = InputFile('video', InputFileInfo('test.mp4', open('test.mp4', 'rb'), 'video/mp4'))
 
     bot = TelegramBot(test_token)
     bot.get_me(callback=print_result)
@@ -618,8 +768,8 @@ if __name__ == '__main__':
     
     bot.send_message(test_chat_id, 'testing1', callback=print_result)
 
-    #send_message(test_chat_id, 'testing', token=test_token, callback=print_result)
-    #bot.send_photo(test_chat_id, photo, callback=print_result)
+    bot.send_photo(test_chat_id, photo, callback=print_result)
+    bot.send_audio(test_chat_id, audio, callback=print_result)
+    bot.send_video(test_chat_id, video, callback=print_result)
 
-    #TelegramBotRPC.send_photo(test_token, test_chat_id, 'AgADAwADqacxGwpPWQaFLwABSzSkg2Bq-usqAASiGyniRUnk5BdEAAIC',
-    #                         callback=print_result, on_error=print_error)
+    bot.send_chat_action(test_chat_id, ChatAction.TEXT)
