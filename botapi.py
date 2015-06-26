@@ -547,13 +547,11 @@ def set_webhook(request_args, **kwargs):
 class TelegramBot:
 
     def __init__(self, token, request_method: RequestMethod=RequestMethod.POST):
-        self._request_method = request_method
-
         self._bot_user = User(None, None, None, None)
 
         self.request_args = dict(
             token=token,
-            request_method=self.request_method
+            request_method=request_method
         )
 
         self.get_me = partial(get_me, request_args=self.request_args)
@@ -584,7 +582,11 @@ class TelegramBot:
 
     @property
     def request_method(self):
-        return self._request_method
+        return self.request_args['request_method']
+
+    @request_method.setter
+    def request_method(self, val: RequestMethod):
+        self.request_args['request_method'] = val
 
     @property
     def username(self):
