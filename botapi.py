@@ -476,48 +476,48 @@ def send_sticker(chat_id, sticker, reply_to_message_id, reply_markup, **request_
     #TODO: implement
     raise NotImplemented
 
-def sendVideo(**request_args):
+def send_video(**request_args):
     """
     :param request_args: Args passed down to the TelegramBotRPCRequest
     """
     #TODO: implement
     raise NotImplemented
-    
-def sendLocation(**request_args):
+
+def send_location(**request_args):
     """
     :param request_args: Args passed down to the TelegramBotRPCRequest
     """
     #TODO: implement
     raise NotImplemented
-    
-def sendChatAction(**request_args):
+
+def send_chat_action(**request_args):
     """
     :param request_args: Args passed down to the TelegramBotRPCRequest
     """
     #TODO: implement
     raise NotImplemented
-    
-def getUserProfilePhotos(**request_args):
+
+def get_user_profile_photos(**request_args):
     """
     :param request_args: Args passed down to the TelegramBotRPCRequest
     """
     #TODO: implement
     raise NotImplemented
-    
-def getUpdates(**request_args):
+
+def get_updates(**request_args):
     """
     :param request_args: Args passed down to the TelegramBotRPCRequest
     """
     #TODO: implement
     raise NotImplemented
-    
-def setWebhook(**request_args):
+
+def set_webhook(**request_args):
     """
     :param request_args: Args passed down to the TelegramBotRPCRequest
     """
     #TODO: implement
     raise NotImplemented
-    
+
 
 class TelegramBot:
 
@@ -535,7 +535,17 @@ class TelegramBot:
 
         setattr(self, 'get_me', partial(get_me, **request_args))
         setattr(self, 'send_message', partial(send_message, **request_args))
+        setattr(self, 'forward_message', partial(forward_message, **request_args))
         setattr(self, 'send_photo', partial(send_photo, **request_args))
+        setattr(self, 'send_audio', partial(send_audio, **request_args))
+        setattr(self, 'send_document', partial(send_document, **request_args))
+        setattr(self, 'send_sticker', partial(send_sticker, **request_args))
+        setattr(self, 'send_video', partial(send_video, **request_args))
+        setattr(self, 'send_location', partial(send_location, **request_args))
+        setattr(self, 'send_chat_action', partial(send_chat_action, **request_args))
+        setattr(self, 'get_user_profile_photos', partial(get_user_profile_photos, **request_args))
+        setattr(self, 'get_updates', partial(get_updates, **request_args))
+        setattr(self, 'set_webhook', partial(set_webhook, **request_args))
 
         setattr(self, 'update_bot_info', partial(get_me, callback=self._update_bot_info, **request_args))
 
