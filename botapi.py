@@ -210,9 +210,13 @@ class UserProfilePhotos(_UserProfilePhotosBase):
         if result is None:
             return None
 
+        photos = []
+        for photo_list in result.get('photos'):
+            photos.append([PhotoSize.from_result(photo) for photo in photo_list])
+
         return UserProfilePhotos(
             total_count=result.get('total_count'), 
-            photos=result.get('photos') #TODO: Array of Array of PhotoSize
+            photos=photos
             )
 
 class ReplyMarkup:
@@ -740,17 +744,6 @@ def send_chat_action(chat_id: int, action: ChatAction,
     return TelegramBotRPCRequest('sendChatAction', params=params, on_result=lambda result: result,
                                  **(_merge_dict(request_args, kwargs))).run()
 
-def _process_get_user_profile_photos_result(result):
-    if result is None:
-        return None
-
-    photo_lists = []
-    for photo_list in result.get('photos'):
-        photo_lists.append([PhotoSize.from_result(photo) for photo in photo_list])
-
-    return photo_lists
-
-
 def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, *, request_args: dict=None, **kwargs):
     """
     Use this method to get a list of profile pictures for a user. Returns a UserProfilePhotos object.
@@ -781,7 +774,7 @@ def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, *, 
     # merge bot args with user overrides
     request_args = _merge_dict(request_args, kwargs)
 
-    return TelegramBotRPCRequest('getUserProfilePhotos', params=params, on_result=_process_get_user_profile_photos_result, **request_args).run()
+    return TelegramBotRPCRequest('getUserProfilePhotos', params=params, on_result=UserProfilePhotos.from_result, **request_args).run()
 
 def _process_get_updates(result):
     if result is None:
@@ -918,9 +911,9 @@ if __name__ == '__main__':
 
     #result = bot.forward_message(97704886, 96846582, msg.message_id).join()
 
-    #result = bot.get_user_profile_photos(97704886, on_error=print_error, request_method=RequestMethod.GET).join()
+    result = bot.get_user_profile_photos(97704886, on_error=print_error).join()
 
-    #print(result)
+    print(result)
 
     #bot.forward_message(test_chat_id, 'testing1', callback=print_result)
 
@@ -929,5 +922,5 @@ if __name__ == '__main__':
     #bot.send_video(test_chat_id, video, callback=print_result)
 
     #bot.send_chat_action(test_chat_id, ChatAction.TEXT)
-    print(bot.get_updates(callback=print_result).join())
+    #print(bot.get_updates(callback=print_result).join())
 
