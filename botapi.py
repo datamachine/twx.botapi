@@ -242,15 +242,15 @@ class RequestMethod(str, Enum):
 class TelegramBotRPCRequest(metaclass=ABCMeta):
     api_url_base = 'https://api.telegram.org/bot'
 
-    def __init__(self, api_method, token, *, params=None, callback=None, on_result=None, on_error=None, files=None, request_method=RequestMethod.GET):
+    def __init__(self, api_method, *, token, params=None, on_result=None, callback=None, on_error=None, files=None, request_method=RequestMethod.GET):
         self.api_method = api_method
         self.token = token
         self.params = params
+        self.on_result = on_result
         self.callback = callback
         self.on_error = on_error
         self.files = files
         self.request_method = RequestMethod(request_method)
-        self.on_result = on_result
 
         self.result = None
         self.error = None
@@ -285,6 +285,7 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
             else:
                 self.result = self.on_result(result)
 
+
             if self.callback is not None:
                 self.callback(self.result)
         else:
@@ -301,7 +302,7 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
 def _cleanup_params(**kwargs):
     return {name:val for name, val in kwargs.items() if val is not None}
 
-def get_me(token, **kwargs):
+def get_me(**kwargs):
     """
     A simple method for testing your bot's auth token. Requires no parameters. 
     Returns basic information about the bot in form of a User object.
@@ -309,9 +310,9 @@ def get_me(token, **kwargs):
     :returns: Returns basic information about the bot in form of a User object.
     :rtype: User
     """
-    return TelegramBotRPCRequest('getMe', token, on_result=User.from_result, **kwargs).run()
+    return TelegramBotRPCRequest('getMe', on_result=User.from_result, **kwargs).run()
 
-def send_message(token, chat_id: int, text: str, 
+def send_message(chat_id: int, text: str, 
                  disable_web_page_preview: bool=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, 
                  **kwargs):
     """
@@ -342,9 +343,9 @@ def send_message(token, chat_id: int, text: str,
         reply_markup=reply_markup
         )
 
-    return TelegramBotRPCRequest('sendMessage', token, params=params, on_result=Message.from_result, **kwargs).run()
+    return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result, **kwargs).run()
 
-def forward_message(token, chat_id, from_chat_id, message_id, **kwargs):
+def forward_message(chat_id, from_chat_id, message_id, **kwargs):
     """
     Use this method to forward messages of any kind. 
 
@@ -363,7 +364,7 @@ def forward_message(token, chat_id, from_chat_id, message_id, **kwargs):
     #TODO: implement
     return None
 
-def send_photo(token, chat_id: int,  photo: InputFile, 
+def send_photo(chat_id: int,  photo: InputFile, 
                caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
                **kwargs):
     """
@@ -404,9 +405,9 @@ def send_photo(token, chat_id: int,  photo: InputFile,
         reply_markup=reply_markup
         )
 
-    return TelegramBotRPCRequest('sendPhoto', token, params=params, files=files, on_result=Message.from_result, **kwargs).run()
+    return TelegramBotRPCRequest('sendPhoto', params=params, files=files, on_result=Message.from_result, **kwargs).run()
 
-def send_audio(token, chat_id: int, audio: InputFile, reply_to_message_id: int=None, reply_markup: ReplyKeyboardMarkup=None, **kwargs):
+def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None, reply_markup: ReplyKeyboardMarkup=None, **kwargs):
     """
     Use this method to send audio files, if you want Telegram clients to display the file as a playable voice
     message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent 
@@ -430,7 +431,7 @@ def send_audio(token, chat_id: int, audio: InputFile, reply_to_message_id: int=N
     #TODO: implement
     return None
 
-def send_document(token, chat_id, document, reply_to_message_id=None, reply_markup=None, **kwargs):
+def send_document(chat_id, document, reply_to_message_id=None, reply_markup=None, **kwargs):
     """
     :param chat_id: 
     :param document: 
@@ -448,7 +449,7 @@ def send_document(token, chat_id, document, reply_to_message_id=None, reply_mark
     # TODO: Implement
     return None
 
-def send_sticker(token, chat_id, sticker, reply_to_message_id, reply_markup, **kwargs):
+def send_sticker(chat_id, sticker, reply_to_message_id, reply_markup, **kwargs):
     """
     :param token: 
     :param chat_id: 
@@ -468,6 +469,32 @@ def send_sticker(token, chat_id, sticker, reply_to_message_id, reply_markup, **k
     #TODO: implement
     return None
 
+class TelegramBot:
+
+    def __init__(self, token):
+        from functools import partial
+        self.token = token
+        self.id = None
+        self.first_name = None
+        self.last_name = None
+        self.username = None
+
+        setattr(self, 'get_me', partial(get_me, token=self.token))
+        setattr(self, 'send_message', partial(send_message, token=self.token))
+        setattr(self, 'send_photo', partial(send_photo, token=self.token))
+
+        setattr(self, 'update_bot_info', partial(self.get_me, callback=self._update_bot_info))
+
+    def __str__(self):
+        return self.token
+
+    def _update_bot_info(self, bot_user):
+        print('update_mae', bot_user)
+        self.id = bot_user.id
+        self.first_name = bot_user.first_name
+        self.last_name = bot_user.last_name
+        self.username = bot_user.username
+
 def print_result(result):
     print(result)
 
@@ -483,8 +510,15 @@ if __name__ == '__main__':
 
     photo = InputFile('photo', InputFileInfo('test.jpg', open('test.jpg', 'rb'), 'image/jpeg'))
 
-    get_me(test_token, callback=print_result)
-    send_message(test_token, test_chat_id, 'testing', callback=print_result)
-    send_photo(test_token, test_chat_id, photo, callback=print_result)
+    bot = TelegramBot(test_token)
+    bot.get_me(callback=print_result)
+    bot.update_bot_info()
+
+    print(bot.username)
+    
+    bot.send_message(test_chat_id, 'testing', callback=print_result)
+    send_message(test_chat_id, 'testing', token=test_token, callback=print_result)
+    #bot.send_photo(test_chat_id, photo, callback=print_result)
+
     #TelegramBotRPC.send_photo(test_token, test_chat_id, 'AgADAwADqacxGwpPWQaFLwABSzSkg2Bq-usqAASiGyniRUnk5BdEAAIC',
     #                         callback=print_result, on_error=print_error)
