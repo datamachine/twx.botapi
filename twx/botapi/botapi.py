@@ -5,34 +5,10 @@ from functools import partial
 from abc import ABCMeta
 from threading import Thread
 
-# Explicitly definied Telegram bot API types
+"""
+Telegram Bot API Types as defined at https://core.telegram.org/bots/api#available-types
+"""
 _UserBase = namedtuple('User', ['id', 'first_name', 'last_name', 'username'])
-_GroupChatBase = namedtuple('GroupChat', ['id', 'title'])
-_MessageBase = namedtuple('Message', ['message_id', 'sender', 'date', 'chat', 'forward_from', 'forward_date', 
-                                      'reply_to_message', 'text', 'audio', 'document', 'photo', 'sticker', 
-                                      'video', 'contact', 'location', 'new_chat_participant', 
-                                      'left_chat_participant', 'new_chat_title', 'new_chat_photo', 
-                                      'delete_chat_photo', 'group_chat_created'])
-_PhotoSizeBase = namedtuple('PhotoSize', ['file_id', 'width', 'height', 'file_size'])
-_AudioBase = namedtuple('Audio', ['file_id', 'duration', 'mime_type', 'file_size'])
-_DocumentBase = namedtuple('Document', ['file_id', 'thumb', 'file_name', 'mime_type', 'file_size'])
-_StickerBase = namedtuple('Sticker', ['file_id', 'width', 'height', 'thumb', 'file_size'])
-_VideoBase = namedtuple('Video', ['file_id', 'width', 'height', 'duration', 'thumb', 'mime_type',
-                                  'file_size', 'caption'])
-_ContactBase = namedtuple('Contact', ['phone_number', 'first_name', 'last_name', 'user_id'])
-_LocationBase = namedtuple('Location', ['longitude', 'latitude'])
-_UserProfilePhotosBase = namedtuple('UserProfilePhotos', ['total_count', 'photos'])
-_ReplyKeyboardMarkupBase = namedtuple('ReplyKeyboardMarkup', ['keyboard', 'resize_keyboard',
-                                                              'one_time_keyboard', 'selective'])
-_ReplyKeyboardHideBase = namedtuple('ReplyKeyboardHide', ['hide_keyboard', 'selective'])
-_ForceReplyBase = namedtuple('ForceReply', ['force_reply', 'selective'])
-_InputFileInfoBase = namedtuple('InputFileInfo', ['file_name', 'fp', 'mime_type'])
-_InputFileBase = namedtuple('InputFile', ['form', 'file_info' ])
-
-# Implicit types
-_MessageUpdateBase = namedtuple('MessageUpdate', ['update_id', 'message'])
-_ErrorBase = namedtuple('Error', ['error_code', 'description'])
-
 class User(_UserBase):
     __slots__ = ()
 
@@ -48,6 +24,7 @@ class User(_UserBase):
             username=result.get('username')
             )
 
+_GroupChatBase = namedtuple('GroupChat', ['id', 'title'])
 class GroupChat(_GroupChatBase):
     __slots__ = ()
 
@@ -61,6 +38,10 @@ class GroupChat(_GroupChatBase):
             title=result.get('title')
             )
 
+_MessageBase = namedtuple('Message', 
+    ['message_id', 'sender', 'date', 'chat', 'forward_from', 'forward_date', 'reply_to_message', 'text', 'audio', 
+     'document', 'photo', 'sticker', 'video', 'contact', 'location', 'new_chat_participant', 'left_chat_participant', 
+     'new_chat_title', 'new_chat_photo', 'delete_chat_photo', 'group_chat_created'])
 class Message(_MessageBase):
     __slots__ = ()
 
@@ -68,6 +49,10 @@ class Message(_MessageBase):
     def from_result(result):
         if result is None:
             return None
+
+        photo = result.get('photo')
+        if photo is not None:
+            photo = [PhotoSize.from_result(photo_size) for photo_size in result.get('photo')]
 
         return Message(
             message_id=result.get('message_id'), 
@@ -80,7 +65,7 @@ class Message(_MessageBase):
             text=result.get('text'),
             audio=Audio.from_result(result.get('audio')),
             document=Document.from_result(result.get('document')),
-            photo=result.get('photo'), # TODO: Array of PhotoSize
+            photo=photo,
             sticker=Sticker.from_result(result.get('sticker')),
             video=Video.from_result(result.get('video')),
             contact=Contact.from_result(result.get('contact')),
@@ -93,6 +78,7 @@ class Message(_MessageBase):
             group_chat_created=result.get('group_chat_created')
             )
 
+_PhotoSizeBase = namedtuple('PhotoSize', ['file_id', 'width', 'height', 'file_size'])
 class PhotoSize(_PhotoSizeBase):
     __slots__ = ()
 
@@ -108,6 +94,7 @@ class PhotoSize(_PhotoSizeBase):
             file_size=result.get('file_size')
             )
 
+_AudioBase = namedtuple('Audio', ['file_id', 'duration', 'mime_type', 'file_size'])
 class Audio(_AudioBase):
     __slots__ = ()
 
@@ -123,6 +110,7 @@ class Audio(_AudioBase):
             file_size=result.get('file_size')
             )
 
+_DocumentBase = namedtuple('Document', ['file_id', 'thumb', 'file_name', 'mime_type', 'file_size'])
 class Document(_DocumentBase):
     __slots__ = ()
 
@@ -139,6 +127,7 @@ class Document(_DocumentBase):
             file_size=result.get('file_size') 
             )
 
+_StickerBase = namedtuple('Sticker', ['file_id', 'width', 'height', 'thumb', 'file_size'])
 class Sticker(_StickerBase):
     __slots__ = ()
 
@@ -155,6 +144,8 @@ class Sticker(_StickerBase):
             file_size=result.get('file_size')
             )
 
+_VideoBase = namedtuple('Video', 
+    ['file_id', 'width', 'height', 'duration', 'thumb', 'mime_type', 'file_size', 'caption'])
 class Video(_VideoBase):
     __slots__ = ()
 
@@ -174,6 +165,7 @@ class Video(_VideoBase):
             caption=result.get('caption')
             )
 
+_ContactBase = namedtuple('Contact', ['phone_number', 'first_name', 'last_name', 'user_id'])
 class Contact(_ContactBase):
     __slots__ = ()
 
@@ -189,6 +181,7 @@ class Contact(_ContactBase):
             user_id=result.get('user_id')
             )
 
+_LocationBase = namedtuple('Location', ['longitude', 'latitude'])
 class Location(_LocationBase):
     __slots__ = ()
 
@@ -202,6 +195,7 @@ class Location(_LocationBase):
             latitude=result.get('latitude')
             )
 
+_UserProfilePhotosBase = namedtuple('UserProfilePhotos', ['total_count', 'photos'])
 class UserProfilePhotos(_UserProfilePhotosBase):
     __slots__ = ()
 
@@ -222,27 +216,50 @@ class UserProfilePhotos(_UserProfilePhotosBase):
 class ReplyMarkup:
     __slots__ = ()
 
+_ReplyKeyboardMarkupBase = namedtuple('ReplyKeyboardMarkup', 
+    ['keyboard', 'resize_keyboard', 'one_time_keyboard', 'selective'])
 class ReplyKeyboardMarkup(_ReplyKeyboardMarkupBase, ReplyMarkup):
     __slots__ = ()
 
+_ReplyKeyboardHideBase = namedtuple('ReplyKeyboardHide', ['hide_keyboard', 'selective'])
 class ReplyKeyboardHide(_ReplyKeyboardHideBase, ReplyMarkup):
     __slots__ = ()
 
+_ForceReplyBase = namedtuple('ForceReply', ['force_reply', 'selective'])
 class ForceReply(_ForceReplyBase, ReplyMarkup):
     __slots__ = ()
 
+_InputFileInfoBase = namedtuple('InputFileInfo', ['file_name', 'fp', 'mime_type'])
 class InputFileInfo(_InputFileInfoBase):
     __slots__ = ()
 
+_InputFileBase = namedtuple('InputFile', ['form', 'file_info' ])
 class InputFile(_InputFileBase):
     __slots__ = ()
 
+"""
+Types added for utility pruposes
+"""
+_MessageUpdateBase = namedtuple('MessageUpdate', ['update_id', 'message'])
 class MessageUpdate(_MessageUpdateBase):
     __slots__ = ()
 
-    def from_result(result):
-        return MessageUpdate(result.get('message_id'), Message.from_result(result.get('message')))
+    @staticmethod
+    def from_dict(message_update):
+        if message_update is None:
+            return None
 
+        return MessageUpdate(message_update.get('message_id'), Message.from_result(message_update.get('message')))
+
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return [MessageUpdate.from_dict(message_update) for message_update in result]
+
+_ErrorBase = namedtuple('Error', ['error_code', 'description'])
 class Error(_ErrorBase):
     __slots__ = ()
 
@@ -250,6 +267,9 @@ class Error(_ErrorBase):
     def from_result(result):
         return Error(error_code=result.get('error_code'), description=result.get('description'))
 
+"""
+RPC Objects
+"""
 class RequestMethod(str, Enum):
     GET = 'GET'
     POST = 'POST'
@@ -353,6 +373,9 @@ def _merge_dict(request_args, kwargs):
         result.update(kwargs)
     return result
 
+"""
+Telegram Bot API Methods as defined at https://core.telegram.org/bots/api#available-methods
+"""
 def get_me(*, request_args=None, **kwargs):
     """
     A simple method for testing your bot's auth token. Requires no parameters. 
@@ -798,14 +821,6 @@ def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, *, 
     return TelegramBotRPCRequest('getUserProfilePhotos', params=params, 
                                  on_result=UserProfilePhotos.from_result, **request_args).run()
 
-def _process_get_updates(result):
-    if result is None:
-        return None
-
-    message_updates = [MessageUpdate.from_result(msg_update) for msg_update in result]
-    return message_updates
-
-
 def get_updates(offset: int=None, limit: int=None, timeout: int=None, *, request_args, **kwargs):
     """
     Use this method to receive incoming updates using long polling. 
@@ -844,7 +859,7 @@ def get_updates(offset: int=None, limit: int=None, timeout: int=None, *, request
     # merge bot args with user overrides
     request_args = _merge_dict(request_args, kwargs)
 
-    return TelegramBotRPCRequest('getUpdates', params=params, on_result=_process_get_updates, **request_args).run()
+    return TelegramBotRPCRequest('getUpdates', params=params, on_result=MessageUpdate.from_result, **request_args).run()
 
 def set_webhook(url: str=None, *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
     """
