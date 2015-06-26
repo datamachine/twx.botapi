@@ -434,7 +434,7 @@ def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None, re
     :rtype: Message
     """
     #TODO: implement
-    return None
+    raise NotImplemented
 
 def send_document(chat_id, document, reply_to_message_id=None, reply_markup=None, **request_args):
     """
@@ -453,7 +453,7 @@ def send_document(chat_id, document, reply_to_message_id=None, reply_markup=None
     :rtype:
     """
     # TODO: Implement
-    return None
+    raise NotImplemented
 
 def send_sticker(chat_id, sticker, reply_to_message_id, reply_markup, **request_args):
     """
@@ -474,7 +474,50 @@ def send_sticker(chat_id, sticker, reply_to_message_id, reply_markup, **request_
     :rtype:
     """
     #TODO: implement
-    return None
+    raise NotImplemented
+
+def sendVideo(**request_args):
+    """
+    :param request_args: Args passed down to the TelegramBotRPCRequest
+    """
+    #TODO: implement
+    raise NotImplemented
+    
+def sendLocation(**request_args):
+    """
+    :param request_args: Args passed down to the TelegramBotRPCRequest
+    """
+    #TODO: implement
+    raise NotImplemented
+    
+def sendChatAction(**request_args):
+    """
+    :param request_args: Args passed down to the TelegramBotRPCRequest
+    """
+    #TODO: implement
+    raise NotImplemented
+    
+def getUserProfilePhotos(**request_args):
+    """
+    :param request_args: Args passed down to the TelegramBotRPCRequest
+    """
+    #TODO: implement
+    raise NotImplemented
+    
+def getUpdates(**request_args):
+    """
+    :param request_args: Args passed down to the TelegramBotRPCRequest
+    """
+    #TODO: implement
+    raise NotImplemented
+    
+def setWebhook(**request_args):
+    """
+    :param request_args: Args passed down to the TelegramBotRPCRequest
+    """
+    #TODO: implement
+    raise NotImplemented
+    
 
 class TelegramBot:
 
