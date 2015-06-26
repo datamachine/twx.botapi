@@ -31,11 +31,23 @@ if 'pypitest' in sys.argv:
 
 download_url = 'https://github.com/datamachine/twx/archive/{long_rev}.tar.gz'.format(long_rev=long_rev)
 
+description="""Unofficial Telegram Bot API Client
+            ##########
+
+            :contributions: Please join https://github.com/datamachine/twx
+            :issues: Please use https://github.com/datamachine/twx/issues
+            :Python version supported: 3.4
+
+            **twx** is a python interface for the Telegram bot API. It supports
+            making synchronous and asynchronous calls and converts the response
+            into a usable native python object.
+            """
+
 setup(
     name = 'twx',
     packages = ['twx'],
     version = version,
-    description = 'Unofficial Telegram Bot API Client',
+    description = description,
     author = 'Vince Castellano, Phillip Lopo',
     author_email = 'surye80@gmail.com, philliplopo@gmail.com',
     url = 'https://github.com/datamachine/twx', 
