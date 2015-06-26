@@ -249,7 +249,7 @@ class MessageUpdate(_MessageUpdateBase):
         if message_update is None:
             return None
 
-        return MessageUpdate(message_update.get('message_id'), Message.from_result(message_update.get('message')))
+        return MessageUpdate(message_update.get('update_id'), Message.from_result(message_update.get('message')))
 
 
     @staticmethod
