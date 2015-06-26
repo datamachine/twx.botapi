@@ -5,6 +5,7 @@ from functools import partial
 from abc import ABCMeta
 from threading import Thread
 
+# Explicitly definied Telegram bot API types
 _UserBase = namedtuple('User', ['id', 'first_name', 'last_name', 'username'])
 _GroupChatBase = namedtuple('GroupChat', ['id', 'title'])
 _MessageBase = namedtuple('Message', ['message_id', 'sender', 'date', 
@@ -28,7 +29,9 @@ _ForceReplyBase = namedtuple('ForceReply', ['force_reply', 'selective'])
 _InputFileInfoBase = namedtuple('InputFileInfo', ['file_name', 'fp', 'mime_type'])
 _InputFileBase = namedtuple('InputFile', ['form', 'file_info' ])
 
-_Error = namedtuple('Error', ['error_code', 'description'])
+# Implicit types
+_MessageUpdateBase = namedtuple('MessageUpdate', ['update_id', 'message'])
+_ErrorBase = namedtuple('Error', ['error_code', 'description'])
 
 class User(_UserBase):
     __slots__ = ()
@@ -65,8 +68,6 @@ class Message(_MessageBase):
     def from_result(result):
         if result is None:
             return None
-
-        print(result)
 
         return Message(
             message_id=result.get('message_id'), 
@@ -232,8 +233,13 @@ class InputFileInfo(_InputFileInfoBase):
 class InputFile(_InputFileBase):
     __slots__ = ()
 
+class MessageUpdate(_MessageUpdateBase):
+    __slots__ = ()
 
-class Error(_Error):
+    def from_result(result):
+        return MessageUpdate(result.get('message_id'), Message.from_result(result.get('message')))
+
+class Error(_ErrorBase):
     __slots__ = ()
 
     @staticmethod
@@ -735,6 +741,14 @@ def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, *, 
 
     return TelegramBotRPCRequest('getUserProfilePhotos', params=params, on_result=_process_get_user_profile_photos_result, **request_args).run()
 
+def _process_get_updates(result):
+    if result is None:
+        return None
+
+    message_updates = [MessageUpdate.from_result(msg_update) for msg_update in result]
+    return message_updates
+
+
 def get_updates(offset: int=None, limit: int=None, timeout: int=None, *, request_args, **kwargs):
     """
     Use this method to receive incoming updates using long polling. 
@@ -756,17 +770,24 @@ def get_updates(offset: int=None, limit: int=None, timeout: int=None, *, request
     :param request_args: Args passed down to the TelegramBotRPCRequest
     :param kwargs: Args passed down to the TelegramBotRPCRequest (Overrides request_args)
 
-    :type offset: 
-    :type limit: 
-    :type timeout: 
-    :type request_args:
-    :type kwargs:
+    :type offset: int
+    :type limit: int
+    :type timeout: int
 
     :returns: An Array of Update objects is returned.
     :rtype: TelegramBotRPCRequest
     """
-    #TODO: implement
-    raise NotImplemented
+    # optional parameters
+    params = _clean_params(
+            offset=offset,
+            limit=limit,
+            timeout=timeout
+        )
+
+    # merge bot args with user overrides
+    request_args = _merge_dict(request_args, kwargs)
+
+    return TelegramBotRPCRequest('getUpdates', params=params, on_result=_process_get_updates, **request_args).run()
 
 def set_webhook(request_args, **kwargs):
     """
@@ -841,12 +862,12 @@ if __name__ == '__main__':
     test_token = config['Test']['token']
     test_chat_id = config['Test']['chat_id']
 
-    photo = InputFile('photo', InputFileInfo('test.jpg', open('test.jpg', 'rb'), 'image/jpeg'))
-    audio = InputFile('audio', InputFileInfo('test.ogg', open('test.ogg', 'rb'), 'audio/ogg'))
-    video = InputFile('video', InputFileInfo('test.mp4', open('test.mp4', 'rb'), 'video/mp4'))
+    #photo = InputFile('photo', InputFileInfo('test.jpg', open('test.jpg', 'rb'), 'image/jpeg'))
+    #audio = InputFile('audio', InputFileInfo('test.ogg', open('test.ogg', 'rb'), 'audio/ogg'))
+    #video = InputFile('video', InputFileInfo('test.mp4', open('test.mp4', 'rb'), 'video/mp4'))
 
     bot = TelegramBot(test_token)
-    bot.get_me(callback=print_result)
+    #bot.get_me(callback=print_result)
     bot.update_bot_info()
     
     # 97704886
@@ -855,14 +876,16 @@ if __name__ == '__main__':
 
     #result = bot.forward_message(97704886, 96846582, msg.message_id).join()
 
-    result = bot.get_user_profile_photos(97704886, on_error=print_error, request_method=RequestMethod.GET).join()
+    #result = bot.get_user_profile_photos(97704886, on_error=print_error, request_method=RequestMethod.GET).join()
 
-    print(result)
+    #print(result)
 
     #bot.forward_message(test_chat_id, 'testing1', callback=print_result)
 
-    bot.send_photo(test_chat_id, photo, callback=print_result)
-    bot.send_audio(test_chat_id, audio, callback=print_result)
-    bot.send_video(test_chat_id, video, callback=print_result)
+    #bot.send_photo(test_chat_id, photo, callback=print_result)
+    #bot.send_audio(test_chat_id, audio, callback=print_result)
+    #bot.send_video(test_chat_id, video, callback=print_result)
 
-    bot.send_chat_action(test_chat_id, ChatAction.TEXT)
+    #bot.send_chat_action(test_chat_id, ChatAction.TEXT)
+    print(bot.get_updates(callback=print_result).join())
+
