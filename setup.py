@@ -45,7 +45,11 @@ setup(
     classifiers = [
       'Development Status :: 4 - Beta',
       'Intended Audience :: Developers',
+      'License :: OSI Approved :: MIT License',
       'Operating System :: OS Independent',
+      'Programming Language :: Python :: 3 :: Only',
       'Programming Language :: Python :: 3.4',
-  ]
+      'Topic :: Communications :: Chat',
+      'Topic :: Communications :: File Sharing'
+      ]
 )
