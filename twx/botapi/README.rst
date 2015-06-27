@@ -53,5 +53,5 @@ Usage
     print(result)
 
     updates = bot.get_updates().wait()
-    for update in update:
+    for update in updates:
         print("update_id: {}".format(update.update_id))
