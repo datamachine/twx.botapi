@@ -33,8 +33,6 @@ if 'pypitest' in sys.argv:
         revision = f.stdout.read().decode().strip()
 elif 'pypi' in sys.argv:
     revision = version
-else:
-    raise Exception('Unkown target: {}', sys.argv)
 
 if revision is None:
     raise Exception('Unable to determine revision')
