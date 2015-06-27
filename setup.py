@@ -9,8 +9,8 @@ _MAJOR_VERSION         = 1
 _MINOR_VERSION         = 0
 _MICRO_VERSION         = None
 _PRE_RELEASE_TYPE      = 'b'   # a | b | rc
-_PRE_RELEASE_VERSION   = 2
-_DEV_RELEASE_VERSION   = None
+_PRE_RELEASE_VERSION   = 3
+_DEV_RELEASE_VERSION   = 115
 
 version = '{}.{}'.format(_MAJOR_VERSION, _MINOR_VERSION)
 
@@ -21,21 +21,11 @@ if _PRE_RELEASE_TYPE is not None and _PRE_RELEASE_VERSION is not None:
     version += '{}{}'.format(_PRE_RELEASE_TYPE, _PRE_RELEASE_VERSION)
 
 if 'pypitest' in sys.argv:
-    with Popen(['git', 'rev-list', 'HEAD', '--count'], stdout=PIPE) as f:
-        _DEV_RELEASE_VERSION = f.stdout.read().decode().strip()
-
-    if _DEV_RELEASE_VERSION is None:
-      raise Exception('Unable to determine dev revision')
-
     version += '.dev{}'.format(_DEV_RELEASE_VERSION)
 
-    with Popen(['git', 'rev-parse', 'HEAD'], stdout=PIPE) as f:
-        revision = f.stdout.read().decode().strip()
+    revision = '9bfadaa27e2991fc3ef0c7a49b5547c145d70973'
 else:
     revision = version
-
-if revision is None:
-    raise Exception('Unable to determine revision')
 
 download_url = 'https://github.com/datamachine/twx/archive/{}.tar.gz'.format(revision)
 
