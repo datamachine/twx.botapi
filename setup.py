@@ -1,35 +1,49 @@
 from setuptools import setup
-
 from subprocess import Popen, PIPE
-
-revlist_count = None
-long_rev = None
-
-VERSION_MAJOR=1
-VERSION_MINOR=0
-VERSION_BETA=1
-
-with Popen(['git', 'rev-list', 'HEAD', '--count'], stdout=PIPE) as f:
-    revlist_count = f.stdout.read().decode().strip()
-
-with Popen(['git', 'rev-parse', 'HEAD'], stdout=PIPE) as f:
-    long_rev = f.stdout.read().decode().strip()
-
-if revlist_count is None:
-  raise Exception('Unable to determine short revision')
-
-if long_rev is None:
-  raise Exception('Unable to determine long revision')
-
 import sys
 
-version = '{}.{}'.format(VERSION_MAJOR, VERSION_MINOR)
-if VERSION_BETA is not None:
-  version = '{}b{}'.format(version, VERSION_BETA)
-if 'pypitest' in sys.argv:
-  version = '{}.dev{}'.format(version, revlist_count)
+revision = None
 
-download_url = 'https://github.com/datamachine/twx/archive/{long_rev}.tar.gz'.format(long_rev=long_rev)
+# must match PEP 440
+_MAJOR_VERSION         = 1
+_MINOR_VERSION         = 0
+_MICRO_VERSION         = None
+_PRE_RELEASE_TYPE      = 'b'   # a | b | rc
+_PRE_RELEASE_VERSION   = 1
+_DEV_RELEASE_VERSION   = None
+
+version = '{}.{}'.format(_MAJOR, _MINOR, _MICRO)
+
+if _MICRO_VERSION is not None:
+    version += '.{}'.format(_MICRO_VERSION)
+
+if _PRE_RELEASE_TYPE is not None and _PRE_RELEASE_VERSION is not None:
+    version += '{}{}'.format(_PRE_RELEASE_TYPE, _PRE_RELEASE_VERSION)
+
+if 'pypitest' in [sys.argv]:
+    with Popen(['git', 'rev-list', 'HEAD', '--count'], stdout=PIPE) as f:
+        _DEV_RELEASE_VERSION = f.stdout.read().decode().strip()
+
+    if _DEV_RELEASE_VERSION is None:
+      raise Exception('Unable to determine dev revision')
+
+    version += '.dev{}'.format(_DEV_RELEASE_VERSION)
+
+    with Popen(['git', 'rev-parse', 'HEAD'], stdout=PIPE) as f:
+        revision = f.stdout.read().decode().strip()
+else:
+    revision = version
+
+if revision is None:
+    raise Exception('Unable to determine revision')
+
+
+download_url = 'https://github.com/datamachine/twx/archive/{}.tar.gz'.format(revision)
+
+print(version)
+print(download_url)
+
+return
 
 setup(
     name = 'twx',
