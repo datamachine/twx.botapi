@@ -418,6 +418,12 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
         :type params: dict
         """
 
+        reply_markup = params.get('reply_markup') if params else None
+        if reply_markup is not None:
+            params['reply_markup'] = reply_markup.serialize()
+
+        print(params)
+
         self.api_method = api_method
         self.token = token
         self.params = params
@@ -551,7 +557,7 @@ def send_message(chat_id: int, text: str,
     params.update(_clean_params(
         disable_web_page_preview=disable_web_page_preview,
         reply_to_message_id=reply_to_message_id,
-        reply_markup=reply_markup.serialize() if reply_markup is not None else None
+        reply_markup=reply_markup
         )
     )
 
