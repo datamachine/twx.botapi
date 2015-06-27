@@ -31,7 +31,7 @@ if 'pypitest' in sys.argv:
 
     with Popen(['git', 'rev-parse', 'HEAD'], stdout=PIPE) as f:
         revision = f.stdout.read().decode().strip()
-elif 'pypi' in sys.argv:
+else:
     revision = version
 
 if revision is None:
