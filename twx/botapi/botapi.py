@@ -538,8 +538,6 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
         if self.files is not None:
             files = self.files
 
-        print(data)
-
         return Request(self.request_method, self._get_url(), data=data, files=files).prepare()
 
     def _async_call(self):
