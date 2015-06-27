@@ -32,6 +32,7 @@ Usage
     from twx.botapi import TelegramBot
     
     bot = TelegramBot('<API TOKEN>')
+    
     request = bot.get_me()
     result = request.wait()
     print(result)
@@ -39,3 +40,6 @@ Usage
     result = bot.send_message(int('userid'), 'test message body').wait()
     print(result)
 
+    updates = bot.get_updates().wait()
+    for update in update:
+        print("update_id: {}".format(update.update_id))
