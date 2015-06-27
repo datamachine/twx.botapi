@@ -31,12 +31,37 @@ if 'pypitest' in sys.argv:
 
 download_url = 'https://github.com/datamachine/twx/archive/{long_rev}.tar.gz'.format(long_rev=long_rev)
 
-
 setup(
     name = 'twx',
     packages = ['twx', 'twx.botapi'],
     version = version,
     description = 'Unofficial Telegram Bot API Client',
+    long_description = open("README.rst").read(),
+    author = 'Vince Castellano, Phillip Lopo',
+    author_email = 'surye80@gmail.com, philliplopo@gmail.com',
+    keywords = ['datamachine', 'telex', 'telegram', 'bot', 'api', 'rpc'],
+    url = 'https://github.com/datamachine/twx', 
+    download_url = download_url, 
+    install_requires=['requests'],
+    platforms = ['Linux', 'Unix', 'MacOsX', 'Windows'],
+    classifiers = [
+      'Development Status :: 4 - Beta',
+      'Intended Audience :: Developers',
+      'License :: OSI Approved :: MIT License',
+      'Operating System :: OS Independent',
+      'Programming Language :: Python :: 3 :: Only',
+      'Programming Language :: Python :: 3.4',
+      'Topic :: Communications :: Chat',
+      'Topic :: Communications :: File Sharing'
+      ]
+)
+
+setup(
+    name = 'twx-botapi',
+    package_dir = {'':'twx'},
+    packages = ['botapi'],
+    version = version,
+    description = 'Standalone version of the Unofficial Telegram Bot API Client from TWX',
     long_description = open("README.rst").read(),
     author = 'Vince Castellano, Phillip Lopo',
     author_email = 'surye80@gmail.com, philliplopo@gmail.com',
