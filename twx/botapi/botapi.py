@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""Unofficial Telegram Bot API
+
+.. _Google Python Style Guide:
+   http://google.github.io/styleguide/pyguide.html
+
+"""
+
 from requests import Request, Session
 from collections import namedtuple
 from enum import Enum
@@ -14,14 +22,11 @@ _UserBase = namedtuple('User', ['id', 'first_name', 'last_name', 'username'])
 class User(_UserBase):
     """This object represents a Telegram user or bot.
 
-    ==============  =====  ======================================
-    Field           Type   Description
-    ==============  =====  ======================================
-    ``id``          `int`  Unique identifier for this user or bot
-    ``first_name``  `str`  User‘s or bot’s first name
-    ``last_name``   `str`  *Optional.* User‘s or bot’s last name
-    ``username``    `str`  *Optional.* User‘s or bot’s username
-    ==============  =====  ======================================
+    Attributes:
+        id          (int): Unique identifier for this user or bot
+        first_name  (str): User‘s or bot’s first name
+        last_name   (str): *Optional.* User‘s or bot’s last name
+        username    (str): *Optional.* User‘s or bot’s username
     """
     __slots__ = ()
 
@@ -40,6 +45,13 @@ class User(_UserBase):
 _GroupChatBase = namedtuple('GroupChat', ['id', 'title'])
 class GroupChat(_GroupChatBase):
     """This object represents a group chat.
+
+    .. attribute:: GroupChat.id
+
+        Unique identifier for this group chat
+
+        :type: int
+
     =========  =====  =====================================
     Field      Type   Description
     =========  =====  =====================================
@@ -65,6 +77,7 @@ _MessageBase = namedtuple('Message',
      'new_chat_title', 'new_chat_photo', 'delete_chat_photo', 'group_chat_created'])
 class Message(_MessageBase):
     """This object represents a message.
+
     =========================  =====================  =================================================================
     Field                      Type                   Description
     =========================  =====================  =================================================================
@@ -328,13 +341,13 @@ class ReplyKeyboardMarkup(_ReplyKeyboardMarkupBase, ReplyMarkup):
                                                       to specific users only. Targets: 
                                                       1) users that are @mentioned in the text of the Message object; 
                                                       2) if the bot's message is a reply (has reply_to_message_id), 
-                                                         sender of the original message.
+                                                      sender of the original message.
     =====================  =========================  ===============================================================
 
-    Example: A user requests to change the bot‘s language, bot replies to the request with a keyboard to select 
+    :example: A user requests to change the bot‘s language, bot replies to the request with a keyboard to select 
              the new language. Other users in the group don’t see the keyboard.
 
-    Usage:
+    :usage:
 
     ::
 
@@ -372,17 +385,21 @@ class ReplyKeyboardMarkup(_ReplyKeyboardMarkupBase, ReplyMarkup):
 _ReplyKeyboardHideBase = namedtuple('ReplyKeyboardHide', ['hide_keyboard', 'selective'])
 class ReplyKeyboardHide(_ReplyKeyboardHideBase, ReplyMarkup):
     """Upon receiving a message with this object, Telegram clients will hide the current custom keyboard 
-       and display the default letter-keyboard. By default, custom keyboards are displayed until a new 
-       keyboard is sent by a bot. An exception is made for one-time keyboards that are hidden immediately 
-       after the user presses a button (see ReplyKeyboardMarkup).
+        and display the default letter-keyboard. By default, custom keyboards are displayed until a new 
+        keyboard is sent by a bot. An exception is made for one-time keyboards that are hidden immediately 
+        after the user presses a button (see ReplyKeyboardMarkup).
 
-        Field              Type     Description
-        ``hide_keyboard``  `True`   Requests clients to hide the custom keyboard
-        ``selective``      `bool`   *Optional.* Use this parameter if you want to hide keyboard for specific 
-                                    users only. Targets: 
-                                    1) users that are @mentioned in the text of the Message object; 
-                                    2) if the bot's message is a reply (has reply_to_message_id), sender of the 
-                                       original message.
+
+        =================  ======  ===========================================================================
+        Field              Type    Description
+        =================  ======  ===========================================================================
+        ``hide_keyboard``  `True`  Requests clients to hide the custom keyboard
+        ``selective``      `bool`  *Optional.* Use this parameter if you want to hide keyboard for specific 
+                                   users only. Targets: 
+                                   1) users that are @mentioned in the text of the Message object; 
+                                   2) if the bot's message is a reply (has reply_to_message_id), sender of the 
+                                   original message.
+        =================  ======  ===========================================================================
 
         Example: A user votes in a poll, bot returns confirmation message in reply to the vote and hides 
                  keyboard for that user, while still showing the keyboard with poll options to users who 
@@ -407,30 +424,33 @@ class ReplyKeyboardHide(_ReplyKeyboardHideBase, ReplyMarkup):
 _ForceReplyBase = namedtuple('ForceReply', ['force_reply', 'selective'])
 class ForceReply(_ForceReplyBase, ReplyMarkup):
     """Upon receiving a message with this object, Telegram clients will display a reply interface to the user
-       (act as if the user has selected the bot‘s message and tapped ’Reply'). This can be extremely useful if
-       you want to create user-friendly step-by-step interfaces without having to sacrifice privacy mode.
+        (act as if the user has selected the bot‘s message and tapped ’Reply'). This can be extremely useful if
+        you want to create user-friendly step-by-step interfaces without having to sacrifice privacy mode.
 
 
-       Field           Type    Description
-       ``force_reply`` `True`  Shows reply interface to the user, as if they manually selected the bot‘s 
-                               message and tapped ’Reply'
-       ``selective``   `bool`  *Optional.* Use this parameter if you want to force reply from specific users 
-                               only. Targets: 
-                               1) users that are @mentioned in the text of the Message object; 
-                               2) if the bot's message is a reply (has reply_to_message_id), sender of the 
-                                  original message.
-       
-       Example: A poll bot for groups runs in privacy mode (only receives commands, replies to its messages 
-                and mentions). There could be two ways to create a new poll:
+        ===============  ======  =============================================================================
+        Field            Type    Description
+        ===============  ======  =============================================================================
+        ``force_reply``  `True`  Shows reply interface to the user, as if they manually selected the bot‘s 
+                                 message and tapped ’Reply'
+        ``selective``    `bool`  *Optional.* Use this parameter if you want to force reply from specific users 
+                                 only. Targets: 
+                                 1) users that are @mentioned in the text of the Message object; 
+                                 2) if the bot's message is a reply (has reply_to_message_id), sender of the 
+                                 original message.
+        ===============  ======  =============================================================================
+
+        Example: A poll bot for groups runs in privacy mode (only receives commands, replies to its messages 
+                 and mentions). There could be two ways to create a new poll:
        
                     Explain the user how to send a command with parameters (e.g. /newpoll question answer1 
-                    answer2). May be appealing for hardcore users but lacks modern day polish.
+                    answer 2). May be appealing for hardcore users but lacks modern day polish.
 
-                    Guide the user through a step-by-step process. ‘Please send me your question’, ‘Cool, 
+                    1. Guide the user through a step-by-step process. ‘Please send me your question’, ‘Cool, 
                     now let’s add the first answer option‘, ’Great. Keep adding answer options, then send 
                     /done when you‘re ready’.
 
-                    The last option is definitely more attractive. And if you use ForceReply in your bot‘s 
+                    2. The last option is definitely more attractive. And if you use ForceReply in your bot‘s 
                     questions, it will receive the user’s answers even if it only receives replies, commands 
                     and mentions — without any extra work for the user.
     """
@@ -620,7 +640,7 @@ def send_message(chat_id: int, text: str,
     """
     Use this method to send text messages. 
 
-    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param int chat_id: Unique identifier for the message recipient — User or GroupChat id
     :param text: Text of the message to be sent
     :param disable_web_page_preview: Disables link previews for links in this message
     :param reply_to_message_id: If the message is a reply, ID of the original message
@@ -629,7 +649,6 @@ def send_message(chat_id: int, text: str,
                          force a reply from the user.
     :param request_args: Args passed down to TelegramBotRPCRequest
 
-    :type chat_id: int
     :type text: str
     :type disable_web_page_preview: bool
     :type reply_to_message_id: int
@@ -658,7 +677,7 @@ def forward_message(chat_id, from_chat_id, message_id,
     """
     Use this method to forward messages of any kind. 
 
-    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param int chat_id: Unique identifier for the message recipient — User or GroupChat id
     :param from_chat_id: Unique identifier for the chat where the original message was sent — User or 
                          GroupChat id
     :param message_id: Unique message identifier

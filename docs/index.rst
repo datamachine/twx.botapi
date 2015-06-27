@@ -11,6 +11,10 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   twx/index
+
+- :doc:`TWX module docs <twx/index>` : The TWX module documentation 
+
 
 
 Indices and tables
