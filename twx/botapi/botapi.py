@@ -359,8 +359,10 @@ class ReplyKeyboardMarkup(_ReplyKeyboardMarkupBase, ReplyMarkup):
 
         if self.resize_keyboard is not None:
             reply_markup['resize_keyboard'] = bool(self.resize_keyboard)
+
         if self.one_time_keyboard is not None:
             reply_markup['one_time_keyboard'] = bool(self.one_time_keyboard)
+
         if self.selective is not None:
             reply_markup['selective'] = bool(self.selective)
 
@@ -393,9 +395,6 @@ class ReplyKeyboardHide(_ReplyKeyboardHideBase, ReplyMarkup):
         return ReplyKeyboardHide(True, selective)
 
     def serialize(self):
-        if not self.hide_keyboard:
-            return ''
-
         reply_markup = dict(
             hide_keyboard=True
             )
@@ -407,7 +406,46 @@ class ReplyKeyboardHide(_ReplyKeyboardHideBase, ReplyMarkup):
 
 _ForceReplyBase = namedtuple('ForceReply', ['force_reply', 'selective'])
 class ForceReply(_ForceReplyBase, ReplyMarkup):
+    """Upon receiving a message with this object, Telegram clients will display a reply interface to the user
+       (act as if the user has selected the bot‘s message and tapped ’Reply'). This can be extremely useful if
+       you want to create user-friendly step-by-step interfaces without having to sacrifice privacy mode.
+
+
+       Field           Type    Description
+       ``force_reply`` `True`  Shows reply interface to the user, as if they manually selected the bot‘s 
+                               message and tapped ’Reply'
+       ``selective``   `bool`  *Optional.* Use this parameter if you want to force reply from specific users 
+                               only. Targets: 
+                               1) users that are @mentioned in the text of the Message object; 
+                               2) if the bot's message is a reply (has reply_to_message_id), sender of the 
+                                  original message.
+       
+       Example: A poll bot for groups runs in privacy mode (only receives commands, replies to its messages 
+                and mentions). There could be two ways to create a new poll:
+       
+                    Explain the user how to send a command with parameters (e.g. /newpoll question answer1 
+                    answer2). May be appealing for hardcore users but lacks modern day polish.
+
+                    Guide the user through a step-by-step process. ‘Please send me your question’, ‘Cool, 
+                    now let’s add the first answer option‘, ’Great. Keep adding answer options, then send 
+                    /done when you‘re ready’.
+
+                    The last option is definitely more attractive. And if you use ForceReply in your bot‘s 
+                    questions, it will receive the user’s answers even if it only receives replies, commands 
+                    and mentions — without any extra work for the user.
+    """
     __slots__ = ()
+
+    @staticmethod
+    def create(selective=None):
+        return ForceReply(True, selective)
+
+    def serialize(self):
+        reply_markup = dict(force_reply=True)
+        if self.selective is not None:
+            reply_markup['selective'] = bool(self.selective)
+
+        return json.dumps(reply_markup)
 
 _InputFileInfoBase = namedtuple('InputFileInfo', ['file_name', 'fp', 'mime_type'])
 class InputFileInfo(_InputFileInfoBase):
@@ -499,6 +537,8 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
             data = self.params
         if self.files is not None:
             files = self.files
+
+        print(data)
 
         return Request(self.request_method, self._get_url(), data=data, files=files).prepare()
 
