@@ -2,7 +2,7 @@ from requests import Request, Session
 from collections import namedtuple
 from enum import Enum
 from functools import partial
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from threading import Thread
 
 import json
@@ -301,8 +301,12 @@ class UserProfilePhotos(_UserProfilePhotosBase):
             photos=photos
             )
 
-class ReplyMarkup:
+class ReplyMarkup(metaclass=ABCMeta):
     __slots__ = ()
+
+    @abstractmethod
+    def serialize(self):
+        raise NotImplements
 
 _ReplyKeyboardMarkupBase = namedtuple('ReplyKeyboardMarkup', 
     ['keyboard', 'resize_keyboard', 'one_time_keyboard', 'selective'])
@@ -329,29 +333,77 @@ class ReplyKeyboardMarkup(_ReplyKeyboardMarkupBase, ReplyMarkup):
 
     Example: A user requests to change the bot‘s language, bot replies to the request with a keyboard to select 
              the new language. Other users in the group don’t see the keyboard.
+
+    Usage:
+
+    ::
+
+            keyboard = [
+            ['7', '8', '9'],
+            ['4', '5', '6'],
+            ['1', '2', '3'],
+                 ['0']
+            ]
+
+            reply_markup = ReplyKeyboardMarkup.create(keyboard)
+            bot.send_message(12345678, 'testing reply_markup', reply_markup=reply_markup)
     """
     __slots__ = ()
 
     @staticmethod
-    def create(keyboard, resize_keyboard=False, one_time_keyboard=False, selective=None):
+    def create(keyboard, resize_keyboard=None, one_time_keyboard=None, selective=None):
         return ReplyKeyboardMarkup(keyboard, resize_keyboard, one_time_keyboard, selective)
 
     def serialize(self):
-        reply_keyboard_markup =dict(keyboard=self.keyboard)
+        reply_markup =dict(keyboard=self.keyboard)
 
-        if self.resize_keyboard:
-            reply_keyboard_markup['resize_keyboard'] = self.resize_keyboard
-        if self.one_time_keyboard:
-            reply_keyboard_markup['one_time_keyboard'] = self.one_time_keyboard
-        if self.selective:
-            reply_keyboard_markup['selective'] = self.selective
+        if self.resize_keyboard is not None:
+            reply_markup['resize_keyboard'] = bool(self.resize_keyboard)
+        if self.one_time_keyboard is not None:
+            reply_markup['one_time_keyboard'] = bool(self.one_time_keyboard)
+        if self.selective is not None:
+            reply_markup['selective'] = bool(self.selective)
 
-        return json.dumps(reply_keyboard_markup)
+        return json.dumps(reply_markup)
 
 
 _ReplyKeyboardHideBase = namedtuple('ReplyKeyboardHide', ['hide_keyboard', 'selective'])
 class ReplyKeyboardHide(_ReplyKeyboardHideBase, ReplyMarkup):
+    """Upon receiving a message with this object, Telegram clients will hide the current custom keyboard 
+       and display the default letter-keyboard. By default, custom keyboards are displayed until a new 
+       keyboard is sent by a bot. An exception is made for one-time keyboards that are hidden immediately 
+       after the user presses a button (see ReplyKeyboardMarkup).
+
+        Field              Type     Description
+        ``hide_keyboard``  `True`   Requests clients to hide the custom keyboard
+        ``selective``      `bool`   *Optional.* Use this parameter if you want to hide keyboard for specific 
+                                    users only. Targets: 
+                                    1) users that are @mentioned in the text of the Message object; 
+                                    2) if the bot's message is a reply (has reply_to_message_id), sender of the 
+                                       original message.
+
+        Example: A user votes in a poll, bot returns confirmation message in reply to the vote and hides 
+                 keyboard for that user, while still showing the keyboard with poll options to users who 
+                 haven't voted yet.
+    """
     __slots__ = ()
+
+    @staticmethod
+    def create(selective=None):
+        return ReplyKeyboardHide(True, selective)
+
+    def serialize(self):
+        if not self.hide_keyboard:
+            return ''
+
+        reply_markup = dict(
+            hide_keyboard=True
+            )
+
+        if self.selective is not None:
+            reply_markup['selective'] = bool(self.selective)
+
+        return json.dumps(reply_markup)
 
 _ForceReplyBase = namedtuple('ForceReply', ['force_reply', 'selective'])
 class ForceReply(_ForceReplyBase, ReplyMarkup):
@@ -421,8 +473,6 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
         reply_markup = params.get('reply_markup') if params else None
         if reply_markup is not None:
             params['reply_markup'] = reply_markup.serialize()
-
-        print(params)
 
         self.api_method = api_method
         self.token = token
