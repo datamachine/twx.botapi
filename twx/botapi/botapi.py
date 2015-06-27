@@ -5,6 +5,8 @@ from functools import partial
 from abc import ABCMeta
 from threading import Thread
 
+import json
+
 """
 Telegram Bot API Types as defined at https://core.telegram.org/bots/api#available-types
 """
@@ -305,7 +307,47 @@ class ReplyMarkup:
 _ReplyKeyboardMarkupBase = namedtuple('ReplyKeyboardMarkup', 
     ['keyboard', 'resize_keyboard', 'one_time_keyboard', 'selective'])
 class ReplyKeyboardMarkup(_ReplyKeyboardMarkupBase, ReplyMarkup):
+    """This object represents a custom keyboard with reply options (see Introduction to bots for details and examples).
+
+    =====================  =========================  ===============================================================
+    Field                  Type                       Description
+    =====================  =========================  ===============================================================
+    ``keyboard``           `list` of `list` of `str`  Array of button rows, each represented by an Array of Strings
+    ``resize_keyboard``    `bool`                     *Optional.* Requests clients to resize the keyboard vertically 
+                                                      for optimal fit (e.g., make the keyboard smaller if there are 
+                                                      just two rows of buttons). Defaults to false, in which case 
+                                                      the custom keyboard is always of the same height as the app's 
+                                                      standard keyboard.
+    ``one_time_keyboard``  `bool`                     *Optional.* Requests clients to hide the keyboard as soon as 
+                                                      it's been used. Defaults to false.
+    ``selective``          `bool`                     *Optional.* Use this parameter if you want to show the keyboard 
+                                                      to specific users only. Targets: 
+                                                      1) users that are @mentioned in the text of the Message object; 
+                                                      2) if the bot's message is a reply (has reply_to_message_id), 
+                                                         sender of the original message.
+    =====================  =========================  ===============================================================
+
+    Example: A user requests to change the bot‘s language, bot replies to the request with a keyboard to select 
+             the new language. Other users in the group don’t see the keyboard.
+    """
     __slots__ = ()
+
+    @staticmethod
+    def create(keyboard, resize_keyboard=False, one_time_keyboard=False, selective=None):
+        return ReplyKeyboardMarkup(keyboard, resize_keyboard, one_time_keyboard, selective)
+
+    def serialize(self):
+        reply_keyboard_markup =dict(keyboard=self.keyboard)
+
+        if self.resize_keyboard:
+            reply_keyboard_markup['resize_keyboard'] = self.resize_keyboard
+        if self.one_time_keyboard:
+            reply_keyboard_markup['one_time_keyboard'] = self.one_time_keyboard
+        if self.selective:
+            reply_keyboard_markup['selective'] = self.selective
+
+        return json.dumps(reply_keyboard_markup)
+
 
 _ReplyKeyboardHideBase = namedtuple('ReplyKeyboardHide', ['hide_keyboard', 'selective'])
 class ReplyKeyboardHide(_ReplyKeyboardHideBase, ReplyMarkup):
@@ -509,7 +551,7 @@ def send_message(chat_id: int, text: str,
     params.update(_clean_params(
         disable_web_page_preview=disable_web_page_preview,
         reply_to_message_id=reply_to_message_id,
-        reply_markup=reply_markup
+        reply_markup=reply_markup.serialize() if reply_markup is not None else None
         )
     )
 
