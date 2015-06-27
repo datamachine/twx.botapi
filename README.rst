@@ -35,4 +35,7 @@ Usage
     request = bot.get_me()
     result = request.wait()
     print(result)
+    
+    result = bot.send_message(int('userid'), 'test message body').wait()
+    print(result)
 
