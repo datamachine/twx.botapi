@@ -44,8 +44,6 @@ download_url = 'https://github.com/datamachine/twx/archive/{}.tar.gz'.format(rev
 print(version)
 print(download_url)
 
-sys.exit(0)
-
 setup(
     name = 'twx',
     packages = ['twx', 'twx.botapi'],
