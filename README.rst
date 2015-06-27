@@ -20,6 +20,7 @@ For stable:
 ``pip install twx``
 
 For dev:
+
 ``pip install -i https://testpypi.python.org/pypi twx``
 
 =====
@@ -27,6 +28,7 @@ Usage
 =====
 
 ::
+    
     from twx.botapi import TelegramBot
     
     bot = TelegramBot('<API TOKEN>')
