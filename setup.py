@@ -12,7 +12,7 @@ _PRE_RELEASE_TYPE      = 'b'   # a | b | rc
 _PRE_RELEASE_VERSION   = 1
 _DEV_RELEASE_VERSION   = None
 
-version = '{}.{}'.format(_MAJOR, _MINOR, _MICRO)
+version = '{}.{}'.format(_MAJOR_VERSION, _MINOR_VERSION)
 
 if _MICRO_VERSION is not None:
     version += '.{}'.format(_MICRO_VERSION)
@@ -20,7 +20,7 @@ if _MICRO_VERSION is not None:
 if _PRE_RELEASE_TYPE is not None and _PRE_RELEASE_VERSION is not None:
     version += '{}{}'.format(_PRE_RELEASE_TYPE, _PRE_RELEASE_VERSION)
 
-if 'pypitest' in [sys.argv]:
+if 'pypitest' in sys.argv:
     with Popen(['git', 'rev-list', 'HEAD', '--count'], stdout=PIPE) as f:
         _DEV_RELEASE_VERSION = f.stdout.read().decode().strip()
 
@@ -31,19 +31,20 @@ if 'pypitest' in [sys.argv]:
 
     with Popen(['git', 'rev-parse', 'HEAD'], stdout=PIPE) as f:
         revision = f.stdout.read().decode().strip()
-else:
+elif 'pypi' in sys.argv:
     revision = version
+else:
+    raise Exception('Unkown target: {}', sys.argv)
 
 if revision is None:
     raise Exception('Unable to determine revision')
-
 
 download_url = 'https://github.com/datamachine/twx/archive/{}.tar.gz'.format(revision)
 
 print(version)
 print(download_url)
 
-return
+sys.exit(0)
 
 setup(
     name = 'twx',
