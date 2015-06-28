@@ -134,9 +134,10 @@ html_theme_options = {
     #'anchor': '#0088cc',
     'gray_1': '#0088cc',
     'gray_2': '#ecf3f8',
+    #'gray_3': '#0088cc',
     #'pre_bg': '#ecf3f8',
     #'font_family': "'Lucida Grande', 'Lucida Sans Unicode', Arial, Helvetica, Verdana, sans-serif",
-    'head_font_family': "'Lucida Grande', 'Lucida Sans Unicode', Arial, Helvetica, Verdana, sans-serif"
+    #'head_font_family': "'Lucida Grande', 'Lucida Sans Unicode', Arial, Helvetica, Verdana, sans-serif"
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
