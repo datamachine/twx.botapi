@@ -171,14 +171,11 @@ _AudioBase = namedtuple('Audio', ['file_id', 'duration', 'mime_type', 'file_size
 class Audio(_AudioBase):
     """This object represents an audio file (voice note).
 
-    =============  =====  =====================================================
-    Field          Type   Description
-    =============  =====  =====================================================
-    ``file_id``    `str`  Unique identifier for this file
-    ``duration``   `int`  Duration of the audio in seconds as defined by sender
-    ``mime_type``  `str`  Optional. MIME type of the file as defined by sender
-    ``file_size``  `int`  Optional. File size
-    =============  =====  =====================================================
+    Attributes:
+        file_id    (str)  :Unique identifier for this file
+        duration   (int)  :Duration of the audio in seconds as defined by sender
+        mime_type  (str)  :*Optional.* MIME type of the file as defined by sender
+        file_size  (int)  :*Optional.* File size
     """
     __slots__ = ()
 
