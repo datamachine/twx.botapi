@@ -379,6 +379,12 @@ class InputFile(_InputFileBase):
 
             bot.send_photo(chat_id=12345678, photo=InputFile)
 
+        .. note::
+
+            While creating the FileInput currently requires a reasonable amount
+            of preparation just to send a file. This class will be extended
+            in the future to make the process easier.
+
     """
     __slots__ = ()
 
