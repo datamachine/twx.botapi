@@ -229,7 +229,7 @@ class Sticker(_StickerBase):
         height     (int)        :Sticker height
         thumb      (PhotoSize)  :Sticker thumbnail in .webp or .jpg format
         file_size  (int)        :*Optional.* File size
-        
+
     """
     __slots__ = ()
 
@@ -249,6 +249,19 @@ class Sticker(_StickerBase):
 _VideoBase = namedtuple('Video', 
     ['file_id', 'width', 'height', 'duration', 'thumb', 'mime_type', 'file_size', 'caption'])
 class Video(_VideoBase):
+    """This object represents a video file.
+
+    Attributes:
+        file_id     (str)       :Unique identifier for this file
+        width       (int)       :Video width as defined by sender
+        height      (int)       :Video height as defined by sender
+        duration    (int)       :Duration of the video in seconds as defined by sender
+        thumb       (PhotoSize) :Video thumbnail
+        mime_type   (str)       :*Optional.* Mime type of a file as defined by sender
+        file_size   (int)       :*Optional.* File size
+        caption     (str)       :*Optional.* Text description of the video (usually empty)
+        
+    """
     __slots__ = ()
 
     @staticmethod
