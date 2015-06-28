@@ -1,9 +1,19 @@
+# -*- coding: utf-8 -*-
+"""Unofficial Telegram Bot API
+
+.. _Google Python Style Guide:
+   http://google.github.io/styleguide/pyguide.html
+
+"""
+
 from requests import Request, Session
 from collections import namedtuple
 from enum import Enum
 from functools import partial
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from threading import Thread
+
+import json
 
 """
 Telegram Bot API Types as defined at https://core.telegram.org/bots/api#available-types
@@ -12,14 +22,12 @@ _UserBase = namedtuple('User', ['id', 'first_name', 'last_name', 'username'])
 class User(_UserBase):
     """This object represents a Telegram user or bot.
 
-    ==============  =====  ======================================
-    Field           Type   Description
-    ==============  =====  ======================================
-    ``id``          `int`  Unique identifier for this user or bot
-    ``first_name``  `str`  User‘s or bot’s first name
-    ``last_name``   `str`  *Optional.* User‘s or bot’s last name
-    ``username``    `str`  *Optional.* User‘s or bot’s username
-    ==============  =====  ======================================
+    Attributes:
+        id (int): Unique identifier for this user or bot
+        first_name (str): User‘s or bot’s first name
+        last_name (Optional[str]): User‘s or bot’s last name
+        username (Optional[str]): User‘s or bot’s username
+
     """
     __slots__ = ()
 
@@ -38,12 +46,11 @@ class User(_UserBase):
 _GroupChatBase = namedtuple('GroupChat', ['id', 'title'])
 class GroupChat(_GroupChatBase):
     """This object represents a group chat.
-    =========  =====  =====================================
-    Field      Type   Description
-    =========  =====  =====================================
-    ``id``     `int`  Unique identifier for this group chat
-    ``title``  `str`  Group name
-    =========  =====  =====================================
+
+    Attributes:
+        id    (int): Unique identifier for this group chat
+        title (str): Group name
+
     """
     __slots__ = ()
 
@@ -63,41 +70,35 @@ _MessageBase = namedtuple('Message',
      'new_chat_title', 'new_chat_photo', 'delete_chat_photo', 'group_chat_created'])
 class Message(_MessageBase):
     """This object represents a message.
-    =========================  =====================  =================================================================
-    Field                      Type                   Description
-    =========================  =====================  =================================================================
-    ``message_id``             `int`                  Unique message identifier    
-    ``sender``                 `User`                 Sender (``from`` in official specification)
-    ``date``                   `int`                  Date the message was sent in Unix time
-    ``chat``                   `User` or `GroupChat`  Conversation the message belongs to — user in case of a private
-                                                      message, GroupChat in case of a group
-    ``forward_from``           `User`                 *Optional.* For forwarded messages, sender of the original 
-                                                      message
-    ``forward_date``           `int`                  *Optional.* For forwarded messages, date the original message was
-                                                      sent in Unix time
-    ``reply_to_message``       `Message`              *Optional.* For replies, the original message. Note that the 
-                                                      Message object in this field will not contain further 
-                                                      reply_to_message fields even if it itself is a reply.
-    ``text``                   `str`                  *Optional.* For text messages, the actual UTF-8 text of the 
-                                                      message
-    ``audio``                  `Audio`                *Optional.* Message is an audio file, information about the file
-    ``document``               `Document`             *Optional.* Message is a general file, information about the file
-    ``photo``                  `list` of `PhotoSize`  *Optional.* Message is a photo, available sizes of the photo
-    ``sticker``                `Sticker`              *Optional.* Message is a sticker, information about the sticker
-    ``video``                  `Video`                *Optional.* Message is a video, information about the video
-    ``contact``                `Contact`              *Optional.* Message is a shared contact, information about the 
-                                                      contact
-    ``location``               `Location`             *Optional.* Message is a shared location, information about the
-                                                      location
-    ``new_chat_participant``   `User`                 *Optional.* A new member was added to the group, information
-                                                      about them (this member may be bot itself)
-    ``left_chat_participant``  `User`                 *Optional.* A member was removed from the group, information
-                                                      about them (this member may be bot itself)
-    ``new_chat_title``         `str`                  *Optional.* A group title was changed to this value
-    ``new_chat_photo``         `list` of `PhotoSize`  *Optional.* A group photo was change to this value
-    ``delete_chat_photo``      `True`                 *Optional.* Informs that the group photo was deleted
-    ``group_chat_created``     `True`                 *Optional.* Informs that the group has been created
-    =========================  =====================  =================================================================
+
+    Attributes:
+        message_id            (int)                 :Unique message identifier
+        from                  (User)                :Sender
+        date                  (int)                 :Date the message was sent in Unix time
+        chat                  (User or GroupChat)   :Conversation the message belongs to — user in case of 
+                                                    a private message, GroupChat in case of a group
+        forward_from          (User)                :*Optional.* For forwarded messages, sender of the original message
+        forward_date          (int)                 :*Optional.* For forwarded messages, date the original message was 
+                                                                 sent in Unix time
+        reply_to_message      (Message)             :*Optional.* For replies, the original message. Note that the Message 
+                                                                 object in this field will not contain further reply_to_message 
+                                                                 fields even if it itself is a reply.
+        text                  (str)                 :*Optional.* For text messages, the actual UTF-8 text of the message
+        audio                 (Audio)               :*Optional.* Message is an audio file, information about the file
+        document              (Document)            :*Optional.* Message is a general file, information about the file
+        photo                 (Sequence[PhotoSize]) :*Optional.* Message is a photo, available sizes of the photo
+        sticker               (Sticker)             :*Optional.* Message is a sticker, information about the sticker
+        video                 (Video)               :*Optional.* Message is a video, information about the video
+        contact               (Contact)             :*Optional.* Message is a shared contact, information about the contact
+        location              (Location)            :*Optional.* Message is a shared location, information about the location
+        new_chat_participant  (User)                :*Optional.* A new member was added to the group, information about 
+                                                                 them (this member may be bot itself)
+        left_chat_participant (User)                :*Optional.* A member was removed from the group, information about 
+                                                                 them (this member may be bot itself)
+        new_chat_title        (str)                 :*Optional.* A group title was changed to this value
+        new_chat_photo        (Sequence[PhotoSize]) :*Optional.* A group photo was change to this value
+        delete_chat_photo     (``True``)            :*Optional.* Informs that the group photo was deleted
+        group_chat_created    (``True``)            :*Optional.* Informs that the group has been created
     """
     __slots__ = ()
 
@@ -146,14 +147,11 @@ _PhotoSizeBase = namedtuple('PhotoSize', ['file_id', 'width', 'height', 'file_si
 class PhotoSize(_PhotoSizeBase):
     """This object represents one size of a photo or a file / sticker thumbnail.
 
-    =============  =====  ===============================
-    Field          Type   Description
-    =============  =====  ===============================
-    ``file_id``    `str`  Unique identifier for this file
-    ``width``      `int`  Photo width
-    ``height``     `int`  Photo height
-    ``file_size``  `int`  Optional. File size
-    =============  =====  ===============================
+    Attributes:
+        file_id    (str)  :Unique identifier for this file
+        width      (int)  :Photo width
+        height     (int)  :Photo height
+        file_size  (int)  :*Optional.* File size
     """
     __slots__ = ()
 
@@ -173,14 +171,12 @@ _AudioBase = namedtuple('Audio', ['file_id', 'duration', 'mime_type', 'file_size
 class Audio(_AudioBase):
     """This object represents an audio file (voice note).
 
-    =============  =====  =====================================================
-    Field          Type   Description
-    =============  =====  =====================================================
-    ``file_id``    `str`  Unique identifier for this file
-    ``duration``   `int`  Duration of the audio in seconds as defined by sender
-    ``mime_type``  `str`  Optional. MIME type of the file as defined by sender
-    ``file_size``  `int`  Optional. File size
-    =============  =====  =====================================================
+    Attributes:
+        file_id    (str)  :Unique identifier for this file
+        duration   (int)  :Duration of the audio in seconds as defined by sender
+        mime_type  (str)  :*Optional.* MIME type of the file as defined by sender
+        file_size  (int)  :*Optional.* File size
+
     """
     __slots__ = ()
 
@@ -198,6 +194,16 @@ class Audio(_AudioBase):
 
 _DocumentBase = namedtuple('Document', ['file_id', 'thumb', 'file_name', 'mime_type', 'file_size'])
 class Document(_DocumentBase):
+    """This object represents a general file (as opposed to photos and audio files).
+
+    Attributes:
+        file_id    (str)        :Unique file identifier
+        thumb      (PhotoSize)  :Document thumbnail as defined by sender
+        file_name  (str)        :*Optional.* Original filename as defined by sender
+        mime_type  (str)        :*Optional.* MIME type of the file as defined by sender
+        file_size  (int)        :*Optional.* File size
+
+    """
     __slots__ = ()
 
     @staticmethod
@@ -215,6 +221,16 @@ class Document(_DocumentBase):
 
 _StickerBase = namedtuple('Sticker', ['file_id', 'width', 'height', 'thumb', 'file_size'])
 class Sticker(_StickerBase):
+    """This object represents a sticker.
+
+    Attributes:
+        file_id    (str)        :Unique identifier for this file
+        width      (int)        :Sticker width
+        height     (int)        :Sticker height
+        thumb      (PhotoSize)  :Sticker thumbnail in .webp or .jpg format
+        file_size  (int)        :*Optional.* File size
+
+    """
     __slots__ = ()
 
     @staticmethod
@@ -233,6 +249,19 @@ class Sticker(_StickerBase):
 _VideoBase = namedtuple('Video', 
     ['file_id', 'width', 'height', 'duration', 'thumb', 'mime_type', 'file_size', 'caption'])
 class Video(_VideoBase):
+    """This object represents a video file.
+
+    Attributes:
+        file_id     (str)       :Unique identifier for this file
+        width       (int)       :Video width as defined by sender
+        height      (int)       :Video height as defined by sender
+        duration    (int)       :Duration of the video in seconds as defined by sender
+        thumb       (PhotoSize) :Video thumbnail
+        mime_type   (str)       :*Optional.* Mime type of a file as defined by sender
+        file_size   (int)       :*Optional.* File size
+        caption     (str)       :*Optional.* Text description of the video (usually empty)
+
+    """
     __slots__ = ()
 
     @staticmethod
@@ -253,6 +282,15 @@ class Video(_VideoBase):
 
 _ContactBase = namedtuple('Contact', ['phone_number', 'first_name', 'last_name', 'user_id'])
 class Contact(_ContactBase):
+    """This object represents a phone contact.
+
+    Attributes:
+        phone_number    (str)  :Contact's phone number
+        first_name      (str)  :Contact's first name
+        last_name       (str)  :*Optional.* Contact's last name
+        user_id         (str)  :*Optional.* Contact's user identifier in Telegram
+
+    """
     __slots__ = ()
 
     @staticmethod
@@ -269,6 +307,13 @@ class Contact(_ContactBase):
 
 _LocationBase = namedtuple('Location', ['longitude', 'latitude'])
 class Location(_LocationBase):
+    """This object represents a point on the map.
+
+    Attributes:
+        longitude   (float)   :Longitude as defined by sender
+        latitude    (float)   :Latitude as defined by sender
+
+    """
     __slots__ = ()
 
     @staticmethod
@@ -281,8 +326,77 @@ class Location(_LocationBase):
             latitude=result.get('latitude')
             )
 
+_UpdateBase = namedtuple('Update', ['update_id', 'message'])
+class Update(_UpdateBase):
+    """This object represents an incoming update.
+
+    Attributes:
+        update_id   (int)     :The update‘s unique identifier. Update identifiers start from a certain 
+                               positive number and increase sequentially. This ID becomes especially handy 
+                               if you’re using Webhooks, since it allows you to ignore repeated updates or to 
+                               restore the correct update sequence, should they get out of order.
+        message     (Message) :*Optional.* New incoming message of any kind — text, photo, sticker, etc.
+
+    """
+    __slots__ = ()
+
+    @staticmethod
+    def from_dict(message_update):
+        if message_update is None:
+            return None
+
+        return Update(message_update.get('update_id'), Message.from_result(message_update.get('message')))
+
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return [Update.from_dict(message_update) for message_update in result]
+
+_InputFileInfoBase = namedtuple('InputFileInfo', ['file_name', 'fp', 'mime_type'])
+class InputFileInfo(_InputFileInfoBase):
+    __slots__ = ()
+
+_InputFileBase = namedtuple('InputFile', ['form', 'file_info' ])
+class InputFile(_InputFileBase):
+    """This object represents the contents of a file to be uploaded. Must be posted using multipart/form-data 
+        in the usual way that files are uploaded via the browser.
+
+        Attributes:
+            form        (str)           :the form used to submit (e.g. 'photo')
+            file_info   (InputFileInfo) :The file metadata required
+
+        :Example:
+
+            ::
+
+                fp = open('foo.png', 'rb')
+                file_info = InputFileInfo('foo.png', fp, 'image/png')
+
+                InputFile('photo', file_info)
+
+                bot.send_photo(chat_id=12345678, photo=InputFile)
+
+            .. note::
+
+                While creating the FileInput currently requires a reasonable amount
+                of preparation just to send a file. This class will be extended
+                in the future to make the process easier.
+
+    """
+    __slots__ = ()
+
 _UserProfilePhotosBase = namedtuple('UserProfilePhotos', ['total_count', 'photos'])
 class UserProfilePhotos(_UserProfilePhotosBase):
+    """This object represent a user's profile pictures.
+
+    Attributes:
+        total_count (int): Total number of profile pictures the target user has
+        photos      (list of list of PhotoSize): Requested profile pictures (in up to 4 sizes each)
+
+    """
     __slots__ = ()
 
     @staticmethod
@@ -299,54 +413,166 @@ class UserProfilePhotos(_UserProfilePhotosBase):
             photos=photos
             )
 
-class ReplyMarkup:
+class ReplyMarkup(metaclass=ABCMeta):
+    """Abstract base to represent all valid inputs to reply_markup parameter in various API methods"""
     __slots__ = ()
+
+    @abstractmethod
+    def serialize(self):
+        raise NotImplements
 
 _ReplyKeyboardMarkupBase = namedtuple('ReplyKeyboardMarkup', 
     ['keyboard', 'resize_keyboard', 'one_time_keyboard', 'selective'])
 class ReplyKeyboardMarkup(_ReplyKeyboardMarkupBase, ReplyMarkup):
+    """This object represents a custom keyboard with reply options (see Introduction to bots for details and examples).
+
+    Attributes:
+        keyboard            (list of list of str)   :Array of button rows, each represented by an Array of Strings
+        resize_keyboard     (bool)  :*Optional.* Requests clients to resize the keyboard vertically for optimal 
+                                        fit (e.g., make the keyboard smaller if there are just two rows of buttons). 
+                                        Defaults to false, in which case the custom keyboard is always of the 
+                                        same height as the app's standard keyboard.
+        one_time_keyboard   (bool)  :*Optional.* Requests clients to hide the keyboard as soon as it's been 
+                                        used. Defaults to false.
+        selective           (bool)  :*Optional.* Use this parameter if you want to show the keyboard to 
+                                        specific users only. Targets: 
+
+                                            1. users that are @mentioned in the text of the Message object; 
+                                            2. if the bot's message is a reply (has reply_to_message_id), sender 
+                                               of the original message.
+
+                                        :example: A user requests to change the bot‘s language, bot replies to the 
+                                            request with a keyboard to select the new language. Other users in the 
+                                            group don’t see the keyboard.
+
+    :Example:
+
+        ::
+
+                keyboard = [
+                ['7', '8', '9'],
+                ['4', '5', '6'],
+                ['1', '2', '3'],
+                     ['0']
+                ]
+
+                reply_markup = ReplyKeyboardMarkup.create(keyboard)
+                bot.send_message(12345678, 'testing reply_markup', reply_markup=reply_markup)
+
+    """
     __slots__ = ()
+
+    @staticmethod
+    def create(keyboard, resize_keyboard=None, one_time_keyboard=None, selective=None):
+        return ReplyKeyboardMarkup(keyboard, resize_keyboard, one_time_keyboard, selective)
+
+    def serialize(self):
+        reply_markup =dict(keyboard=self.keyboard)
+
+        if self.resize_keyboard is not None:
+            reply_markup['resize_keyboard'] = bool(self.resize_keyboard)
+
+        if self.one_time_keyboard is not None:
+            reply_markup['one_time_keyboard'] = bool(self.one_time_keyboard)
+
+        if self.selective is not None:
+            reply_markup['selective'] = bool(self.selective)
+
+        return json.dumps(reply_markup)
+
 
 _ReplyKeyboardHideBase = namedtuple('ReplyKeyboardHide', ['hide_keyboard', 'selective'])
 class ReplyKeyboardHide(_ReplyKeyboardHideBase, ReplyMarkup):
+    """Upon receiving a message with this object, Telegram clients will hide the current custom keyboard and 
+        display the default letter-keyboard. By default, custom keyboards are displayed until a new keyboard 
+        is sent by a bot. An exception is made for one-time keyboards that are hidden immediately after the 
+        user presses a button (see :class:`ReplyKeyboardMarkup`).
+
+    Attributes:
+        hide_keyboard   (``True``)  :Requests clients to hide the custom keyboard
+        selective       (bool)      :*Optional.* Use this parameter if you want to hide keyboard for specific 
+                                    users only. Targets: 
+                                        
+                                        1. users that are @mentioned in the text of the Message object;
+                                        2. if the bot's message is a reply (has reply_to_message_id), sender 
+                                           of the original message.
+
+                                    :example: A user votes in a poll, bot returns confirmation message in reply 
+                                        to the vote and hides keyboard for that user, while still showing the 
+                                        keyboard with poll options to users who haven't voted yet.
+
+    """
     __slots__ = ()
+
+    @staticmethod
+    def create(selective=None):
+        return ReplyKeyboardHide(True, selective)
+
+    def serialize(self):
+        reply_markup = dict(
+            hide_keyboard=True
+            )
+
+        if self.selective is not None:
+            reply_markup['selective'] = bool(self.selective)
+
+        return json.dumps(reply_markup)
 
 _ForceReplyBase = namedtuple('ForceReply', ['force_reply', 'selective'])
 class ForceReply(_ForceReplyBase, ReplyMarkup):
+    """Upon receiving a message with this object, Telegram clients will display a reply interface to the user
+        (act as if the user has selected the bot‘s message and tapped ’Reply'). This can be extremely useful 
+        if you want to create user-friendly step-by-step interfaces without having to sacrifice privacy mode.
+
+    Attributes:
+        force_reply (``True``)  :Shows reply interface to the user, as if they manually selected the bot‘s 
+                                    message and tapped ’Reply'
+        selective   (bool)      :Optional. Use this parameter if you want to force reply from specific users 
+                                    only. Targets: 1) users that are @mentioned in the text of the Message 
+                                    object; 2) if the bot's message is a reply (has reply_to_message_id), 
+                                    sender of the original message.
+
+    :Example: A poll bot for groups runs in privacy mode (only receives commands, replies to its messages and 
+        mentions). There could be two ways to create a new poll:
+
+            * Explain the user how to send a command with parameters (e.g. /newpoll question answer1 answer2). 
+              May be appealing for hardcore users but lacks modern day polish.
+            * Guide the user through a step-by-step process. ‘Please send me your question’, ‘Cool, now let’s 
+              add the first answer option‘, ’Great. Keep adding answer options, then send /done when you‘re ready’.
+
+    The last option is definitely more attractive. And if you use ForceReply in your bot‘s questions, it will 
+    receive the user’s answers even if it only receives replies, commands and mentions — without any extra 
+    work for the user.
+
+    """
     __slots__ = ()
 
-_InputFileInfoBase = namedtuple('InputFileInfo', ['file_name', 'fp', 'mime_type'])
-class InputFileInfo(_InputFileInfoBase):
-    __slots__ = ()
+    @staticmethod
+    def create(selective=None):
+        return ForceReply(True, selective)
 
-_InputFileBase = namedtuple('InputFile', ['form', 'file_info' ])
-class InputFile(_InputFileBase):
-    __slots__ = ()
+    def serialize(self):
+        reply_markup = dict(force_reply=True)
+        if self.selective is not None:
+            reply_markup['selective'] = bool(self.selective)
+
+        return json.dumps(reply_markup)
+
+
 
 """
 Types added for utility pruposes
 """
-_MessageUpdateBase = namedtuple('MessageUpdate', ['update_id', 'message'])
-class MessageUpdate(_MessageUpdateBase):
-    __slots__ = ()
-
-    @staticmethod
-    def from_dict(message_update):
-        if message_update is None:
-            return None
-
-        return MessageUpdate(message_update.get('update_id'), Message.from_result(message_update.get('message')))
-
-
-    @staticmethod
-    def from_result(result):
-        if result is None:
-            return None
-
-        return [MessageUpdate.from_dict(message_update) for message_update in result]
-
 _ErrorBase = namedtuple('Error', ['error_code', 'description'])
 class Error(_ErrorBase):
+    """The error code and message returned when a request was successfuly but the method call was invalid
+
+    Attributes:
+        error_code  (int)   :An Integer ‘error_code’ field is also returned, but its 
+                            contents are subject to change in the future.
+        description (str)   :The description of the error as reported by Telegram
+
+    """
     __slots__ = ()
 
     @staticmethod
@@ -375,6 +601,10 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
         :type token: str
         :type params: dict
         """
+
+        reply_markup = params.get('reply_markup') if params else None
+        if reply_markup is not None:
+            params['reply_markup'] = reply_markup.serialize()
 
         self.api_method = api_method
         self.token = token
@@ -462,25 +692,22 @@ def _merge_user_overrides(request_args, **kwargs):
 """
 Telegram Bot API Methods as defined at https://core.telegram.org/bots/api#available-methods
 """
-def get_me(*, request_args=None, **kwargs):
+def get_me(**kwargs):
     """
     A simple method for testing your bot's auth token. Requires no parameters. 
     Returns basic information about the bot in form of a User object.
 
-    :param request_args: Args passed down to TelegramBotRPCRequest
+    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :returns: Returns basic information about the bot in form of a User object.
     :rtype: User
     """
-
-    request_args = _merge_user_overrides(request_args, **kwargs)
-
-    return TelegramBotRPCRequest('getMe', on_result=User.from_result, **request_args).run()
+    return TelegramBotRPCRequest('getMe', on_result=User.from_result, **kwargs)
 
 def send_message(chat_id: int, text: str, 
                  disable_web_page_preview: bool=None, reply_to_message_id: int=None, 
                  reply_markup: ReplyMarkup=None, 
-                 *, request_args=None, **kwargs):
+                 **kwargs):
     """
     Use this method to send text messages. 
 
@@ -491,16 +718,17 @@ def send_message(chat_id: int, text: str,
     :param reply_markup: Additional interface options. A JSON-serialized object for a 
                          custom reply keyboard, instructions to hide keyboard or to 
                          force a reply from the user.
-    :param request_args: Args passed down to TelegramBotRPCRequest
+    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type text: str
     :type disable_web_page_preview: bool
     :type reply_to_message_id: int
-    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+    :type reply_markup: :class:`ReplyKeyboardMarkup` or :class:`ReplyKeyboardHide` or :class:`ForceReply`
 
     :returns: On success, the sent Message is returned.
     :rtype: Message
+
     """
     # required args
     params = dict(chat_id=chat_id, text=text)
@@ -513,9 +741,7 @@ def send_message(chat_id: int, text: str,
         )
     )
 
-    request_args = _merge_user_overrides(request_args, **kwargs)
-
-    return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result, **request_args).run()
+    return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result, **kwargs)
 
 def forward_message(chat_id, from_chat_id, message_id,
                     *, request_args=None, **kwargs):
@@ -568,7 +794,7 @@ def send_photo(chat_id: int,  photo: InputFile,
     :type photo: InputFile or str
     :type caption: str
     :type reply_to_message_id: int
-    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+    :type reply_markup: :class:`ReplyKeyboardMarkup` or :class:`ReplyKeyboardHide` or :class:`ForceReply`
 
     :returns: On success, the sent Message is returned.
     :rtype: TelegramBotRPCRequest
@@ -888,14 +1114,15 @@ def send_chat_action(chat_id: int, action: ChatAction,
 
     return TelegramBotRPCRequest('sendChatAction', params=params, on_result=lambda result: result, **request_args).run()
 
-def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, *, request_args: dict=None, **kwargs):
+def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, 
+                            *, request_args: dict=None, **kwargs):
     """
     Use this method to get a list of profile pictures for a user. Returns a UserProfilePhotos object.
 
     :param user_id: Unique identifier of the target user
     :param offset: Sequential number of the first photo to be returned. By default, all photos are returned.
     :param limit: Limits the number of photos to be retrieved. Values between 1—100 are accepted. Defaults to 100.
-    :param request_args, **kwargs: Args passed down to the TelegramBotRPCRequest
+    :param request_args: Args passed down to the TelegramBotRPCRequest
 
     :type user_id: int
     :type offset: int
@@ -921,12 +1148,15 @@ def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, *, 
     return TelegramBotRPCRequest('getUserProfilePhotos', params=params, 
                                  on_result=UserProfilePhotos.from_result, **request_args).run()
 
-def get_updates(offset: int=None, limit: int=None, timeout: int=None, *, request_args, **kwargs):
+def get_updates(offset: int=None, limit: int=None, timeout: int=None, 
+                *, request_args, **kwargs):
     """
     Use this method to receive incoming updates using long polling. 
-    Notes
-    1. This method will not work if an outgoing webhook is set up.
-    2. In order to avoid getting duplicate updates, recalculate offset after each server response.
+    
+    .. note::
+
+        1. This method will not work if an outgoing webhook is set up.
+        2. In order to avoid getting duplicate updates, recalculate offset after each server response.
 
     :param offset: Identifier of the first update to be returned. Must be 
                    greater by one than the highest among the identifiers of
@@ -959,9 +1189,10 @@ def get_updates(offset: int=None, limit: int=None, timeout: int=None, *, request
     # merge bot args with user overrides
     request_args = _merge_user_overrides(request_args, **kwargs)
 
-    return TelegramBotRPCRequest('getUpdates', params=params, on_result=MessageUpdate.from_result, **request_args).run()
+    return TelegramBotRPCRequest('getUpdates', params=params, on_result=Update.from_result, **request_args).run()
 
-def set_webhook(url: str=None, *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
+def set_webhook(url: str=None, 
+                *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
     """
     Use this method to specify a url and receive incoming updates via an outgoing webhook.
     Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a
@@ -991,15 +1222,13 @@ def set_webhook(url: str=None, *, request_args=None, **kwargs) -> TelegramBotRPC
 class TelegramBot:
 
     def __init__(self, token, request_method: RequestMethod=RequestMethod.POST):
-        self._bot_user = User(None, None, None, None)
+        self._bot_user = None
 
         self.request_args = dict(
             token=token,
             request_method=request_method
         )
 
-        self.get_me = partial(get_me, request_args=self.request_args)
-        self.send_message = partial(send_message, request_args=self.request_args)
         self.forward_message = partial(forward_message, request_args=self.request_args)
         self.send_photo = partial(send_photo, request_args=self.request_args)
         self.send_audio = partial(send_audio, request_args=self.request_args)
@@ -1011,10 +1240,26 @@ class TelegramBot:
         self.get_user_profile_photos = partial(get_user_profile_photos, request_args=self.request_args)
         self.get_updates = partial(get_updates, request_args=self.request_args)
         self.set_webhook = partial(set_webhook, request_args=self.request_args)
-        self.update_bot_info = partial(get_me, request_args=self.request_args, callback=self._update_bot_info)
 
     def __str__(self):
         return self.token
+
+    def _merge_overrides(self, **kwargs):
+        ra = self.request_args.copy()
+        ra.update(kwargs)
+        return ra
+
+    def get_me(self, *args, **kwargs):
+        return get_me(*args, **self._merge_overrides(**kwargs)).run()
+
+    def send_message(self, *args, **kwargs):
+        return send_message(*args, **self._merge_overrides(**kwargs)).run()
+
+    def _update_bot_info(self, response):
+        self._bot_user = response
+
+    def update_bot_info(self):
+        return self.get_me(callback=self._update_bot_info)
 
     @property
     def token(self):
@@ -1034,19 +1279,21 @@ class TelegramBot:
 
     @property
     def id(self):
-        return self._bot_user.id   
+        if self._bot_user is not None:
+            return self._bot_user.id   
 
     @property
     def first_name(self):
-        return self._bot_user.first_name   
+        if self._bot_user is not None:
+            return self._bot_user.first_name   
 
     @property
     def last_name(self):
-        return self._bot_user.last_name   
+        if self._bot_user is not None:
+            return self._bot_user.last_name   
 
     @property
     def username(self):
-        return self._bot_user.username    
+        if self._bot_user is not None:
+            return self._bot_user.username    
 
-    def _update_bot_info(self, bot_user):
-        self._bot_user = bot_user

@@ -5,10 +5,10 @@ import sys
 revision = None
 
 # must match PEP 440
-_MAJOR_VERSION         = 0
-_MINOR_VERSION         = 5
+_MAJOR_VERSION         = 1
+_MINOR_VERSION         = 0
 _MICRO_VERSION         = None
-_PRE_RELEASE_TYPE      = 'a'   # a | b | rc
+_PRE_RELEASE_TYPE      = 'b'   # a | b | rc
 _PRE_RELEASE_VERSION   = 4
 _DEV_RELEASE_VERSION   = None
 
@@ -27,16 +27,16 @@ if _DEV_RELEASE_VERSION is not None:
     download_url = 'https://github.com/datamachine/twx/archive/{}.tar.gz'.format(revision)
 else:
     revision = version
-    download_url = 'https://github.com/datamachine/twx/archive/twx-{}.tar.gz'.format(revision)
+    download_url = 'https://github.com/datamachine/twx/archive/botapi-{}.tar.gz'.format(revision)
 
 print(version)
 print(download_url)
 
 setup(
-    name = 'twx',
-    packages = ['twx', 'twx.botapi'],
+    name = 'twx-botapi',
+    packages = ['twx'],
     version = version,
-    description = 'Telegram Bot API and MTProto Client and Abstraction Layer',
+    description = 'Unofficial Telegram Bot API Client',
     long_description = open("README.rst").read(),
     author = 'Vince Castellano, Phillip Lopo',
     author_email = 'surye80@gmail.com, philliplopo@gmail.com',

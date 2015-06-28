@@ -1,4 +1,4 @@
-TWX: Unofficial Telegram Bot API Client
+TWX: Bot API: Unofficial Telegram Bot API Client
 ##########
 
 :contributions: Please join https://github.com/datamachine/twx
@@ -19,55 +19,39 @@ For stable:
 
 ``pip install twx``
 
+or for just the botapi
+
+``pip install twx-botapi``
+
 For dev:
 
 ``pip install -i https://testpypi.python.org/pypi twx``
 
-===========
-Quick Start
-===========
+or for just the botapi
 
-Setup the bot
--------------
+``pip install -i https://testpypi.python.org/pypi twx-botapi``
+
+=====
+Usage
+=====
 
 ::
     
+    # if twx is installed, use:
     from twx.botapi import TelegramBot
     
+    # if only twx-botapi is installed, use:
+    # from botapi import TelegramBot
+    
     bot = TelegramBot('<API TOKEN>')
-    bot.update_bot_info().wait()
-
-    print(bot.username)
-
-Send a message
---------------
-
-::
+    
+    request = bot.get_me()
+    result = request.wait()
+    print(result)
     
     result = bot.send_message(int('userid'), 'test message body').wait()
     print(result)
 
-Get messages sent to the bot
-----------------------------
-
-::
-
     updates = bot.get_updates().wait()
     for update in updates:
-        print(update)
-
-Use a custom keyboard
-
-::
-
-    keyboard = [
-        ['7', '8', '9'],
-        ['4', '5', '6'],
-        ['1', '2', '3'],
-             ['0']
-    ]
-
-    reply_markup = ReplyKeyboardMarkup.create(keyboard)
-
-    bot.send_message(user_id, 'please enter a number', reply_markup=reply_markup).wait()
-
+        print("update_id: {}".format(update.update_id))
