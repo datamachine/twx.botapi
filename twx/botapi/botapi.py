@@ -336,7 +336,7 @@ class Update(_UpdateBase):
                                if you’re using Webhooks, since it allows you to ignore repeated updates or to 
                                restore the correct update sequence, should they get out of order.
         message     (Message) :*Optional.* New incoming message of any kind — text, photo, sticker, etc.
-        
+
     """
     __slots__ = ()
 
@@ -354,6 +354,33 @@ class Update(_UpdateBase):
             return None
 
         return [Update.from_dict(message_update) for message_update in result]
+
+_InputFileInfoBase = namedtuple('InputFileInfo', ['file_name', 'fp', 'mime_type'])
+class InputFileInfo(_InputFileInfoBase):
+    __slots__ = ()
+
+_InputFileBase = namedtuple('InputFile', ['form', 'file_info' ])
+class InputFile(_InputFileBase):
+    """This object represents the contents of a file to be uploaded. Must be posted using multipart/form-data 
+        in the usual way that files are uploaded via the browser.
+
+        Attributes:
+            form        (str)       :the form used to submit (e.g. 'photo')
+            file_info   (InputFileInfo) :The file metadata required
+
+        :example:
+
+        ::
+
+            fp = open('foo.png', 'rb')
+            file_info = InputFileInfo('foo.png', fp, 'image/png')
+
+            InputFile('photo', file_info)
+
+            bot.send_photo(chat_id=12345678, photo=InputFile)
+
+    """
+    __slots__ = ()
 
 _UserProfilePhotosBase = namedtuple('UserProfilePhotos', ['total_count', 'photos'])
 class UserProfilePhotos(_UserProfilePhotosBase):
@@ -532,14 +559,6 @@ class ForceReply(_ForceReplyBase, ReplyMarkup):
             reply_markup['selective'] = bool(self.selective)
 
         return json.dumps(reply_markup)
-
-_InputFileInfoBase = namedtuple('InputFileInfo', ['file_name', 'fp', 'mime_type'])
-class InputFileInfo(_InputFileInfoBase):
-    __slots__ = ()
-
-_InputFileBase = namedtuple('InputFile', ['form', 'file_info' ])
-class InputFile(_InputFileBase):
-    __slots__ = ()
 
 
 
