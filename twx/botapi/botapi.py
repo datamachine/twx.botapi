@@ -714,7 +714,7 @@ def send_message(chat_id: int, text: str,
     """
     Use this method to send text messages. 
 
-    :param int chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
     :param text: Text of the message to be sent
     :param disable_web_page_preview: Disables link previews for links in this message
     :param reply_to_message_id: If the message is a reply, ID of the original message
@@ -723,13 +723,15 @@ def send_message(chat_id: int, text: str,
                          force a reply from the user.
     :param request_args: Args passed down to TelegramBotRPCRequest
 
+    :type chat_id: int
     :type text: str
     :type disable_web_page_preview: bool
     :type reply_to_message_id: int
-    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+    :type reply_markup: :class:`ReplyKeyboardMarkup` or :class:`ReplyKeyboardHide` or :class:`ForceReply`
 
     :returns: On success, the sent Message is returned.
     :rtype: Message
+
     """
     # required args
     params = dict(chat_id=chat_id, text=text)
@@ -751,7 +753,7 @@ def forward_message(chat_id, from_chat_id, message_id,
     """
     Use this method to forward messages of any kind. 
 
-    :param int chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
     :param from_chat_id: Unique identifier for the chat where the original message was sent — User or 
                          GroupChat id
     :param message_id: Unique message identifier
@@ -797,7 +799,7 @@ def send_photo(chat_id: int,  photo: InputFile,
     :type photo: InputFile or str
     :type caption: str
     :type reply_to_message_id: int
-    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+    :type reply_markup: :class:`ReplyKeyboardMarkup` or :class:`ReplyKeyboardHide` or :class:`ForceReply`
 
     :returns: On success, the sent Message is returned.
     :rtype: TelegramBotRPCRequest
@@ -1117,14 +1119,15 @@ def send_chat_action(chat_id: int, action: ChatAction,
 
     return TelegramBotRPCRequest('sendChatAction', params=params, on_result=lambda result: result, **request_args).run()
 
-def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, *, request_args: dict=None, **kwargs):
+def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, 
+                            *, request_args: dict=None, **kwargs):
     """
     Use this method to get a list of profile pictures for a user. Returns a UserProfilePhotos object.
 
     :param user_id: Unique identifier of the target user
     :param offset: Sequential number of the first photo to be returned. By default, all photos are returned.
     :param limit: Limits the number of photos to be retrieved. Values between 1—100 are accepted. Defaults to 100.
-    :param request_args, **kwargs: Args passed down to the TelegramBotRPCRequest
+    :param request_args: Args passed down to the TelegramBotRPCRequest
 
     :type user_id: int
     :type offset: int
@@ -1150,7 +1153,8 @@ def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, *, 
     return TelegramBotRPCRequest('getUserProfilePhotos', params=params, 
                                  on_result=UserProfilePhotos.from_result, **request_args).run()
 
-def get_updates(offset: int=None, limit: int=None, timeout: int=None, *, request_args, **kwargs):
+def get_updates(offset: int=None, limit: int=None, timeout: int=None, 
+                *, request_args, **kwargs):
     """
     Use this method to receive incoming updates using long polling. 
     
@@ -1192,7 +1196,8 @@ def get_updates(offset: int=None, limit: int=None, timeout: int=None, *, request
 
     return TelegramBotRPCRequest('getUpdates', params=params, on_result=Update.from_result, **request_args).run()
 
-def set_webhook(url: str=None, *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
+def set_webhook(url: str=None, 
+                *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
     """
     Use this method to specify a url and receive incoming updates via an outgoing webhook.
     Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a
