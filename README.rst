@@ -23,23 +23,51 @@ For dev:
 
 ``pip install -i https://testpypi.python.org/pypi twx``
 
-=====
-Usage
-=====
+===========
+Quick Start
+===========
+
+Setup the bot
+-------------
 
 ::
     
     from twx.botapi import TelegramBot
     
     bot = TelegramBot('<API TOKEN>')
-    
-    request = bot.get_me()
-    result = request.wait()
-    print(result)
+    bot.update_bot_info().wait()
+
+    print(bot.username)
+
+Send a message
+--------------
+
+::
     
     result = bot.send_message(int('userid'), 'test message body').wait()
     print(result)
 
+Get messages sent to the bot
+----------------------------
+
+::
+
     updates = bot.get_updates().wait()
     for update in updates:
-        print("update_id: {}".format(update.update_id))
+        print(update)
+
+Use a custom keyboard
+
+::
+
+    keyboard = [
+        ['7', '8', '9'],
+        ['4', '5', '6'],
+        ['1', '2', '3'],
+             ['0']
+    ]
+
+    reply_markup = ReplyKeyboardMarkup.create(keyboard)
+
+    bot.send_message(user_id, 'please enter a number', reply_markup=reply_markup).wait()
+
