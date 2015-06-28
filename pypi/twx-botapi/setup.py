@@ -32,6 +32,12 @@ else:
 print(version)
 print(download_url)
 
+requirements = ['requests']
+if sys.version_info.major < 3 or sys.version_info.minor < 4:
+  requirements.append('enum34')
+
+print(requirements)
+
 setup(
     name = 'twx-botapi',
     packages = ['twx'],
@@ -43,7 +49,7 @@ setup(
     keywords = ['datamachine', 'telex', 'telegram', 'bot', 'api', 'rpc'],
     url = 'https://github.com/datamachine/twx', 
     download_url = download_url, 
-    install_requires=['requests'],
+    install_requires=requirements,
     platforms = ['Linux', 'Unix', 'MacOsX', 'Windows'],
     classifiers = [
       'Development Status :: 4 - Beta',
