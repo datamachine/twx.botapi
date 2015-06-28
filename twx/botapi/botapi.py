@@ -683,12 +683,6 @@ class TelegramBotRPCRequest(metaclass=ABCMeta):
 def _clean_params(**params):
     return {name: val for name, val in params.items() if val is not None}
 
-def _merge_user_overrides(request_args, **kwargs):
-    result = request_args.copy() if request_args is not None else {}
-    if kwargs is not None:
-        result.update(kwargs)
-    return result
-
 """
 Telegram Bot API Methods as defined at https://core.telegram.org/bots/api#available-methods
 """
@@ -743,8 +737,8 @@ def send_message(chat_id: int, text: str,
 
     return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result, **kwargs)
 
-def forward_message(chat_id, from_chat_id, message_id,
-                    *, request_args=None, **kwargs):
+def forward_message(chat_id, from_chat_id, message_id, 
+                    **kwargs):
     """
     Use this method to forward messages of any kind. 
 
@@ -752,7 +746,7 @@ def forward_message(chat_id, from_chat_id, message_id,
     :param from_chat_id: Unique identifier for the chat where the original message was sent — User or 
                          GroupChat id
     :param message_id: Unique message identifier
-    :param request_args: Args passed down to TelegramBotRPCRequest
+    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type from_chat_id: int
@@ -769,13 +763,11 @@ def forward_message(chat_id, from_chat_id, message_id,
         message_id=message_id
     )
 
-    request_args = _merge_user_overrides(request_args, **kwargs)
-
-    return TelegramBotRPCRequest('forwardMessage', params=params, on_result=Message.from_result, **request_args).run()
+    return TelegramBotRPCRequest('forwardMessage', params=params, on_result=Message.from_result, **kwargs)
 
 def send_photo(chat_id: int,  photo: InputFile, 
                caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
-               *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
+               **kwargs) -> TelegramBotRPCRequest:
     """
     Use this method to send photos.
 
@@ -788,7 +780,7 @@ def send_photo(chat_id: int,  photo: InputFile,
     :param reply_markup: Additional interface options. A JSON-serialized object for a 
                          custom reply keyboard, instructions to hide keyboard or to 
                          force a reply from the user.
-    :param request_args: Args passed down to TelegramBotRPCRequest
+    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type photo: InputFile or str
@@ -822,14 +814,11 @@ def send_photo(chat_id: int,  photo: InputFile,
         )
     )
 
-    request_args = _merge_user_overrides(request_args, **kwargs)
-
-    return TelegramBotRPCRequest('sendPhoto', params=params, files=files, on_result=Message.from_result, 
-        **request_args).run()
+    return TelegramBotRPCRequest('sendPhoto', params=params, files=files, on_result=Message.from_result, **kwargs)
 
 def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None,
                reply_markup: ReplyKeyboardMarkup=None,
-               *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
+               **kwargs) -> TelegramBotRPCRequest:
     """
     Use this method to send audio files, if you want Telegram clients to display the file as a playable voice
     message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent 
@@ -841,7 +830,7 @@ def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None,
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard, 
                          instructions to hide keyboard or to force a reply from the user.
-    :param request_args: Args passed down to TelegramBotRPCRequest
+    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type audio: InputFile or str
@@ -871,17 +860,14 @@ def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None,
             reply_markup=reply_markup
         )
     )
-
-    request_args = _merge_user_overrides(request_args, **kwargs)
     
-    return TelegramBotRPCRequest('sendAudio', params=params, files=files, on_result=Message.from_result,
-                                 **request_args).run()
+    return TelegramBotRPCRequest('sendAudio', params=params, files=files, on_result=Message.from_result, **kwargs)
 
 
 
 def send_document(chat_id: int, document: InputFile, reply_to_message_id: int=None,
                   reply_markup: ReplyKeyboardMarkup=None,
-                  *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
+                  **kwargs) -> TelegramBotRPCRequest:
     """
     Use this method to send general files.
 
@@ -891,7 +877,7 @@ def send_document(chat_id: int, document: InputFile, reply_to_message_id: int=No
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
                          instructions to hide keyboard or to force a reply from the user.
-    :param request_args: Args passed down to TelegramBotRPCRequest
+    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type document: InputFile or str
@@ -922,14 +908,11 @@ def send_document(chat_id: int, document: InputFile, reply_to_message_id: int=No
         )
     )
 
-    request_args = _merge_user_overrides(request_args, **kwargs)
-
-    return TelegramBotRPCRequest('sendDocument', params=params, files=files, on_result=Message.from_result,
-                                 **request_args).run()
+    return TelegramBotRPCRequest('sendDocument', params=params, files=files, on_result=Message.from_result, **kwargs)
 
 def send_sticker(chat_id: int, sticker: InputFile, reply_to_message_id: int=None,
                  reply_markup: ReplyKeyboardMarkup=None,
-                 *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
+                 **kwargs) -> TelegramBotRPCRequest:
     """
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
     :param sticker: Sticker to send. You can either pass a file_id as String to resend a sticker
@@ -937,7 +920,7 @@ def send_sticker(chat_id: int, sticker: InputFile, reply_to_message_id: int=None
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
                          instructions to hide keyboard or to force a reply from the user.
-    :param request_args: Args passed down to TelegramBotRPCRequest
+    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type sticker: InputFile or str
@@ -968,14 +951,11 @@ def send_sticker(chat_id: int, sticker: InputFile, reply_to_message_id: int=None
         )
     )
 
-    request_args = _merge_user_overrides(request_args, **kwargs)
-
-    return TelegramBotRPCRequest('sendSticker', params=params, files=files, on_result=Message.from_result,
-                                 **request_args).run()
+    return TelegramBotRPCRequest('sendSticker', params=params, files=files, on_result=Message.from_result, **kwargs)
 
 def send_video(chat_id: int, video: InputFile, reply_to_message_id: int=None,
                reply_markup: ReplyKeyboardMarkup=None,
-               *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
+               **kwargs) -> TelegramBotRPCRequest:
     """
     Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as Document).
 
@@ -987,7 +967,7 @@ def send_video(chat_id: int, video: InputFile, reply_to_message_id: int=None,
     :param reply_markup: Additional interface options. A JSON-serialized object for a
                          custom reply keyboard, instructions to hide keyboard or to
                          force a reply from the user.
-    :param request_args: Args passed down to TelegramBotRPCRequest
+    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type video: InputFile or str
@@ -1017,15 +997,12 @@ def send_video(chat_id: int, video: InputFile, reply_to_message_id: int=None,
             reply_markup=reply_markup
         )
     )
-
-    request_args = _merge_user_overrides(request_args, **kwargs)
     
-    return TelegramBotRPCRequest('sendVideo', params=params, files=files, on_result=Message.from_result,
-                                 **request_args).run()
+    return TelegramBotRPCRequest('sendVideo', params=params, files=files, on_result=Message.from_result, **kwargs)
 
 def send_location(chat_id: int, latitude: float, longitude: float, reply_to_message_id: int=None,
                   reply_markup: ReplyKeyboardMarkup=None,
-                  *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
+                  **kwargs) -> TelegramBotRPCRequest:
     """
     Use this method to send point on the map.
 
@@ -1036,7 +1013,7 @@ def send_location(chat_id: int, latitude: float, longitude: float, reply_to_mess
     :param reply_markup: Additional interface options. A JSON-serialized object for a
                          custom reply keyboard, instructions to hide keyboard or to
                          force a reply from the user.
-    :param request_args: Args passed down to TelegramBotRPCRequest
+    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type latitude: float
@@ -1063,10 +1040,7 @@ def send_location(chat_id: int, latitude: float, longitude: float, reply_to_mess
         )
     )
 
-    request_args = _merge_user_overrides(request_args, **kwargs)
-
-    return TelegramBotRPCRequest('sendLocation', params=params, on_result=Message.from_result,
-                                 **request_args).run()
+    return TelegramBotRPCRequest('sendLocation', params=params, on_result=Message.from_result, **kwargs)
 
 class ChatAction(str, Enum):
     TEXT = 'typing'
@@ -1079,7 +1053,7 @@ class ChatAction(str, Enum):
     LOCATION = 'find_location'
 
 def send_chat_action(chat_id: int, action: ChatAction,
-                     *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
+                     **kwargs) -> TelegramBotRPCRequest:
     """
     Use this method when you need to tell the user that something is happening on the bot's side. The status is set
      for 5 seconds or less (when a message arrives from your bot, Telegram clients clear its typing status).
@@ -1095,7 +1069,7 @@ def send_chat_action(chat_id: int, action: ChatAction,
                    typing for text messages, upload_photo for photos, record_video or upload_video for videos,
                    record_audio or upload_audio for audio files, upload_document for general files,
                    find_location for location data.
-    :param request_args: Args passed down to TelegramBotRPCRequest
+    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type action: ChatAction
@@ -1109,20 +1083,17 @@ def send_chat_action(chat_id: int, action: ChatAction,
         action=action
     )
 
-    # merge bot args with user overrides
-    request_args = _merge_user_overrides(request_args, **kwargs)
-
-    return TelegramBotRPCRequest('sendChatAction', params=params, on_result=lambda result: result, **request_args).run()
+    return TelegramBotRPCRequest('sendChatAction', params=params, on_result=lambda result: result, **kwargs)
 
 def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, 
-                            *, request_args: dict=None, **kwargs):
+                            **kwargs):
     """
     Use this method to get a list of profile pictures for a user. Returns a UserProfilePhotos object.
 
     :param user_id: Unique identifier of the target user
     :param offset: Sequential number of the first photo to be returned. By default, all photos are returned.
     :param limit: Limits the number of photos to be retrieved. Values between 1—100 are accepted. Defaults to 100.
-    :param request_args: Args passed down to the TelegramBotRPCRequest
+    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type user_id: int
     :type offset: int
@@ -1142,14 +1113,11 @@ def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None,
         )
     )
 
-    # merge bot args with user overrides
-    request_args = _merge_user_overrides(request_args, **kwargs)
-
     return TelegramBotRPCRequest('getUserProfilePhotos', params=params, 
-                                 on_result=UserProfilePhotos.from_result, **request_args).run()
+                                 on_result=UserProfilePhotos.from_result, **kwargs)
 
 def get_updates(offset: int=None, limit: int=None, timeout: int=None, 
-                *, request_args, **kwargs):
+                **kwargs):
     """
     Use this method to receive incoming updates using long polling. 
     
@@ -1168,9 +1136,7 @@ def get_updates(offset: int=None, limit: int=None, timeout: int=None,
                   1—100 are accepted. Defaults to 100
     :param timeout: Timeout in seconds for long polling. Defaults to 0, i.e.
                     usual short polling
-
-    :param request_args: Args passed down to the TelegramBotRPCRequest
-    :param kwargs: Args passed down to the TelegramBotRPCRequest (Overrides request_args)
+    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type offset: int
     :type limit: int
@@ -1186,13 +1152,9 @@ def get_updates(offset: int=None, limit: int=None, timeout: int=None,
             timeout=timeout
         )
 
-    # merge bot args with user overrides
-    request_args = _merge_user_overrides(request_args, **kwargs)
+    return TelegramBotRPCRequest('getUpdates', params=params, on_result=Update.from_result, **kwargs)
 
-    return TelegramBotRPCRequest('getUpdates', params=params, on_result=Update.from_result, **request_args).run()
-
-def set_webhook(url: str=None, 
-                *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
+def set_webhook(url: str=None, **kwargs) -> TelegramBotRPCRequest:
     """
     Use this method to specify a url and receive incoming updates via an outgoing webhook.
     Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a
@@ -1202,7 +1164,7 @@ def set_webhook(url: str=None,
     webhook is set up.
 
     :param url: HTTPS url to send updates to. Use an empty string to remove webhook integration
-    :param request_args: Args passed down to TelegramBotRPCRequest
+    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type url: str
 
@@ -1212,11 +1174,7 @@ def set_webhook(url: str=None,
     # optional args
     params = _clean_params(url=url)
 
-    # merge bot args with user overrides
-    request_args = _merge_user_overrides(request_args, **kwargs)
-
-    return TelegramBotRPCRequest('setWebhook', params=params,
-                                 on_result=lambda result: result, **request_args).run()
+    return TelegramBotRPCRequest('setWebhook', params=params, on_result=lambda result: result, **kwargs)
 
 
 class TelegramBot:
@@ -1229,18 +1187,6 @@ class TelegramBot:
             request_method=request_method
         )
 
-        self.forward_message = partial(forward_message, request_args=self.request_args)
-        self.send_photo = partial(send_photo, request_args=self.request_args)
-        self.send_audio = partial(send_audio, request_args=self.request_args)
-        self.send_document = partial(send_document, request_args=self.request_args)
-        self.send_sticker = partial(send_sticker, request_args=self.request_args)
-        self.send_video = partial(send_video, request_args=self.request_args)
-        self.send_location = partial(send_location, request_args=self.request_args)
-        self.send_chat_action = partial(send_chat_action, request_args=self.request_args)
-        self.get_user_profile_photos = partial(get_user_profile_photos, request_args=self.request_args)
-        self.get_updates = partial(get_updates, request_args=self.request_args)
-        self.set_webhook = partial(set_webhook, request_args=self.request_args)
-
     def __str__(self):
         return self.token
 
@@ -1250,10 +1196,56 @@ class TelegramBot:
         return ra
 
     def get_me(self, *args, **kwargs):
+        """See :func:`get_me`"""
         return get_me(*args, **self._merge_overrides(**kwargs)).run()
 
     def send_message(self, *args, **kwargs):
+        """See :func:`send_message`"""
         return send_message(*args, **self._merge_overrides(**kwargs)).run()
+
+    def forward_message(self, *args, **kwargs):
+        """See :func:`forward_message`"""
+        return forward_message(*args, **self._merge_overrides(**kwargs)).run()
+
+    def send_photo(self, *args, **kwargs):
+        """See :func:`send_photo`"""
+        return send_photo(*args, **self._merge_overrides(**kwargs)).run()
+
+    def send_audio(self, *args, **kwargs):
+        """See :func:`send_audio`"""
+        return send_audio(*args, **self._merge_overrides(**kwargs)).run()
+
+    def send_document(self, *args, **kwargs):
+        """See :func:`send_document`"""
+        return send_document(*args, **self._merge_overrides(**kwargs)).run()
+
+    def send_sticker(self, *args, **kwargs):
+        """See :func:`send_sticker`"""
+        return send_sticker(*args, **self._merge_overrides(**kwargs)).run()
+
+    def send_video(self, *args, **kwargs):
+        """See :func:`send_video`"""
+        return send_video(*args, **self._merge_overrides(**kwargs)).run()
+
+    def send_location(self, *args, **kwargs):
+        """See :func:`send_location`"""
+        return send_location(*args, **self._merge_overrides(**kwargs)).run()
+
+    def send_chat_action(self, *args, **kwargs):
+        """See :func:`send_chat_action`"""
+        return send_chat_action(*args, **self._merge_overrides(**kwargs)).run()
+
+    def get_user_profile_photos(self, *args, **kwargs):
+        """See :func:`get_user_profile_photos`"""
+        return get_user_profile_photos(*args, **self._merge_overrides(**kwargs)).run()
+
+    def get_updates(self, *args, **kwargs):
+        """See :func:`get_updates`"""
+        return get_updates(*args, **self._merge_overrides(**kwargs)).run()
+
+    def set_webhook(self, *args, **kwargs):
+        """See :func:`set_webhook`"""
+        return set_webhook(*args, **self._merge_overrides(**kwargs)).run()
 
     def _update_bot_info(self, response):
         self._bot_user = response
