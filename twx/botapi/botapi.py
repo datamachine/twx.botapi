@@ -365,7 +365,7 @@ class InputFile(_InputFileBase):
         in the usual way that files are uploaded via the browser.
 
         Attributes:
-            form        (str)       :the form used to submit (e.g. 'photo')
+            form        (str)           :the form used to submit (e.g. 'photo')
             file_info   (InputFileInfo) :The file metadata required
 
         :example:
