@@ -73,41 +73,28 @@ _MessageBase = namedtuple('Message',
 class Message(_MessageBase):
     """This object represents a message.
 
-    =========================  =====================  =================================================================
-    Field                      Type                   Description
-    =========================  =====================  =================================================================
-    ``message_id``             `int`                  Unique message identifier    
-    ``sender``                 `User`                 Sender (``from`` in official specification)
-    ``date``                   `int`                  Date the message was sent in Unix time
-    ``chat``                   `User` or `GroupChat`  Conversation the message belongs to — user in case of a private
-                                                      message, GroupChat in case of a group
-    ``forward_from``           `User`                 *Optional.* For forwarded messages, sender of the original 
-                                                      message
-    ``forward_date``           `int`                  *Optional.* For forwarded messages, date the original message was
-                                                      sent in Unix time
-    ``reply_to_message``       `Message`              *Optional.* For replies, the original message. Note that the 
-                                                      Message object in this field will not contain further 
-                                                      reply_to_message fields even if it itself is a reply.
-    ``text``                   `str`                  *Optional.* For text messages, the actual UTF-8 text of the 
-                                                      message
-    ``audio``                  `Audio`                *Optional.* Message is an audio file, information about the file
-    ``document``               `Document`             *Optional.* Message is a general file, information about the file
-    ``photo``                  `list` of `PhotoSize`  *Optional.* Message is a photo, available sizes of the photo
-    ``sticker``                `Sticker`              *Optional.* Message is a sticker, information about the sticker
-    ``video``                  `Video`                *Optional.* Message is a video, information about the video
-    ``contact``                `Contact`              *Optional.* Message is a shared contact, information about the 
-                                                      contact
-    ``location``               `Location`             *Optional.* Message is a shared location, information about the
-                                                      location
-    ``new_chat_participant``   `User`                 *Optional.* A new member was added to the group, information
-                                                      about them (this member may be bot itself)
-    ``left_chat_participant``  `User`                 *Optional.* A member was removed from the group, information
-                                                      about them (this member may be bot itself)
-    ``new_chat_title``         `str`                  *Optional.* A group title was changed to this value
-    ``new_chat_photo``         `list` of `PhotoSize`  *Optional.* A group photo was change to this value
-    ``delete_chat_photo``      `True`                 *Optional.* Informs that the group photo was deleted
-    ``group_chat_created``     `True`                 *Optional.* Informs that the group has been created
-    =========================  =====================  =================================================================
+    Attributes:
+        message_id  (int) Unique message identifier
+        from                    (`User`)                          :Sender
+        date                    (int)                             :Date the message was sent in Unix time
+        chat                    (`User` or `GroupChat`)           :Conversation the message belongs to — user in case of a private message, GroupChat in case of a group
+        forward_from            (Optional[`User`])                :For forwarded messages, sender of the original message
+        forward_date            (Optional[int])                   :For forwarded messages, date the original message was sent in Unix time
+        reply_to_message        (Optional[Message])               :For replies, the original message. Note that the Message object in this field will not contain further reply_to_message fields even if it itself is a reply.
+        text                    (Optional[str])                   :For text messages, the actual UTF-8 text of the message
+        audio                   (Optional[`Audio`])               :Message is an audio file, information about the file
+        document                (Optional[`Document`])            :Message is a general file, information about the file
+        photo                   (Optional[Sequence[`PhotoSize`]])  :Message is a photo, available sizes of the photo
+        sticker                 (Optional[`Sticker`])             :Message is a sticker, information about the sticker
+        video                   (Optional[`Video`])               :Message is a video, information about the video
+        contact                 (Optional[`Contact`])             :Message is a shared contact, information about the contact
+        location                (Optional[`Location`])            :Message is a shared location, information about the location
+        new_chat_participant    (Optional[`User`])                :A new member was added to the group, information about them (this member may be bot itself)
+        left_chat_participant   (Optional[`User`])                :A member was removed from the group, information about them (this member may be bot itself)
+        new_chat_title          (Optional[`str`])                   :A group title was changed to this value
+        new_chat_photo          (Optional[Sequence[`PhotoSize`]]) :A group photo was change to this value
+        delete_chat_photo       (Optional[``True``]):                 :Informs that the group photo was deleted
+        group_chat_created      (Optional[``True``]):                 :Informs that the group has been created
     """
     __slots__ = ()
 
@@ -470,11 +457,9 @@ _InputFileBase = namedtuple('InputFile', ['form', 'file_info' ])
 class InputFile(_InputFileBase):
     __slots__ = ()
 
-"""
-Types added for utility pruposes
-"""
-_MessageUpdateBase = namedtuple('MessageUpdate', ['update_id', 'message'])
-class MessageUpdate(_MessageUpdateBase):
+
+_UpdateBase = namedtuple('Update', ['update_id', 'message'])
+class Update(_UpdateBase):
     __slots__ = ()
 
     @staticmethod
@@ -482,7 +467,7 @@ class MessageUpdate(_MessageUpdateBase):
         if message_update is None:
             return None
 
-        return MessageUpdate(message_update.get('update_id'), Message.from_result(message_update.get('message')))
+        return Update(message_update.get('update_id'), Message.from_result(message_update.get('message')))
 
 
     @staticmethod
@@ -490,8 +475,11 @@ class MessageUpdate(_MessageUpdateBase):
         if result is None:
             return None
 
-        return [MessageUpdate.from_dict(message_update) for message_update in result]
+        return [Update.from_dict(message_update) for message_update in result]
 
+"""
+Types added for utility pruposes
+"""
 _ErrorBase = namedtuple('Error', ['error_code', 'description'])
 class Error(_ErrorBase):
     __slots__ = ()
@@ -1109,7 +1097,7 @@ def get_updates(offset: int=None, limit: int=None, timeout: int=None, *, request
     # merge bot args with user overrides
     request_args = _merge_user_overrides(request_args, **kwargs)
 
-    return TelegramBotRPCRequest('getUpdates', params=params, on_result=MessageUpdate.from_result, **request_args).run()
+    return TelegramBotRPCRequest('getUpdates', params=params, on_result=Update.from_result, **request_args).run()
 
 def set_webhook(url: str=None, *, request_args=None, **kwargs) -> TelegramBotRPCRequest:
     """
