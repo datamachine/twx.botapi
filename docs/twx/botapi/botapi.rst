@@ -1,3 +1,9 @@
+:mod:`twx.botapi` --- Unofficial Telegram Bot API Client
+========================================================
+
+Types and Members
+-----------------
+
 .. automodule:: twx.botapi
 .. autoclass:: User
 .. autoclass:: GroupChat

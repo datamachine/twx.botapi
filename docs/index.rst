@@ -13,7 +13,6 @@ Contents:
 
    twx/index
 
-- :doc:`TWX module docs <twx/index>` : The TWX module documentation 
 
 
 

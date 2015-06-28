@@ -27,6 +27,10 @@ class User(_UserBase):
         first_name (str): User‘s or bot’s first name
         last_name (Optional[str]): User‘s or bot’s last name
         username (Optional[str]): User‘s or bot’s username
+
+    .. _PEP 484:
+       https://www.python.org/dev/peps/pep-0484/
+       
     """
     __slots__ = ()
 
