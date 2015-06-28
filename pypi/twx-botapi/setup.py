@@ -9,8 +9,8 @@ _MAJOR_VERSION         = 1
 _MINOR_VERSION         = 0
 _MICRO_VERSION         = None
 _PRE_RELEASE_TYPE      = 'b'   # a | b | rc
-_PRE_RELEASE_VERSION   = 4
-_DEV_RELEASE_VERSION   = None
+_PRE_RELEASE_VERSION   = 5
+_DEV_RELEASE_VERSION   = 1
 
 version = '{}.{}'.format(_MAJOR_VERSION, _MINOR_VERSION)
 revision = None
@@ -50,7 +50,11 @@ setup(
       'Intended Audience :: Developers',
       'License :: OSI Approved :: MIT License',
       'Operating System :: OS Independent',
-      'Programming Language :: Python :: 3 :: Only',
+      'Programming Language :: Python :: 2.7',
+      'Programming Language :: Python :: 3.0',
+      'Programming Language :: Python :: 3.1',
+      'Programming Language :: Python :: 3.2',
+      'Programming Language :: Python :: 3.3',
       'Programming Language :: Python :: 3.4',
       'Topic :: Communications :: Chat',
       'Topic :: Communications :: File Sharing'
