@@ -436,9 +436,10 @@ class ReplyKeyboardMarkup(_ReplyKeyboardMarkupBase, ReplyMarkup):
                                         used. Defaults to false.
         selective           (bool)  :*Optional.* Use this parameter if you want to show the keyboard to 
                                         specific users only. Targets: 
-                                        1. users that are @mentioned in the text of the Message object; 
-                                        2. if the bot's message is a reply (has reply_to_message_id), sender 
-                                        of the original message.
+
+                                            1. users that are @mentioned in the text of the Message object; 
+                                            2. if the bot's message is a reply (has reply_to_message_id), sender 
+                                               of the original message.
 
                                         :example: A user requests to change the bot‘s language, bot replies to the 
                                             request with a keyboard to select the new language. Other users in the 
@@ -482,26 +483,24 @@ class ReplyKeyboardMarkup(_ReplyKeyboardMarkupBase, ReplyMarkup):
 
 _ReplyKeyboardHideBase = namedtuple('ReplyKeyboardHide', ['hide_keyboard', 'selective'])
 class ReplyKeyboardHide(_ReplyKeyboardHideBase, ReplyMarkup):
-    """Upon receiving a message with this object, Telegram clients will hide the current custom keyboard 
-        and display the default letter-keyboard. By default, custom keyboards are displayed until a new 
-        keyboard is sent by a bot. An exception is made for one-time keyboards that are hidden immediately 
-        after the user presses a button (see ReplyKeyboardMarkup).
+    """Upon receiving a message with this object, Telegram clients will hide the current custom keyboard and 
+        display the default letter-keyboard. By default, custom keyboards are displayed until a new keyboard 
+        is sent by a bot. An exception is made for one-time keyboards that are hidden immediately after the 
+        user presses a button (see :class:`ReplyKeyboardMarkup`).
 
+    Attributes:
+        hide_keyboard   (``True``)  :Requests clients to hide the custom keyboard
+        selective       (bool)      :*Optional.* Use this parameter if you want to hide keyboard for specific 
+                                    users only. Targets: 
+                                        
+                                        1. users that are @mentioned in the text of the Message object;
+                                        2. if the bot's message is a reply (has reply_to_message_id), sender 
+                                           of the original message.
 
-        =================  ======  ===========================================================================
-        Field              Type    Description
-        =================  ======  ===========================================================================
-        ``hide_keyboard``  `True`  Requests clients to hide the custom keyboard
-        ``selective``      `bool`  *Optional.* Use this parameter if you want to hide keyboard for specific 
-                                   users only. Targets: 
-                                   1) users that are @mentioned in the text of the Message object; 
-                                   2) if the bot's message is a reply (has reply_to_message_id), sender of the 
-                                   original message.
-        =================  ======  ===========================================================================
+                                    :example: A user votes in a poll, bot returns confirmation message in reply 
+                                        to the vote and hides keyboard for that user, while still showing the 
+                                        keyboard with poll options to users who haven't voted yet.
 
-        Example: A user votes in a poll, bot returns confirmation message in reply to the vote and hides 
-                 keyboard for that user, while still showing the keyboard with poll options to users who 
-                 haven't voted yet.
     """
     __slots__ = ()
 
@@ -522,35 +521,29 @@ class ReplyKeyboardHide(_ReplyKeyboardHideBase, ReplyMarkup):
 _ForceReplyBase = namedtuple('ForceReply', ['force_reply', 'selective'])
 class ForceReply(_ForceReplyBase, ReplyMarkup):
     """Upon receiving a message with this object, Telegram clients will display a reply interface to the user
-        (act as if the user has selected the bot‘s message and tapped ’Reply'). This can be extremely useful if
-        you want to create user-friendly step-by-step interfaces without having to sacrifice privacy mode.
+        (act as if the user has selected the bot‘s message and tapped ’Reply'). This can be extremely useful 
+        if you want to create user-friendly step-by-step interfaces without having to sacrifice privacy mode.
 
+    Attributes:
+        force_reply (``True``)  :Shows reply interface to the user, as if they manually selected the bot‘s 
+                                    message and tapped ’Reply'
+        selective   (bool)      :Optional. Use this parameter if you want to force reply from specific users 
+                                    only. Targets: 1) users that are @mentioned in the text of the Message 
+                                    object; 2) if the bot's message is a reply (has reply_to_message_id), 
+                                    sender of the original message.
 
-        ===============  ======  =============================================================================
-        Field            Type    Description
-        ===============  ======  =============================================================================
-        ``force_reply``  `True`  Shows reply interface to the user, as if they manually selected the bot‘s 
-                                 message and tapped ’Reply'
-        ``selective``    `bool`  *Optional.* Use this parameter if you want to force reply from specific users 
-                                 only. Targets: 
-                                 1) users that are @mentioned in the text of the Message object; 
-                                 2) if the bot's message is a reply (has reply_to_message_id), sender of the 
-                                 original message.
-        ===============  ======  =============================================================================
+    :Example: A poll bot for groups runs in privacy mode (only receives commands, replies to its messages and 
+        mentions). There could be two ways to create a new poll:
 
-        Example: A poll bot for groups runs in privacy mode (only receives commands, replies to its messages 
-                 and mentions). There could be two ways to create a new poll:
-       
-                    Explain the user how to send a command with parameters (e.g. /newpoll question answer1 
-                    answer 2). May be appealing for hardcore users but lacks modern day polish.
+            * Explain the user how to send a command with parameters (e.g. /newpoll question answer1 answer2). 
+              May be appealing for hardcore users but lacks modern day polish.
+            * Guide the user through a step-by-step process. ‘Please send me your question’, ‘Cool, now let’s 
+              add the first answer option‘, ’Great. Keep adding answer options, then send /done when you‘re ready’.
 
-                    1. Guide the user through a step-by-step process. ‘Please send me your question’, ‘Cool, 
-                    now let’s add the first answer option‘, ’Great. Keep adding answer options, then send 
-                    /done when you‘re ready’.
+    The last option is definitely more attractive. And if you use ForceReply in your bot‘s questions, it will 
+    receive the user’s answers even if it only receives replies, commands and mentions — without any extra 
+    work for the user.
 
-                    2. The last option is definitely more attractive. And if you use ForceReply in your bot‘s 
-                    questions, it will receive the user’s answers even if it only receives replies, commands 
-                    and mentions — without any extra work for the user.
     """
     __slots__ = ()
 
@@ -572,6 +565,14 @@ Types added for utility pruposes
 """
 _ErrorBase = namedtuple('Error', ['error_code', 'description'])
 class Error(_ErrorBase):
+    """The error code and message returned when a request was successfuly but the method call was invalid
+
+    Attributes:
+        error_code  (int)   :An Integer ‘error_code’ field is also returned, but its 
+                            contents are subject to change in the future.
+        description (str)   :The description of the error as reported by Telegram
+
+    """
     __slots__ = ()
 
     @staticmethod
@@ -1152,9 +1153,11 @@ def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, *, 
 def get_updates(offset: int=None, limit: int=None, timeout: int=None, *, request_args, **kwargs):
     """
     Use this method to receive incoming updates using long polling. 
-    Notes
-    1. This method will not work if an outgoing webhook is set up.
-    2. In order to avoid getting duplicate updates, recalculate offset after each server response.
+    
+    .. note::
+
+        1. This method will not work if an outgoing webhook is set up.
+        2. In order to avoid getting duplicate updates, recalculate offset after each server response.
 
     :param offset: Identifier of the first update to be returned. Must be 
                    greater by one than the highest among the identifiers of
