@@ -23,10 +23,10 @@ class User(_UserBase):
     """This object represents a Telegram user or bot.
 
     Attributes:
-        id          (int): Unique identifier for this user or bot
-        first_name  (str): User‘s or bot’s first name
-        last_name   (str): *Optional.* User‘s or bot’s last name
-        username    (str): *Optional.* User‘s or bot’s username
+        id (int): Unique identifier for this user or bot
+        first_name (str): User‘s or bot’s first name
+        last_name (Optional[str]): User‘s or bot’s last name
+        username (Optional[str]): User‘s or bot’s username
     """
     __slots__ = ()
 
@@ -1146,7 +1146,7 @@ def set_webhook(url: str=None, *, request_args=None, **kwargs) -> TelegramBotRPC
 class TelegramBot:
 
     def __init__(self, token, request_method: RequestMethod=RequestMethod.POST):
-        self._bot_user = User(None, None, None, None)
+        self._bot_user = None
 
         self.request_args = dict(
             token=token,
@@ -1189,19 +1189,23 @@ class TelegramBot:
 
     @property
     def id(self):
-        return self._bot_user.id   
+        if self._bot_user is not None:
+            return self._bot_user.id   
 
     @property
     def first_name(self):
-        return self._bot_user.first_name   
+        if self._bot_user is not None:
+            return self._bot_user.first_name   
 
     @property
     def last_name(self):
-        return self._bot_user.last_name   
+        if self._bot_user is not None:
+            return self._bot_user.last_name   
 
     @property
     def username(self):
-        return self._bot_user.username    
+        if self._bot_user is not None:
+            return self._bot_user.username    
 
     def _update_bot_info(self, bot_user):
         self._bot_user = bot_user
