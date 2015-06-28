@@ -9,8 +9,8 @@ _MAJOR_VERSION         = 1
 _MINOR_VERSION         = 0
 _MICRO_VERSION         = None
 _PRE_RELEASE_TYPE      = 'b'   # a | b | rc
-_PRE_RELEASE_VERSION   = 3
-_DEV_RELEASE_VERSION   = 118
+_PRE_RELEASE_VERSION   = 4
+_DEV_RELEASE_VERSION   = None
 
 version = '{}.{}'.format(_MAJOR_VERSION, _MINOR_VERSION)
 revision = None
@@ -27,7 +27,7 @@ if _DEV_RELEASE_VERSION is not None:
     download_url = 'https://github.com/datamachine/twx/archive/{}.tar.gz'.format(revision)
 else:
     revision = version
-    download_url = 'https://github.com/datamachine/twx/archive/twx-botapi-{}.tar.gz'.format(revision)
+    download_url = 'https://github.com/datamachine/twx/archive/botapi-{}.tar.gz'.format(revision)
 
 print(version)
 print(download_url)
