@@ -30,7 +30,7 @@ class User(_UserBase):
 
     .. _PEP 484:
        https://www.python.org/dev/peps/pep-0484/
-       
+
     """
     __slots__ = ()
 
@@ -50,18 +50,9 @@ _GroupChatBase = namedtuple('GroupChat', ['id', 'title'])
 class GroupChat(_GroupChatBase):
     """This object represents a group chat.
 
-    .. attribute:: GroupChat.id
-
-        Unique identifier for this group chat
-
-        :type: int
-
-    =========  =====  =====================================
-    Field      Type   Description
-    =========  =====  =====================================
-    ``id``     `int`  Unique identifier for this group chat
-    ``title``  `str`  Group name
-    =========  =====  =====================================
+    Attributes:
+        id    (int): Unique identifier for this group chat
+        title (str): Group name
     """
     __slots__ = ()
 
