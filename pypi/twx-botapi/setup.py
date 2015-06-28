@@ -10,7 +10,7 @@ _MINOR_VERSION         = 0
 _MICRO_VERSION         = None
 _PRE_RELEASE_TYPE      = 'b'   # a | b | rc
 _PRE_RELEASE_VERSION   = 7
-_DEV_RELEASE_VERSION   = 1
+_DEV_RELEASE_VERSION   = None
 
 version = '{}.{}'.format(_MAJOR_VERSION, _MINOR_VERSION)
 revision = None
@@ -40,7 +40,7 @@ print(requirements)
 
 setup(
     name = 'twx-botapi',
-    packages = ['twx'],
+    packages = ['twx', 'twx.botapi'],
     version = version,
     description = 'Unofficial Telegram Bot API Client',
     long_description = open("README.rst").read(),
