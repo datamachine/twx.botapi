@@ -28,9 +28,6 @@ class User(_UserBase):
         last_name (Optional[str]): User‘s or bot’s last name
         username (Optional[str]): User‘s or bot’s username
 
-    .. _PEP 484:
-       https://www.python.org/dev/peps/pep-0484/
-
     """
     __slots__ = ()
 
@@ -53,6 +50,7 @@ class GroupChat(_GroupChatBase):
     Attributes:
         id    (int): Unique identifier for this group chat
         title (str): Group name
+
     """
     __slots__ = ()
 
@@ -74,27 +72,35 @@ class Message(_MessageBase):
     """This object represents a message.
 
     Attributes:
-        message_id  (int) Unique message identifier
-        from                    (`User`)                          :Sender
-        date                    (int)                             :Date the message was sent in Unix time
-        chat                    (`User` or `GroupChat`)           :Conversation the message belongs to — user in case of a private message, GroupChat in case of a group
-        forward_from            (Optional[`User`])                :For forwarded messages, sender of the original message
-        forward_date            (Optional[int])                   :For forwarded messages, date the original message was sent in Unix time
-        reply_to_message        (Optional[Message])               :For replies, the original message. Note that the Message object in this field will not contain further reply_to_message fields even if it itself is a reply.
-        text                    (Optional[str])                   :For text messages, the actual UTF-8 text of the message
-        audio                   (Optional[`Audio`])               :Message is an audio file, information about the file
-        document                (Optional[`Document`])            :Message is a general file, information about the file
-        photo                   (Optional[Sequence[`PhotoSize`]])  :Message is a photo, available sizes of the photo
-        sticker                 (Optional[`Sticker`])             :Message is a sticker, information about the sticker
-        video                   (Optional[`Video`])               :Message is a video, information about the video
-        contact                 (Optional[`Contact`])             :Message is a shared contact, information about the contact
-        location                (Optional[`Location`])            :Message is a shared location, information about the location
-        new_chat_participant    (Optional[`User`])                :A new member was added to the group, information about them (this member may be bot itself)
-        left_chat_participant   (Optional[`User`])                :A member was removed from the group, information about them (this member may be bot itself)
-        new_chat_title          (Optional[`str`])                   :A group title was changed to this value
-        new_chat_photo          (Optional[Sequence[`PhotoSize`]]) :A group photo was change to this value
-        delete_chat_photo       (Optional[``True``]):                 :Informs that the group photo was deleted
-        group_chat_created      (Optional[``True``]):                 :Informs that the group has been created
+        message_id            (int)                 :Unique message identifier
+        from                  (User)                :Sender
+        date                  (int)                 :Date the message was sent in Unix time
+        chat                  (User or GroupChat)   :Conversation the message belongs to — user in case of 
+                                                    a private message, GroupChat in case of a group
+        forward_from          (Optional[User])      :For forwarded messages, sender of the original message
+        forward_date          (Optional[int])       :For forwarded messages, date the original message was 
+                                                    sent in Unix time
+        reply_to_message      (Optional[Message])   :For replies, the original message. Note that the Message 
+                                                    object in this field will not contain further reply_to_message 
+                                                    fields even if it itself is a reply.
+        text                  (Optional[str])       :For text messages, the actual UTF-8 text of the message
+        audio                 (Optional[Audio])     :Message is an audio file, information about the file
+        document              (Optional[Document])  :Message is a general file, information about the file
+        photo                 (Optional[Sequence[PhotoSize]]):
+                                                    Message is a photo, available sizes of the photo
+        sticker               (Optional[Sticker])   :Message is a sticker, information about the sticker
+        video                 (Optional[Video])     :Message is a video, information about the video
+        contact               (Optional[Contact])   :Message is a shared contact, information about the contact
+        location              (Optional[Location])  :Message is a shared location, information about the location
+        new_chat_participant  (Optional[User])      :A new member was added to the group, information about 
+                                                    them (this member may be bot itself)
+        left_chat_participant (Optional[User])      :A member was removed from the group, information about 
+                                                    them (this member may be bot itself)
+        new_chat_title        (Optional[str])       :A group title was changed to this value
+        new_chat_photo        (Optional[Sequence[PhotoSize]]):
+                                                    A group photo was change to this value
+        delete_chat_photo     (Optional[``True``])  :Informs that the group photo was deleted
+        group_chat_created    (Optional[``True``])  :Informs that the group has been created
     """
     __slots__ = ()
 
