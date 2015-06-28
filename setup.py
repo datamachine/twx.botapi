@@ -10,7 +10,7 @@ _MINOR_VERSION         = 5
 _MICRO_VERSION         = None
 _PRE_RELEASE_TYPE      = 'a'   # a | b | rc
 _PRE_RELEASE_VERSION   = 3
-_DEV_RELEASE_VERSION   = 116
+_DEV_RELEASE_VERSION   = 117
 
 version = '{}.{}'.format(_MAJOR_VERSION, _MINOR_VERSION)
 revision = None
