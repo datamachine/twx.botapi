@@ -122,6 +122,22 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #html_theme_options = {}
+html_theme_options = {
+    'github_user': 'datamachine',
+    'github_repo': 'twx',
+    'description': 'Telegram Bot API and MTProto Clients',
+    'github_banner': True,
+    'github_button': True,
+    'show_powered_by': False,
+    #'link': '#0088cc',
+    #'sidebar_link': '#0088cc',
+    #'anchor': '#0088cc',
+    'gray_1': '#0088cc',
+    'gray_2': '#ecf3f8',
+    #'pre_bg': '#ecf3f8',
+    #'font_family': "'Lucida Grande', 'Lucida Sans Unicode', Arial, Helvetica, Verdana, sans-serif",
+    'head_font_family': "'Lucida Grande', 'Lucida Sans Unicode', Arial, Helvetica, Verdana, sans-serif"
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
