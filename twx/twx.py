@@ -343,7 +343,7 @@ class TWXBotApi(TWX):
         if isinstance(reply, Message):
             reply = reply.id
 
-        photo = botapi.InputFile('photo', botapi.InputFileInfo(photo, open(photo, 'rb'), _get_mimetype(photo)))
+        photo = botapi.InputFile('photo', botapi.InputFileInfo(photo, open(photo, 'rb'), get_mimetype(photo)))
 
         botapi.send_photo(chat_id=peer.id, photo=photo, caption=caption, reply_to_message_id=reply, callback=callback,
                           reply_markup=reply_markup, request_args=self.request_args)
@@ -362,7 +362,7 @@ class TWXBotApi(TWX):
         if isinstance(reply, Message):
             reply = reply.id
 
-        audio = botapi.InputFile('audio', botapi.InputFileInfo(audio, open(audio, 'rb'), _get_mimetype(audio)))
+        audio = botapi.InputFile('audio', botapi.InputFileInfo(audio, open(audio, 'rb'), get_mimetype(audio)))
 
         botapi.send_audio(chat_id=peer.id, audio=audio, reply_to_message_id=reply, callback=callback,
                           reply_markup=reply_markup, request_args=self.request_args)
@@ -382,7 +382,7 @@ class TWXBotApi(TWX):
             reply = reply.id
 
         document = botapi.InputFile('document', botapi.InputFileInfo(document, open(document, 'rb'),
-                                                                     _get_mimetype(document)))
+                                                                     get_mimetype(document)))
 
         botapi.send_document(chat_id=peer.id, document=document, reply_to_message_id=reply, callback=callback,
                              reply_markup=reply_markup, request_args=self.request_args)
@@ -402,7 +402,7 @@ class TWXBotApi(TWX):
             reply = reply.id
 
         sticker = botapi.InputFile('sticker', botapi.InputFileInfo(sticker, open(sticker, 'rb'),
-                                                                   _get_mimetype(sticker)))
+                                                                   get_mimetype(sticker)))
 
         botapi.send_sticker(chat_id=peer.id, sticker=sticker, reply_to_message_id=reply, callback=callback,
                             reply_markup=reply_markup, request_args=self.request_args)
@@ -422,7 +422,7 @@ class TWXBotApi(TWX):
             reply = reply.id
 
         video = botapi.InputFile('video', botapi.InputFileInfo(video, open(video, 'rb'),
-                                                               _get_mimetype(video)))
+                                                               get_mimetype(video)))
 
         botapi.send_video(chat_id=peer.id, video=video, reply_to_message_id=reply, callback=callback,
                           reply_markup=reply_markup, request_args=self.request_args)
