@@ -77,30 +77,28 @@ class Message(_MessageBase):
         date                  (int)                 :Date the message was sent in Unix time
         chat                  (User or GroupChat)   :Conversation the message belongs to — user in case of 
                                                     a private message, GroupChat in case of a group
-        forward_from          (Optional[User])      :For forwarded messages, sender of the original message
-        forward_date          (Optional[int])       :For forwarded messages, date the original message was 
-                                                    sent in Unix time
-        reply_to_message      (Optional[Message])   :For replies, the original message. Note that the Message 
-                                                    object in this field will not contain further reply_to_message 
-                                                    fields even if it itself is a reply.
-        text                  (Optional[str])       :For text messages, the actual UTF-8 text of the message
-        audio                 (Optional[Audio])     :Message is an audio file, information about the file
-        document              (Optional[Document])  :Message is a general file, information about the file
-        photo                 (Optional[Sequence[PhotoSize]]):
-                                                    Message is a photo, available sizes of the photo
-        sticker               (Optional[Sticker])   :Message is a sticker, information about the sticker
-        video                 (Optional[Video])     :Message is a video, information about the video
-        contact               (Optional[Contact])   :Message is a shared contact, information about the contact
-        location              (Optional[Location])  :Message is a shared location, information about the location
-        new_chat_participant  (Optional[User])      :A new member was added to the group, information about 
-                                                    them (this member may be bot itself)
-        left_chat_participant (Optional[User])      :A member was removed from the group, information about 
-                                                    them (this member may be bot itself)
-        new_chat_title        (Optional[str])       :A group title was changed to this value
-        new_chat_photo        (Optional[Sequence[PhotoSize]]):
-                                                    A group photo was change to this value
-        delete_chat_photo     (Optional[``True``])  :Informs that the group photo was deleted
-        group_chat_created    (Optional[``True``])  :Informs that the group has been created
+        forward_from          (User)                :*Optional.* For forwarded messages, sender of the original message
+        forward_date          (int)                 :*Optional.* For forwarded messages, date the original message was 
+                                                                 sent in Unix time
+        reply_to_message      (Message)             :*Optional.* For replies, the original message. Note that the Message 
+                                                                 object in this field will not contain further reply_to_message 
+                                                                 fields even if it itself is a reply.
+        text                  (str)                 :*Optional.* For text messages, the actual UTF-8 text of the message
+        audio                 (Audio)               :*Optional.* Message is an audio file, information about the file
+        document              (Document)            :*Optional.* Message is a general file, information about the file
+        photo                 (Sequence[PhotoSize]) :*Optional.* Message is a photo, available sizes of the photo
+        sticker               (Sticker)             :*Optional.* Message is a sticker, information about the sticker
+        video                 (Video)               :*Optional.* Message is a video, information about the video
+        contact               (Contact)             :*Optional.* Message is a shared contact, information about the contact
+        location              (Location)            :*Optional.* Message is a shared location, information about the location
+        new_chat_participant  (User)                :*Optional.* A new member was added to the group, information about 
+                                                                 them (this member may be bot itself)
+        left_chat_participant (User)                :*Optional.* A member was removed from the group, information about 
+                                                                 them (this member may be bot itself)
+        new_chat_title        (str)                 :*Optional.* A group title was changed to this value
+        new_chat_photo        (Sequence[PhotoSize]) :*Optional.* A group photo was change to this value
+        delete_chat_photo     (``True``)            :*Optional.* Informs that the group photo was deleted
+        group_chat_created    (``True``)            :*Optional.* Informs that the group has been created
     """
     __slots__ = ()
 
@@ -149,14 +147,11 @@ _PhotoSizeBase = namedtuple('PhotoSize', ['file_id', 'width', 'height', 'file_si
 class PhotoSize(_PhotoSizeBase):
     """This object represents one size of a photo or a file / sticker thumbnail.
 
-    =============  =====  ===============================
-    Field          Type   Description
-    =============  =====  ===============================
-    ``file_id``    `str`  Unique identifier for this file
-    ``width``      `int`  Photo width
-    ``height``     `int`  Photo height
-    ``file_size``  `int`  Optional. File size
-    =============  =====  ===============================
+    Attributes:
+        file_id    (str)  :Unique identifier for this file
+        width      (int)  :Photo width
+        height     (int)  :Photo height
+        file_size  (int)  :*Optional.* File size
     """
     __slots__ = ()
 
