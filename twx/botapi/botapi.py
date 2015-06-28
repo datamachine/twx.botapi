@@ -692,20 +692,17 @@ def _merge_user_overrides(request_args, **kwargs):
 """
 Telegram Bot API Methods as defined at https://core.telegram.org/bots/api#available-methods
 """
-def get_me(*, request_args=None, **kwargs):
+def get_me(**kwargs):
     """
     A simple method for testing your bot's auth token. Requires no parameters. 
     Returns basic information about the bot in form of a User object.
 
-    :param request_args: Args passed down to TelegramBotRPCRequest
+    :param **kwargs: Args passed down to TelegramBotRPCRequest
 
     :returns: Returns basic information about the bot in form of a User object.
     :rtype: User
     """
-
-    request_args = _merge_user_overrides(request_args, **kwargs)
-
-    return TelegramBotRPCRequest('getMe', on_result=User.from_result, **request_args).run()
+    return TelegramBotRPCRequest('getMe', on_result=User.from_result, **kwargs)
 
 def send_message(chat_id: int, text: str, 
                  disable_web_page_preview: bool=None, reply_to_message_id: int=None, 
@@ -1234,7 +1231,6 @@ class TelegramBot:
             request_method=request_method
         )
 
-        self.get_me = partial(get_me, request_args=self.request_args)
         self.send_message = partial(send_message, request_args=self.request_args)
         self.forward_message = partial(forward_message, request_args=self.request_args)
         self.send_photo = partial(send_photo, request_args=self.request_args)
@@ -1247,10 +1243,23 @@ class TelegramBot:
         self.get_user_profile_photos = partial(get_user_profile_photos, request_args=self.request_args)
         self.get_updates = partial(get_updates, request_args=self.request_args)
         self.set_webhook = partial(set_webhook, request_args=self.request_args)
-        self.update_bot_info = partial(get_me, request_args=self.request_args, callback=self._update_bot_info)
 
     def __str__(self):
         return self.token
+
+    def _merge_overrides(self, **kwargs):
+        ra = self.request_args.copy()
+        ra.update(kwargs)
+        return ra
+
+    def get_me(self, **kwargs):
+        return get_me(**self._merge_overrides(**kwargs)).run()
+
+    def _update_bot_info(self, response):
+        self._bot_user = response
+
+    def update_bot_info(self):
+        return self.get_me(callback=self._update_bot_info)
 
     @property
     def token(self):
@@ -1288,5 +1297,3 @@ class TelegramBot:
         if self._bot_user is not None:
             return self._bot_user.username    
 
-    def _update_bot_info(self, bot_user):
-        self._bot_user = bot_user
