@@ -9,7 +9,7 @@ Welcome to TWX's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    twx/index
 
