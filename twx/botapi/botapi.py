@@ -176,6 +176,7 @@ class Audio(_AudioBase):
         duration   (int)  :Duration of the audio in seconds as defined by sender
         mime_type  (str)  :*Optional.* MIME type of the file as defined by sender
         file_size  (int)  :*Optional.* File size
+        
     """
     __slots__ = ()
 
@@ -193,6 +194,16 @@ class Audio(_AudioBase):
 
 _DocumentBase = namedtuple('Document', ['file_id', 'thumb', 'file_name', 'mime_type', 'file_size'])
 class Document(_DocumentBase):
+    """This object represents a general file (as opposed to photos and audio files).
+
+    Attributes:
+        file_id    (str)        :Unique file identifier
+        thumb      (PhotoSize)  :Document thumbnail as defined by sender
+        file_name  (str)        :*Optional.* Original filename as defined by sender
+        mime_type  (str)        :*Optional.* MIME type of the file as defined by sender
+        file_size  (int)        :*Optional.* File size
+
+    """
     __slots__ = ()
 
     @staticmethod
