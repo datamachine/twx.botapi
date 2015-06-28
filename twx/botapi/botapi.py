@@ -260,7 +260,7 @@ class Video(_VideoBase):
         mime_type   (str)       :*Optional.* Mime type of a file as defined by sender
         file_size   (int)       :*Optional.* File size
         caption     (str)       :*Optional.* Text description of the video (usually empty)
-        
+
     """
     __slots__ = ()
 
@@ -282,6 +282,15 @@ class Video(_VideoBase):
 
 _ContactBase = namedtuple('Contact', ['phone_number', 'first_name', 'last_name', 'user_id'])
 class Contact(_ContactBase):
+    """This object represents a phone contact.
+
+    Attributes:
+        phone_number    (str)  :Contact's phone number
+        first_name      (str)  :Contact's first name
+        last_name       (str)  :*Optional.* Contact's last name
+        user_id         (str)  :*Optional.* Contact's user identifier in Telegram
+        
+    """
     __slots__ = ()
 
     @staticmethod
