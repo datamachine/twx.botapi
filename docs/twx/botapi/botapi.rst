@@ -5,8 +5,9 @@
 
 .. py:currentmodule:: twx.botapi
 
-Index
------
+
+Quick Jump
+----------
 
 Telegram Bot API Types
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -27,6 +28,24 @@ Telegram Bot API Types
 * :class:`ReplyKeyboardMarkup`
 * :class:`ReplyKeyboardHide`
 * :class:`ForceReply`
+
+Telegram Bot API Methods
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+* :func:`get_me`
+* :func:`send_message`
+* :func:`forward_message`
+* :func:`send_photo`
+* :func:`send_audio`
+* :func:`send_document`
+* :func:`send_sticker`
+* :func:`send_video`
+* :func:`send_location`
+* :func:`send_chat_action`
+* :func:`getUser_profile_photos`
+* :func:`get_updates`
+* :func:`set_webhook`
+
 
 Telegram Bot API Types
 ----------------------
