@@ -176,7 +176,7 @@ class Audio(_AudioBase):
         duration   (int)  :Duration of the audio in seconds as defined by sender
         mime_type  (str)  :*Optional.* MIME type of the file as defined by sender
         file_size  (int)  :*Optional.* File size
-        
+
     """
     __slots__ = ()
 
@@ -221,6 +221,16 @@ class Document(_DocumentBase):
 
 _StickerBase = namedtuple('Sticker', ['file_id', 'width', 'height', 'thumb', 'file_size'])
 class Sticker(_StickerBase):
+    """This object represents a sticker.
+
+    Attributes:
+        file_id    (str)        :Unique identifier for this file
+        width      (int)        :Sticker width
+        height     (int)        :Sticker height
+        thumb      (PhotoSize)  :Sticker thumbnail in .webp or .jpg format
+        file_size  (int)        :*Optional.* File size
+        
+    """
     __slots__ = ()
 
     @staticmethod
