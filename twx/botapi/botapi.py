@@ -8,10 +8,10 @@
 
 from requests import Request, Session
 from collections import namedtuple
-from enum import Enum
 from functools import partial
 from abc import ABCMeta, abstractmethod
 from threading import Thread
+from enum import Enum
 
 import json
 
@@ -413,13 +413,9 @@ class UserProfilePhotos(_UserProfilePhotosBase):
             photos=photos
             )
 
-class ReplyMarkup(metaclass=ABCMeta):
+class ReplyMarkup:
     """Abstract base to represent all valid inputs to reply_markup parameter in various API methods"""
     __slots__ = ()
-
-    @abstractmethod
-    def serialize(self):
-        raise NotImplements
 
 _ReplyKeyboardMarkupBase = namedtuple('ReplyKeyboardMarkup', 
     ['keyboard', 'resize_keyboard', 'one_time_keyboard', 'selective'])
@@ -586,10 +582,10 @@ class RequestMethod(str, Enum):
     GET = 'GET'
     POST = 'POST'
 
-class TelegramBotRPCRequest(metaclass=ABCMeta):
+class TelegramBotRPCRequest:
     api_url_base = 'https://api.telegram.org/bot'
 
-    def __init__(self, api_method: str, *, token, params: dict=None, on_result=None, callback=None, 
+    def __init__(self, api_method, token, params=None, on_result=None, callback=None, 
                  on_error=None, files=None, request_method=RequestMethod.POST):
         """
         :param api_method: The API method to call. See https://core.telegram.org/bots/api#available-methods
@@ -698,9 +694,8 @@ def get_me(**kwargs):
     """
     return TelegramBotRPCRequest('getMe', on_result=User.from_result, **kwargs)
 
-def send_message(chat_id: int, text: str, 
-                 disable_web_page_preview: bool=None, reply_to_message_id: int=None, 
-                 reply_markup: ReplyMarkup=None, 
+def send_message(chat_id, text, 
+                 disable_web_page_preview=None, reply_to_message_id=None, reply_markup=None, 
                  **kwargs):
     """
     Use this method to send text messages. 
@@ -765,9 +760,9 @@ def forward_message(chat_id, from_chat_id, message_id,
 
     return TelegramBotRPCRequest('forwardMessage', params=params, on_result=Message.from_result, **kwargs)
 
-def send_photo(chat_id: int,  photo: InputFile, 
-               caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None,
-               **kwargs) -> TelegramBotRPCRequest:
+def send_photo(chat_id,  photo, 
+               caption=None, reply_to_message_id=None, reply_markup=None,
+               **kwargs):
     """
     Use this method to send photos.
 
@@ -816,9 +811,9 @@ def send_photo(chat_id: int,  photo: InputFile,
 
     return TelegramBotRPCRequest('sendPhoto', params=params, files=files, on_result=Message.from_result, **kwargs)
 
-def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None,
-               reply_markup: ReplyKeyboardMarkup=None,
-               **kwargs) -> TelegramBotRPCRequest:
+def send_audio(chat_id, audio, 
+               reply_to_message_id=None, reply_markup=None,
+               **kwargs):
     """
     Use this method to send audio files, if you want Telegram clients to display the file as a playable voice
     message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent 
@@ -865,9 +860,9 @@ def send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None,
 
 
 
-def send_document(chat_id: int, document: InputFile, reply_to_message_id: int=None,
-                  reply_markup: ReplyKeyboardMarkup=None,
-                  **kwargs) -> TelegramBotRPCRequest:
+def send_document(chat_id, document, 
+                  reply_to_message_id=None, reply_markup=None,
+                  **kwargs):
     """
     Use this method to send general files.
 
@@ -910,9 +905,9 @@ def send_document(chat_id: int, document: InputFile, reply_to_message_id: int=No
 
     return TelegramBotRPCRequest('sendDocument', params=params, files=files, on_result=Message.from_result, **kwargs)
 
-def send_sticker(chat_id: int, sticker: InputFile, reply_to_message_id: int=None,
-                 reply_markup: ReplyKeyboardMarkup=None,
-                 **kwargs) -> TelegramBotRPCRequest:
+def send_sticker(chat_id, sticker, 
+                 reply_to_message_id=None, reply_markup=None,
+                 **kwargs):
     """
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
     :param sticker: Sticker to send. You can either pass a file_id as String to resend a sticker
@@ -953,9 +948,9 @@ def send_sticker(chat_id: int, sticker: InputFile, reply_to_message_id: int=None
 
     return TelegramBotRPCRequest('sendSticker', params=params, files=files, on_result=Message.from_result, **kwargs)
 
-def send_video(chat_id: int, video: InputFile, reply_to_message_id: int=None,
-               reply_markup: ReplyKeyboardMarkup=None,
-               **kwargs) -> TelegramBotRPCRequest:
+def send_video(chat_id, video, 
+               reply_to_message_id=None, reply_markup=None,
+               **kwargs):
     """
     Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as Document).
 
@@ -1000,9 +995,9 @@ def send_video(chat_id: int, video: InputFile, reply_to_message_id: int=None,
     
     return TelegramBotRPCRequest('sendVideo', params=params, files=files, on_result=Message.from_result, **kwargs)
 
-def send_location(chat_id: int, latitude: float, longitude: float, reply_to_message_id: int=None,
-                  reply_markup: ReplyKeyboardMarkup=None,
-                  **kwargs) -> TelegramBotRPCRequest:
+def send_location(chat_id, latitude, longitude, 
+                  reply_to_message_id=None, reply_markup=None,
+                  **kwargs):
     """
     Use this method to send point on the map.
 
@@ -1052,8 +1047,8 @@ class ChatAction(str, Enum):
     DOCUMENT = 'upload_document'
     LOCATION = 'find_location'
 
-def send_chat_action(chat_id: int, action: ChatAction,
-                     **kwargs) -> TelegramBotRPCRequest:
+def send_chat_action(chat_id, action,
+                     **kwargs):
     """
     Use this method when you need to tell the user that something is happening on the bot's side. The status is set
      for 5 seconds or less (when a message arrives from your bot, Telegram clients clear its typing status).
@@ -1085,7 +1080,8 @@ def send_chat_action(chat_id: int, action: ChatAction,
 
     return TelegramBotRPCRequest('sendChatAction', params=params, on_result=lambda result: result, **kwargs)
 
-def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, 
+def get_user_profile_photos(user_id, 
+                            offset=None, limit=None, 
                             **kwargs):
     """
     Use this method to get a list of profile pictures for a user. Returns a UserProfilePhotos object.
@@ -1116,7 +1112,7 @@ def get_user_profile_photos(user_id: int, offset: int=None, limit: int=None,
     return TelegramBotRPCRequest('getUserProfilePhotos', params=params, 
                                  on_result=UserProfilePhotos.from_result, **kwargs)
 
-def get_updates(offset: int=None, limit: int=None, timeout: int=None, 
+def get_updates(offset=None, limit=None, timeout=None, 
                 **kwargs):
     """
     Use this method to receive incoming updates using long polling. 
@@ -1154,7 +1150,7 @@ def get_updates(offset: int=None, limit: int=None, timeout: int=None,
 
     return TelegramBotRPCRequest('getUpdates', params=params, on_result=Update.from_result, **kwargs)
 
-def set_webhook(url: str=None, **kwargs) -> TelegramBotRPCRequest:
+def set_webhook(url=None, **kwargs):
     """
     Use this method to specify a url and receive incoming updates via an outgoing webhook.
     Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a
@@ -1190,10 +1186,10 @@ class TelegramBot:
 
         Unlike the unbound API methods, when the bot executes an API call, ``run()`` is immediately called
         on the request object.
-        
+
     """
 
-    def __init__(self, token, request_method: RequestMethod=RequestMethod.POST):
+    def __init__(self, token, request_method=RequestMethod.POST):
         self._bot_user = None
 
         self.request_args = dict(
@@ -1280,7 +1276,7 @@ class TelegramBot:
         return self.request_args['request_method']
 
     @request_method.setter
-    def request_method(self, val: RequestMethod):
+    def request_method(self, val):
         self.request_args['request_method'] = val
 
     @property
