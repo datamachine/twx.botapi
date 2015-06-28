@@ -697,7 +697,7 @@ def get_me(**kwargs):
     A simple method for testing your bot's auth token. Requires no parameters. 
     Returns basic information about the bot in form of a User object.
 
-    :param **kwargs: Args passed down to TelegramBotRPCRequest
+    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :returns: Returns basic information about the bot in form of a User object.
     :rtype: User
@@ -707,7 +707,7 @@ def get_me(**kwargs):
 def send_message(chat_id: int, text: str, 
                  disable_web_page_preview: bool=None, reply_to_message_id: int=None, 
                  reply_markup: ReplyMarkup=None, 
-                 *, request_args=None, **kwargs):
+                 **kwargs):
     """
     Use this method to send text messages. 
 
@@ -718,7 +718,7 @@ def send_message(chat_id: int, text: str,
     :param reply_markup: Additional interface options. A JSON-serialized object for a 
                          custom reply keyboard, instructions to hide keyboard or to 
                          force a reply from the user.
-    :param request_args: Args passed down to TelegramBotRPCRequest
+    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type text: str
@@ -741,9 +741,7 @@ def send_message(chat_id: int, text: str,
         )
     )
 
-    request_args = _merge_user_overrides(request_args, **kwargs)
-
-    return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result, **request_args).run()
+    return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result, **kwargs)
 
 def forward_message(chat_id, from_chat_id, message_id,
                     *, request_args=None, **kwargs):
@@ -1231,7 +1229,6 @@ class TelegramBot:
             request_method=request_method
         )
 
-        self.send_message = partial(send_message, request_args=self.request_args)
         self.forward_message = partial(forward_message, request_args=self.request_args)
         self.send_photo = partial(send_photo, request_args=self.request_args)
         self.send_audio = partial(send_audio, request_args=self.request_args)
@@ -1252,8 +1249,11 @@ class TelegramBot:
         ra.update(kwargs)
         return ra
 
-    def get_me(self, **kwargs):
-        return get_me(**self._merge_overrides(**kwargs)).run()
+    def get_me(self, *args, **kwargs):
+        return get_me(*args, **self._merge_overrides(**kwargs)).run()
+
+    def send_message(self, *args, **kwargs):
+        return send_message(*args, **self._merge_overrides(**kwargs)).run()
 
     def _update_bot_info(self, response):
         self._bot_user = response
