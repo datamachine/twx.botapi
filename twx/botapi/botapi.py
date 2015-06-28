@@ -312,7 +312,7 @@ class Location(_LocationBase):
     Attributes:
         longitude   (float)   :Longitude as defined by sender
         latitude    (float)   :Latitude as defined by sender
-        
+
     """
     __slots__ = ()
 
@@ -326,8 +326,34 @@ class Location(_LocationBase):
             latitude=result.get('latitude')
             )
 
+_UpdateBase = namedtuple('Update', ['update_id', 'message'])
+class Update(_UpdateBase):
+    __slots__ = ()
+
+    @staticmethod
+    def from_dict(message_update):
+        if message_update is None:
+            return None
+
+        return Update(message_update.get('update_id'), Message.from_result(message_update.get('message')))
+
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return [Update.from_dict(message_update) for message_update in result]
+
 _UserProfilePhotosBase = namedtuple('UserProfilePhotos', ['total_count', 'photos'])
 class UserProfilePhotos(_UserProfilePhotosBase):
+    """This object represent a user's profile pictures.
+
+    Attributes:
+        total_count (int): Total number of profile pictures the target user has
+        photos      (list of list of PhotoSize): Requested profile pictures (in up to 4 sizes each)
+
+    """
     __slots__ = ()
 
     @staticmethod
@@ -506,24 +532,6 @@ class InputFile(_InputFileBase):
     __slots__ = ()
 
 
-_UpdateBase = namedtuple('Update', ['update_id', 'message'])
-class Update(_UpdateBase):
-    __slots__ = ()
-
-    @staticmethod
-    def from_dict(message_update):
-        if message_update is None:
-            return None
-
-        return Update(message_update.get('update_id'), Message.from_result(message_update.get('message')))
-
-
-    @staticmethod
-    def from_result(result):
-        if result is None:
-            return None
-
-        return [Update.from_dict(message_update) for message_update in result]
 
 """
 Types added for utility pruposes
