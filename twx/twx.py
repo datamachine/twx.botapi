@@ -3,7 +3,6 @@ import botapi
 
 import mimetypes
 from datetime import datetime
-import hashlib
 from abc import ABCMeta, abstractmethod
 
 
@@ -193,6 +192,9 @@ class TWXBotApi(TWX):
                             reply_to_message_id=reply, callback=callback, reply_markup=reply_markup,
                             request_args=self.request_args)
 
+    def forward_message(self):
+        pass
+
     def send_photo(self, peer: Peer, photo: str, caption: str=None, reply: int=None, link_preview: bool=None,
                      callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
         """
@@ -214,6 +216,125 @@ class TWXBotApi(TWX):
         botapi.send_photo(chat_id=peer.id, photo=photo, caption=caption, disable_web_page_preview=not link_preview,
                           reply_to_message_id=reply, callback=callback, reply_markup=reply_markup,
                           request_args=self.request_args)
+
+    def send_audio(self, peer: Peer, audio: str, reply: int=None, link_preview: bool=None,
+                   callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
+        """
+        Send audio clip to peer.
+        :param peer: Peer to send message to.
+        :param audio: File path to audio to send.
+        :param reply: Message object or message_id to reply to.
+        :param link_preview: Whether or not to show the link preview for this message
+        :param callback: Callback to call when call is complete.
+
+        :type reply: int or Message
+        """
+        if isinstance(reply, Message):
+            reply = reply.id
+
+        audio = botapi.InputFile('audio', botapi.InputFileInfo(audio, open(audio, 'rb'), self._get_mimetype(audio)))
+
+        botapi.send_audio(chat_id=peer.id, audio=audio, disable_web_page_preview=not link_preview,
+                          reply_to_message_id=reply, callback=callback, reply_markup=reply_markup,
+                          request_args=self.request_args)
+
+    def send_document(self, peer: Peer, document: str, reply: int=None, link_preview: bool=None,
+                      callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
+        """
+        Send document to peer.
+        :param peer: Peer to send message to.
+        :param document: File path to document to send.
+        :param reply: Message object or message_id to reply to.
+        :param link_preview: Whether or not to show the link preview for this message
+        :param callback: Callback to call when call is complete.
+
+        :type reply: int or Message
+        """
+        if isinstance(reply, Message):
+            reply = reply.id
+
+        document = botapi.InputFile('document', botapi.InputFileInfo(document, open(document, 'rb'), self._get_mimetype(document)))
+
+        botapi.send_document(chat_id=peer.id, document=document, disable_web_page_preview=not link_preview,
+                             reply_to_message_id=reply, callback=callback, reply_markup=reply_markup,
+                             request_args=self.request_args)
+
+    def send_sticker(self, peer: Peer, sticker: str, reply: int=None, link_preview: bool=None,
+                     callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
+        """
+        Send sticker to peer.
+        :param peer: Peer to send message to.
+        :param sticker: File path to sticker to send.
+        :param reply: Message object or message_id to reply to.
+        :param link_preview: Whether or not to show the link preview for this message
+        :param callback: Callback to call when call is complete.
+
+        :type reply: int or Message
+        """
+        if isinstance(reply, Message):
+            reply = reply.id
+
+        sticker = botapi.InputFile('sticker', botapi.InputFileInfo(sticker, open(sticker, 'rb'), self._get_mimetype(sticker)))
+
+        botapi.send_sticker(chat_id=peer.id, sticker=sticker, disable_web_page_preview=not link_preview,
+                            reply_to_message_id=reply, callback=callback, reply_markup=reply_markup,
+                            request_args=self.request_args)
+        
+    def send_video(self, peer: Peer, video: str, reply: int=None, link_preview: bool=None,
+                   callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
+        """
+        Send video to peer.
+        :param peer: Peer to send message to.
+        :param video: File path to video to send.
+        :param reply: Message object or message_id to reply to.
+        :param link_preview: Whether or not to show the link preview for this message
+        :param callback: Callback to call when call is complete.
+
+        :type reply: int or Message
+        """
+        if isinstance(reply, Message):
+            reply = reply.id
+
+        video = botapi.InputFile('video', botapi.InputFileInfo(video, open(video, 'rb'), self._get_mimetype(video)))
+
+        botapi.send_video(chat_id=peer.id, video=video, disable_web_page_preview=not link_preview,
+                          reply_to_message_id=reply, callback=callback, reply_markup=reply_markup,
+                          request_args=self.request_args)
+
+    def send_location(self, peer: Peer, latitude: float, longitude: float, reply: int=None, link_preview: bool=None,
+                      callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
+        """
+        Send location to peer.
+        :param peer: Peer to send message to.
+        :param latitude: Latitude of the location.
+        :param longitude: Longitude of the location.
+        :param reply: Message object or message_id to reply to.
+        :param link_preview: Whether or not to show the link preview for this message
+        :param callback: Callback to call when call is complete.
+
+        :type reply: int or Message
+        """
+        if isinstance(reply, Message):
+            reply = reply.id
+
+        botapi.send_location(chat_id=peer.id, latitude=latitude, longitude=longitude,
+                             reply_to_message_id=reply, callback=callback, reply_markup=reply_markup,
+                             request_args=self.request_args)
+
+    def send_chat_action(self, peer: Peer, action: botapi.ChatAction, callback: callable=None):
+        """
+        Send status to peer.
+        :param peer: Peer to send status to.
+        :param action: Type of action to send to peer.
+        :param callback: Callback to call when call is complete.
+
+        """
+        botapi.send_chat_action(chat_id=peer.id, action=action, callback=callback, request_args=self.request_args)
+
+    def get_user_profile_photos(self, peer: Peer, reply: int=None, link_preview: bool=None,
+                                callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
+        pass
+
 
     def get_contact_list(self, callback=None):
         """
