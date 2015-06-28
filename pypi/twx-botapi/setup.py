@@ -33,7 +33,7 @@ setup(
     packages = ['twx.botapi'],
     version = version,
     description = 'Unofficial Telegram Bot API Client',
-    long_description = open("README.rst").read(),
+    long_description = open("../../README.rst").read(),
     author = 'Vince Castellano, Phillip Lopo',
     author_email = 'surye80@gmail.com, philliplopo@gmail.com',
     keywords = ['datamachine', 'telex', 'telegram', 'bot', 'api', 'rpc'],
