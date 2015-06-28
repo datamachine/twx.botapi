@@ -289,7 +289,7 @@ class Contact(_ContactBase):
         first_name      (str)  :Contact's first name
         last_name       (str)  :*Optional.* Contact's last name
         user_id         (str)  :*Optional.* Contact's user identifier in Telegram
-        
+
     """
     __slots__ = ()
 
@@ -307,6 +307,13 @@ class Contact(_ContactBase):
 
 _LocationBase = namedtuple('Location', ['longitude', 'latitude'])
 class Location(_LocationBase):
+    """This object represents a point on the map.
+
+    Attributes:
+        longitude   (float)   :Longitude as defined by sender
+        latitude    (float)   :Latitude as defined by sender
+        
+    """
     __slots__ = ()
 
     @staticmethod
