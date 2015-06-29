@@ -539,6 +539,9 @@ class TWXBotApi(TWX):
             request_method=botapi.RequestMethod.POST
         )
 
+        self.update_bot_info()
+
+
     def start(self):
         """
         Starts the long polling update loop.
@@ -557,7 +560,7 @@ class TWXBotApi(TWX):
         return self._bot_user.id
 
     def update_bot_info(self):
-        self._bot_user = botapi.get_me(request_args=self.request_args)
+        self._bot_user = botapi.get_me(**self.request_args).run().wait()
 
     def send_message(self, peer: Peer, text: str, reply: int=None, link_preview: bool=None,
                      callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
