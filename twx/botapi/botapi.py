@@ -698,7 +698,7 @@ def get_me(**kwargs):
     A simple method for testing your bot's auth token. Requires no parameters. 
     Returns basic information about the bot in form of a User object.
 
-    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :returns: Returns basic information about the bot in form of a User object.
     :rtype: User
@@ -718,7 +718,7 @@ def send_message(chat_id, text,
     :param reply_markup: Additional interface options. A JSON-serialized object for a 
                          custom reply keyboard, instructions to hide keyboard or to 
                          force a reply from the user.
-    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type text: str
@@ -752,7 +752,7 @@ def forward_message(chat_id, from_chat_id, message_id,
     :param from_chat_id: Unique identifier for the chat where the original message was sent — User or 
                          GroupChat id
     :param message_id: Unique message identifier
-    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type from_chat_id: int
@@ -786,7 +786,7 @@ def send_photo(chat_id,  photo,
     :param reply_markup: Additional interface options. A JSON-serialized object for a 
                          custom reply keyboard, instructions to hide keyboard or to 
                          force a reply from the user.
-    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type photo: InputFile or str
@@ -836,7 +836,7 @@ def send_audio(chat_id, audio,
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard, 
                          instructions to hide keyboard or to force a reply from the user.
-    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type audio: InputFile or str
@@ -883,7 +883,7 @@ def send_document(chat_id, document,
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
                          instructions to hide keyboard or to force a reply from the user.
-    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type document: InputFile or str
@@ -926,7 +926,7 @@ def send_sticker(chat_id, sticker,
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
                          instructions to hide keyboard or to force a reply from the user.
-    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type sticker: InputFile or str
@@ -973,7 +973,7 @@ def send_video(chat_id, video,
     :param reply_markup: Additional interface options. A JSON-serialized object for a
                          custom reply keyboard, instructions to hide keyboard or to
                          force a reply from the user.
-    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type video: InputFile or str
@@ -1019,7 +1019,7 @@ def send_location(chat_id, latitude, longitude,
     :param reply_markup: Additional interface options. A JSON-serialized object for a
                          custom reply keyboard, instructions to hide keyboard or to
                          force a reply from the user.
-    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type latitude: float
@@ -1075,7 +1075,7 @@ def send_chat_action(chat_id, action,
                    typing for text messages, upload_photo for photos, record_video or upload_video for videos,
                    record_audio or upload_audio for audio files, upload_document for general files,
                    find_location for location data.
-    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type action: ChatAction
@@ -1100,7 +1100,7 @@ def get_user_profile_photos(user_id,
     :param user_id: Unique identifier of the target user
     :param offset: Sequential number of the first photo to be returned. By default, all photos are returned.
     :param limit: Limits the number of photos to be retrieved. Values between 1—100 are accepted. Defaults to 100.
-    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type user_id: int
     :type offset: int
@@ -1143,7 +1143,7 @@ def get_updates(offset=None, limit=None, timeout=None,
                   1—100 are accepted. Defaults to 100
     :param timeout: Timeout in seconds for long polling. Defaults to 0, i.e.
                     usual short polling
-    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type offset: int
     :type limit: int
@@ -1171,7 +1171,7 @@ def set_webhook(url=None, **kwargs):
     webhook is set up.
 
     :param url: HTTPS url to send updates to. Use an empty string to remove webhook integration
-    :param **kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type url: str
 
