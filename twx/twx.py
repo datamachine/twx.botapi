@@ -511,8 +511,8 @@ class TWXBotApi(TWX):
 
         def run(self):
             while True:
-                botapi.get_updates(offset=self.update_offset, timeout=300, request_args=self.twx.request_args,
-                                   callback=self.new_updates).wait()
+                botapi.get_updates(offset=self.update_offset, timeout=300,
+                                   callback=self.new_updates, **self.twx.request_args).wait()
 
         def new_updates(self, updates):
             for update in updates:
@@ -560,10 +560,9 @@ class TWXBotApi(TWX):
         if isinstance(reply, Message):
             reply = reply.id
 
-        response = botapi.send_message(chat_id=peer.id, text=text, disable_web_page_preview=not link_preview,
+        botapi.send_message(chat_id=peer.id, text=text, disable_web_page_preview=not link_preview,
                             reply_to_message_id=reply, callback=callback, reply_markup=reply_markup,
                             **self.request_args).run()
-        print(response)
 
     def forward_message(self, peer: Peer, message: Message, callback: callable=None):
         """
@@ -575,7 +574,7 @@ class TWXBotApi(TWX):
 
         :returns: On success, the sent Message is returned.
         """
-        botapi.forward_message(peer.id, message.sender.id, message.id, **self.request_args)
+        botapi.forward_message(peer.id, message.sender.id, message.id, **self.request_args).run()
 
     def send_photo(self, peer: Peer, photo: str, caption: str=None, reply: int=None, callback: callable=None,
                    reply_markup: botapi.ReplyMarkup=None):
@@ -595,7 +594,7 @@ class TWXBotApi(TWX):
         photo = botapi.InputFile('photo', botapi.InputFileInfo(photo, open(photo, 'rb'), get_mimetype(photo)))
 
         botapi.send_photo(chat_id=peer.id, photo=photo, caption=caption, reply_to_message_id=reply, callback=callback,
-                          reply_markup=reply_markup, **self.request_args)
+                          reply_markup=reply_markup, **self.request_args).run()
 
     def send_audio(self, peer: Peer, audio: str, reply: int=None, callback: callable=None,
                    reply_markup: botapi.ReplyMarkup=None):
@@ -614,7 +613,7 @@ class TWXBotApi(TWX):
         audio = botapi.InputFile('audio', botapi.InputFileInfo(audio, open(audio, 'rb'), get_mimetype(audio)))
 
         botapi.send_audio(chat_id=peer.id, audio=audio, reply_to_message_id=reply, callback=callback,
-                          reply_markup=reply_markup, **self.request_args)
+                          reply_markup=reply_markup, **self.request_args).run()
 
     def send_document(self, peer: Peer, document: str, reply: int=None, callback: callable=None,
                       reply_markup: botapi.ReplyMarkup=None):
@@ -634,7 +633,7 @@ class TWXBotApi(TWX):
                                                                      get_mimetype(document)))
 
         botapi.send_document(chat_id=peer.id, document=document, reply_to_message_id=reply, callback=callback,
-                             reply_markup=reply_markup, **self.request_args)
+                             reply_markup=reply_markup, **self.request_args).run()
 
     def send_sticker(self, peer: Peer, sticker: str, reply: int=None, callback: callable=None,
                      reply_markup: botapi.ReplyMarkup=None):
@@ -654,7 +653,7 @@ class TWXBotApi(TWX):
                                                                    get_mimetype(sticker)))
 
         botapi.send_sticker(chat_id=peer.id, sticker=sticker, reply_to_message_id=reply, callback=callback,
-                            reply_markup=reply_markup, **self.request_args)
+                            reply_markup=reply_markup, **self.request_args).run()
         
     def send_video(self, peer: Peer, video: str, reply: int=None,
                    callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
@@ -674,7 +673,7 @@ class TWXBotApi(TWX):
                                                                get_mimetype(video)))
 
         botapi.send_video(chat_id=peer.id, video=video, reply_to_message_id=reply, callback=callback,
-                          reply_markup=reply_markup, **self.request_args)
+                          reply_markup=reply_markup, **self.request_args).run()
 
     def send_location(self, peer: Peer, latitude: float, longitude: float, reply: int=None,
                       callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
@@ -693,7 +692,7 @@ class TWXBotApi(TWX):
 
         botapi.send_location(chat_id=peer.id, latitude=latitude, longitude=longitude,
                              reply_to_message_id=reply, callback=callback, reply_markup=reply_markup,
-                             **self.request_args)
+                             **self.request_args).run()
 
     def send_chat_action(self, peer: Peer, action: botapi.ChatAction, callback: callable=None):
         """
@@ -703,7 +702,7 @@ class TWXBotApi(TWX):
         :param callback: Callback to call when call is complete.
 
         """
-        botapi.send_chat_action(chat_id=peer.id, action=action, callback=callback, **self.request_args)
+        botapi.send_chat_action(chat_id=peer.id, action=action, callback=callback, **self.request_args).run()
 
     def get_user_profile_photos(self, user: User, callback: callable, offset: int=None, limit: int=None):
         # """
@@ -715,7 +714,7 @@ class TWXBotApi(TWX):
         # """
 
         botapi.get_user_profile_photos(user_id=user.id, callback=callback, offset=offset, limit=limit,
-                                       **self.request_args)
+                                       **self.request_args).run()
 
     # region Unsupported in botapi
     def get_contact_list(self, callback=None):
