@@ -212,6 +212,7 @@ class Peer:
 class Group(Peer):
     def __init__(self, twx, peer_id: int):
         super().__init__(twx, peer_id, PeerType.GROUP)
+        self.type_name = 'chat'
         self.title = None
 
     def rename_chat(self, name):
@@ -227,6 +228,7 @@ class Group(Peer):
 class User(Peer):
     def __init__(self, twx, peer_id: int):
         super().__init__(twx, peer_id, PeerType.USER)
+        self.type_name = 'user'
         self.user_status = {'online': None, 'when': None}
         self.phone = None
         self.first_name = None
