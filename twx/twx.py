@@ -548,7 +548,11 @@ class TWXBotApi(TWX):
         self.update_loop.start()
 
     def process_update(self, update: botapi.Update):
-        print(update)
+        try:
+            print(update)
+        except Exception:
+            import sys
+            print(update.__str__().encode().decode(sys.stdout.encoding))
         msg = update.message
         if any([msg.text, msg.audio, msg.document, msg.photo, msg.video, msg.sticker, msg.location, msg.contact]):
             self._on_msg_receive(msg=self._to_twx_msg(msg))
