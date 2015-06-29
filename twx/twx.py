@@ -541,13 +541,11 @@ class TWXBotApi(TWX):
 
         self.update_bot_info()
 
-
     def start(self):
         """
         Starts the long polling update loop.
         """
         self.update_loop.start()
-
 
     def process_update(self, update: botapi.Update):
         print(update)
@@ -792,7 +790,8 @@ class TWXBotApi(TWX):
     def _to_twx_msg(self, msg: botapi.Message):
         twx_msg = Message()
         twx_msg.id = msg.message_id
-        twx_msg.mention = self._bot_user.username and '@{}'.format(self._bot_user.username.lower()) in msg.text.lower()
+        twx_msg.mention = self._bot_user.username and msg.text and \
+                          '@{}'.format(self._bot_user.username.lower()) in msg.text.lower()
         twx_msg.out = False  # BotApi will never include it's own messages.
         twx_msg.unread = False  # BotApi has no read/unread
         twx_msg.service = any([msg.new_chat_participant, msg.left_chat_participant, msg.new_chat_title,
