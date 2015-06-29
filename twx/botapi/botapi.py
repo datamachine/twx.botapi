@@ -117,7 +117,7 @@ class Message(_MessageBase):
         # photo is a list of PhotoSize
         photo = result.get('photo')
         if photo is not None:
-            photo = [PhotoSize.from_result(photo_size) for photo_size in result.get('photo')]
+            photo = [PhotoSize.from_result(photo_size) for photo_size in photo]
 
         return Message(
             message_id=result.get('message_id'), 
