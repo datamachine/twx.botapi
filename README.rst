@@ -27,47 +27,43 @@ For dev:
 Quick Start
 ===========
 
-Setup the bot
--------------
 
 ::
+
+    from twx.botapi import TelegramBot, ReplyKeyboardMarkup
     
-    from twx.botapi import TelegramBot
+    """
+    Setup the bot
+    """
     
     bot = TelegramBot('<API TOKEN>')
     bot.update_bot_info().wait()
-
     print(bot.username)
 
-Send a message
---------------
+    """
+    Send a message to a user
+    """
+    user_id = int(<someuserid>)
 
-::
-    
-    result = bot.send_message(int('userid'), 'test message body').wait()
+    result = bot.send_message(user_id, 'test message body').wait()
     print(result)
 
-Get messages sent to the bot
-----------------------------
-
-::
-
+    """
+    Get updates sent to the bot
+    """
     updates = bot.get_updates().wait()
     for update in updates:
         print(update)
 
-Use a custom keyboard
-
-::
-
+    """
+    Use a custom keyboard
+    """
     keyboard = [
         ['7', '8', '9'],
         ['4', '5', '6'],
         ['1', '2', '3'],
              ['0']
     ]
-
     reply_markup = ReplyKeyboardMarkup.create(keyboard)
 
     bot.send_message(user_id, 'please enter a number', reply_markup=reply_markup).wait()
-
