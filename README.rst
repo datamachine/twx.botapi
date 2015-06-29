@@ -1,12 +1,12 @@
-#######################################
-TWX: Unofficial Telegram Bot API Client
-#######################################
+##############################################
+twx.botapi: Unofficial Telegram Bot API Client
+##############################################
 
 :contributions: Please join https://github.com/datamachine/twx
 :issues: Please use https://github.com/datamachine/twx/issues
-:Python version supported: 3.4
+:Python version supported: 2.7, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5b
 
-**TWX** is a python interface for the Telegram bot API. It supports
+**twx.botapi** is a python interface for the Telegram bot API. It supports
 making synchronous and asynchronous calls and converts the response
 into a usable native python object.
 
@@ -18,11 +18,11 @@ Install
 
 For stable:
 
-``pip install twx``
+``pip install twx.botapi``
 
 For dev:
 
-``pip install -i https://testpypi.python.org/pypi twx``
+``pip install -i https://testpypi.python.org/pypi twx.botapi``
 
 ===========
 Quick Start
