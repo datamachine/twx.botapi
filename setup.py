@@ -5,11 +5,11 @@ import sys
 revision = None
 
 # must match PEP 440
-_MAJOR_VERSION         = 0
-_MINOR_VERSION         = 5
+_MAJOR_VERSION         = 1
+_MINOR_VERSION         = 0
 _MICRO_VERSION         = None
-_PRE_RELEASE_TYPE      = 'a'   # a | b | rc
-_PRE_RELEASE_VERSION   = 4
+_PRE_RELEASE_TYPE      = 'b'   # a | b | rc
+_PRE_RELEASE_VERSION   = 7
 _DEV_RELEASE_VERSION   = None
 
 version = '{}.{}'.format(_MAJOR_VERSION, _MINOR_VERSION)
@@ -27,30 +27,40 @@ if _DEV_RELEASE_VERSION is not None:
     download_url = 'https://github.com/datamachine/twx/archive/{}.tar.gz'.format(revision)
 else:
     revision = version
-    download_url = 'https://github.com/datamachine/twx/archive/twx-{}.tar.gz'.format(revision)
+    download_url = 'https://github.com/datamachine/twx/archive/botapi-{}.tar.gz'.format(revision)
 
 print(version)
 print(download_url)
 
+requirements = ['requests']
+if sys.version_info.major < 3 or sys.version_info.minor < 4:
+  requirements.append('enum34')
+
+print(requirements)
+
 setup(
-    name = 'twx',
+    name = 'twx-botapi',
     packages = ['twx', 'twx.botapi'],
     version = version,
-    description = 'Telegram Bot API and MTProto Client and Abstraction Layer',
+    description = 'Unofficial Telegram Bot API Client',
     long_description = open("README.rst").read(),
     author = 'Vince Castellano, Phillip Lopo',
     author_email = 'surye80@gmail.com, philliplopo@gmail.com',
     keywords = ['datamachine', 'telex', 'telegram', 'bot', 'api', 'rpc'],
     url = 'https://github.com/datamachine/twx', 
     download_url = download_url, 
-    install_requires=['requests'],
+    install_requires=requirements,
     platforms = ['Linux', 'Unix', 'MacOsX', 'Windows'],
     classifiers = [
       'Development Status :: 4 - Beta',
       'Intended Audience :: Developers',
       'License :: OSI Approved :: MIT License',
       'Operating System :: OS Independent',
-      'Programming Language :: Python :: 3 :: Only',
+      'Programming Language :: Python :: 2.7',
+      'Programming Language :: Python :: 3.0',
+      'Programming Language :: Python :: 3.1',
+      'Programming Language :: Python :: 3.2',
+      'Programming Language :: Python :: 3.3',
       'Programming Language :: Python :: 3.4',
       'Topic :: Communications :: Chat',
       'Topic :: Communications :: File Sharing'
