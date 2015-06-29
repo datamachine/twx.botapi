@@ -585,7 +585,7 @@ class RequestMethod(str, Enum):
 class TelegramBotRPCRequest:
     api_url_base = 'https://api.telegram.org/bot'
 
-    def __init__(self, api_method, token, params=None, on_result=None, callback=None, 
+    def __init__(self, api_method, token, params=None, on_result=None, on_success=None, callback=None, 
                  on_error=None, files=None, request_method=RequestMethod.POST):
         """
         :param api_method: The API method to call. See https://core.telegram.org/bots/api#available-methods
@@ -602,11 +602,18 @@ class TelegramBotRPCRequest:
         if reply_markup is not None:
             params['reply_markup'] = reply_markup.serialize()
 
+        if callback != None:
+            print('WARNING: callback is deprecated in favor of on_success')
+            if on_success:
+                print('WARNING: callback parameter will be ignored, on_success will be used instead')
+            else:
+                on_success = callback
+
         self.api_method = api_method
         self.token = token
         self.params = params
         self.on_result = on_result
-        self.callback = callback
+        self.on_success = on_success
         self.on_error = on_error
         self.files = files
         self.request_method = RequestMethod(request_method)
@@ -646,8 +653,8 @@ class TelegramBotRPCRequest:
             else:
                 self.result = self.on_result(result)
 
-            if self.callback is not None:
-                self.callback(self.result)
+            if self.on_success is not None:
+                self.on_success(self.result)
         else:
             self.error = Error.from_result(api_response)
             if self.on_error:
