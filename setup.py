@@ -8,9 +8,9 @@ revision = None
 _MAJOR_VERSION         = 1
 _MINOR_VERSION         = 0
 _MICRO_VERSION         = None
-_PRE_RELEASE_TYPE      = 'b'   # a | b | rc
-_PRE_RELEASE_VERSION   = 7
-_DEV_RELEASE_VERSION   = 1
+_PRE_RELEASE_TYPE      = 'rc'   # a | b | rc
+_PRE_RELEASE_VERSION   = 1
+_DEV_RELEASE_VERSION   = None
 
 version = '{}.{}'.format(_MAJOR_VERSION, _MINOR_VERSION)
 revision = None
@@ -33,6 +33,7 @@ print(version)
 print(download_url)
 
 requirements = ['requests']
+
 if sys.version_info.major < 3 or sys.version_info.minor < 4:
   requirements.append('enum34')
 
