@@ -66,7 +66,7 @@ Update
 InputFile
 ^^^^^^^^^
 
-.. autoclass:: InputFile
+.. autoclass:
 
 UserProfilePhotos
 ^^^^^^^^^^^^^^^^^
@@ -76,7 +76,7 @@ UserProfilePhotos
 ReplyKeyboardMarkup
 ^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: ReplyKeyboardMarkup
+.. autoclass:
 
 ReplyKeyboardHide
 ^^^^^^^^^^^^^^^^^
@@ -108,7 +108,7 @@ get_me
 send_message
 ^^^^^^^^^^^^
 
-.. autofunction:: send_message(chat_id: int, text: str, disable_web_page_preview: bool=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, *, request_args=None, **kwargs)
+.. autofunction:: send_message(chat_id, text, disable_web_page_preview=None, reply_to_message_id=None, reply_markup, *, request_args=None, **kwargs)
 
 forward_message
 ^^^^^^^^^^^^^^^
@@ -118,49 +118,49 @@ forward_message
 send_photo
 ^^^^^^^^^^
 
-.. autofunction:: send_photo(chat_id: int,  photo: InputFile, caption: str=None, reply_to_message_id: int=None, reply_markup: ReplyMarkup=None, *, request_args=None, **kwargs) -> TelegramBotRPCRequest
+.. autofunction:: send_photo(chat_id,  photo, caption=None, reply_to_message_id=None, reply_markup, *, request_args=None, **kwargs)
 
 send_audio
 ^^^^^^^^^^
 
-.. autofunction:: send_audio(chat_id: int, audio: InputFile, reply_to_message_id: int=None, reply_markup: ReplyKeyboardMarkup=None, *, request_args=None, **kwargs) -> TelegramBotRPCRequest
+.. autofunction:: send_audio(chat_id, audio, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
 
 send_document
 ^^^^^^^^^^^^^
 
-.. autofunction:: send_document(chat_id: int, document: InputFile, reply_to_message_id: int=None, reply_markup: ReplyKeyboardMarkup=None, *, request_args=None, **kwargs) -> TelegramBotRPCRequest
+.. autofunction:: send_document(chat_id, document, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
 
 send_sticker
 ^^^^^^^^^^^^
 
-.. autofunction:: send_sticker(chat_id: int, sticker: InputFile, reply_to_message_id: int=None, reply_markup: ReplyKeyboardMarkup=None, *, request_args=None, **kwargs) -> TelegramBotRPCRequest
+.. autofunction:: send_sticker(chat_id, sticker, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
 
 send_video
 ^^^^^^^^^^
 
-.. autofunction:: send_video(chat_id: int, video: InputFile, reply_to_message_id: int=None, reply_markup: ReplyKeyboardMarkup=None, *, request_args=None, **kwargs) -> TelegramBotRPCRequest
+.. autofunction:: send_video(chat_id, video, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
 
 send_location
 ^^^^^^^^^^^^^
 
-.. autofunction:: send_location(chat_id: int, latitude: float, longitude: float, reply_to_message_id: int=None, reply_markup: ReplyKeyboardMarkup=None, *, request_args=None, **kwargs) -> TelegramBotRPCRequest
+.. autofunction:: send_location(chat_id, latitude, longitude, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
 
 send_chat_action
 ^^^^^^^^^^^^^^^^
 
-.. autofunction:: send_chat_action(chat_id: int, action: ChatAction, *, request_args=None, **kwargs) -> TelegramBotRPCRequest
+.. autofunction:: send_chat_action(chat_id, action, *, request_args=None, **kwargs)
 
 get_user_profile_photos
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autofunction:: get_user_profile_photos(user_id: int, offset: int=None, limit: int=None, *, request_args: dict=None, **kwargs)
+.. autofunction:: get_user_profile_photos(user_id, offset=None, limit=None, *, request_args=None, **kwargs)
 
 get_updates
 ^^^^^^^^^^^
 
-.. autofunction:: get_updates(offset: int=None, limit: int=None, timeout: int=None, *, request_args, **kwargs)
+.. autofunction:: get_updates(offset=None, limit=None, timeout=None, *, request_args, **kwargs)
 
 set_webhook
 ^^^^^^^^^^^
 
-.. autofunction:: set_webhook(url: str=None, *, request_args=None, **kwargs) -> TelegramBotRPCRequest
+.. autofunction:: set_webhook(url=None, *, request_args=None, **kwargs)
