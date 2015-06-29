@@ -414,8 +414,12 @@ class UserProfilePhotos(_UserProfilePhotosBase):
             )
 
 class ReplyMarkup:
-    """Abstract base to represent all valid inputs to reply_markup parameter in various API methods"""
+    __metaclass__ = ABCMeta
     __slots__ = ()
+
+    @abstractmethod
+    def serialize(self):
+        raise NotImplementedError("")
 
 _ReplyKeyboardMarkupBase = namedtuple('ReplyKeyboardMarkup',
     ['keyboard', 'resize_keyboard', 'one_time_keyboard', 'selective'])
