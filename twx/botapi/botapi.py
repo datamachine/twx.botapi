@@ -557,7 +557,7 @@ class ForceReply(_ForceReplyBase, ReplyMarkup):
 
 
 """
-Types added for utility pruposes
+Types added for utility purposes
 """
 _ErrorBase = namedtuple('Error', ['error_code', 'description'])
 class Error(_ErrorBase):

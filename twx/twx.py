@@ -244,6 +244,13 @@ class TWX(metaclass=ABCMeta):
         self._on_chat_update = None
         self._on_secret_chat_update = None
 
+    @abstractmethod
+    def start(self):
+        """
+        Starts the client's main loop.
+        """
+        pass
+
     @property
     @abstractmethod
     def bot_id(self):
@@ -512,7 +519,7 @@ class TWXBotApi(TWX):
         def run(self):
             while True:
                 botapi.get_updates(offset=self.update_offset, timeout=300,
-                                   callback=self.new_updates, **self.twx.request_args).wait()
+                                   callback=self.new_updates, **self.twx.request_args).run().wait()
 
         def new_updates(self, updates):
             for update in updates:
@@ -529,8 +536,13 @@ class TWXBotApi(TWX):
             token=token,
             request_method=botapi.RequestMethod.POST
         )
-        
+
+    def start(self):
+        """
+        Starts the long polling update loop.
+        """
         self.update_loop.start()
+
 
     def process_update(self, update: botapi.Update):
         print(update)
