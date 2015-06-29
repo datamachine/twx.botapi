@@ -419,7 +419,7 @@ class ReplyMarkup(metaclass=ABCMeta):
 
     @abstractmethod
     def serialize(self):
-        raise NotImplements
+        raise NotImplemented
 
 _ReplyKeyboardMarkupBase = namedtuple('ReplyKeyboardMarkup', 
     ['keyboard', 'resize_keyboard', 'one_time_keyboard', 'selective'])
