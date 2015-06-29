@@ -1,6 +1,6 @@
 from enum import Enum
 from threading import Thread
-from . botapi import botapi
+from . import botapi
 
 import mimetypes
 from datetime import datetime
