@@ -34,22 +34,22 @@ class Message:
     def dest(self):
         return self.receiver
 
-    def load_photo(self, callback):
+    def load_photo(self, on_success):
         raise NotImplementedError()
 
-    def load_video(self, callback):
+    def load_video(self, on_success):
         raise NotImplementedError()
 
-    def load_video_thumb(self, callback):
+    def load_video_thumb(self, on_success):
         raise NotImplementedError()
 
-    def load_audio(self, callback):
+    def load_audio(self, on_success):
         raise NotImplementedError()
 
-    def load_document(self, callback):
+    def load_document(self, on_success):
         raise NotImplementedError()
 
-    def load_document_thumb(self, callback):
+    def load_document_thumb(self, on_success):
         raise NotImplementedError()
 
     def delete_msg(self):
@@ -76,25 +76,25 @@ class Peer:
         self.name = None
 
     def send_message(self, text: str, reply: int=None, link_preview: bool=None,
-                     callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
+                     on_success: callable=None, reply_markup: botapi.ReplyMarkup=None):
         """
         Send message to this peer.
         :param text: Text to send.
         :param reply: Message object or message_id to reply to.
         :param link_preview: Whether or not to show the link preview for this message
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
-        self.twx.send_message(self, text=text, reply=reply, link_preview=link_preview, callback=callback,
+        self.twx.send_message(self, text=text, reply=reply, link_preview=link_preview, on_success=on_success,
                               reply_markup=reply_markup)
 
-    def message_search(self, text: str, callback: callable, min_date: datetime=None, max_date: datetime=None,
+    def message_search(self, text: str, on_success: callable, min_date: datetime=None, max_date: datetime=None,
                        max_id: int=None, offset: int=0, limit: int=255):
-        self.twx.message_search(text, callback, self, min_date=min_date, max_date=max_date,
+        self.twx.message_search(text, on_success, self, min_date=min_date, max_date=max_date,
                                 max_id=max_id, offset=offset, limit=limit)
 
-    def get_history(self, callback, offset=0, limit=255):
+    def get_history(self, on_success, offset=0, limit=255):
         raise NotImplemented()
 
     def send_typing(self):
@@ -103,99 +103,99 @@ class Peer:
     def send_typing_abort(self):
         pass
 
-    def forward_message(self, message: Message=None, callback: callable=None):
+    def forward_message(self, message: Message=None, on_success: callable=None):
         """
         Forward message to this peer.
         :param message: Message to forward to peer.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
         :return:
         """
-        self.twx.forward_message(self, message, callback=callback)
+        self.twx.forward_message(self, message, on_success=on_success)
 
-    def send_photo(self, photo: str, caption: str=None, reply: Message=None, callback: callable=None,
+    def send_photo(self, photo: str, caption: str=None, reply: Message=None, on_success: callable=None,
                    reply_markup: botapi.ReplyMarkup=None):
         """
         Send photo to this peer.
         :param photo: File path to photo to send.
         :param caption: Caption for photo
         :param reply: Message object or message_id to reply to.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
         self.twx.send_photo(peer=self, photo=photo, caption=caption, reply=reply, reply_markup=reply_markup,
-                            callback=callback)
+                            on_success=on_success)
 
-    def send_audio(self, audio: str, reply: Message=None, callback: callable=None,
+    def send_audio(self, audio: str, reply: Message=None, on_success: callable=None,
                    reply_markup: botapi.ReplyMarkup=None):
         """
         Send audio clip to this peer.
         :param audio: File path to audio to send.
         :param reply: Message object or message_id to reply to.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
 
-        self.twx.send_audio(peer=self, audio=audio, reply_to_message_id=reply, callback=callback,
+        self.twx.send_audio(peer=self, audio=audio, reply_to_message_id=reply, on_success=on_success,
                             reply_markup=reply_markup)
 
-    def send_document(self, document: str, reply: Message=None, callback: callable=None,
+    def send_document(self, document: str, reply: Message=None, on_success: callable=None,
                       reply_markup: botapi.ReplyMarkup=None):
         """
         Send document to this peer.
         :param document: File path to document to send.
         :param reply: Message object or message_id to reply to.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
 
-        self.twx.send_document(peer=self, document=document, reply_to_message_id=reply, callback=callback,
+        self.twx.send_document(peer=self, document=document, reply_to_message_id=reply, on_success=on_success,
                                reply_markup=reply_markup)
 
-    def send_sticker(self, sticker: str, reply: Message=None, callback: callable=None,
+    def send_sticker(self, sticker: str, reply: Message=None, on_success: callable=None,
                      reply_markup: botapi.ReplyMarkup=None):
         """
         Send sticker to this peer.
         :param sticker: File path to sticker to send.
         :param reply: Message object.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
 
-        self.twx.send_sticker(peer=self, sticker=sticker, reply_to_message_id=reply, callback=callback,
+        self.twx.send_sticker(peer=self, sticker=sticker, reply_to_message_id=reply, on_success=on_success,
                               reply_markup=reply_markup)
 
     def send_video(self, video: str, reply: Message=None,
-                   callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
+                   on_success: callable=None, reply_markup: botapi.ReplyMarkup=None):
         """
         Send video to this peer.
         :param video: File path to video to send.
         :param reply: Message object.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
 
-        self.twx.send_video(peer=self, video=video, reply_to_message_id=reply, callback=callback,
+        self.twx.send_video(peer=self, video=video, reply_to_message_id=reply, on_success=on_success,
                             reply_markup=reply_markup)
 
     def send_location(self, latitude: float, longitude: float, reply: Message=None,
-                      callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
+                      on_success: callable=None, reply_markup: botapi.ReplyMarkup=None):
         """
         Send location to this peer.
         :param latitude: Latitude of the location.
         :param longitude: Longitude of the location.
         :param reply: Message object.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
 
         self.twx.send_location(peer=self, latitude=latitude, longitude=longitude,
-                               reply_to_message_id=reply, callback=callback, reply_markup=reply_markup)
+                               reply_to_message_id=reply, on_success=on_success, reply_markup=reply_markup)
 
     def mark_read(self):
         pass
@@ -218,10 +218,10 @@ class Group(Peer):
     def rename_chat(self, name):
         raise NotImplementedError()
 
-    def add_user(self, user, callback=None):
+    def add_user(self, user, on_success=None):
         raise NotImplementedError()
 
-    def remove_user(self, user, callback=None):
+    def remove_user(self, user, on_success=None):
         raise NotImplementedError()
 
 
@@ -266,42 +266,42 @@ class TWX(metaclass=ABCMeta):
         return self._on_msg_receive(msg)
 
     @on_msg_receive.setter
-    def on_msg_receive(self, callback: callable):
-        self._on_msg_receive = callback
+    def on_msg_receive(self, on_success: callable):
+        self._on_msg_receive = on_success
 
     @property
     def on_user_update(self) -> callable:
         return self._on_user_update
 
     @on_user_update.setter
-    def on_user_update(self, callback):
-        self._on_user_update = callback
+    def on_user_update(self, on_success):
+        self._on_user_update = on_success
 
     @property
     def on_chat_update(self) -> callable:
         return self._on_chat_update
 
     @on_chat_update.setter
-    def on_chat_update(self, callback):
-        self._on_chat_update = callback
+    def on_chat_update(self, on_success):
+        self._on_chat_update = on_success
 
     @property
     def on_secret_chat_update(self) -> callable:
         return self._on_secret_chat_update
 
     @on_secret_chat_update.setter
-    def on_secret_chat_update(self, callback):
-        self._on_secret_chat_update = callback
+    def on_secret_chat_update(self, on_success):
+        self._on_secret_chat_update = on_success
 
     @abstractmethod
-    def send_message(self, peer: Peer, text: str, reply: int=None, link_preview: bool=None, callback: callable=None):
+    def send_message(self, peer: Peer, text: str, reply: int=None, link_preview: bool=None, on_success: callable=None):
         """
         Send message to peer.
         :param peer: Peer to send message to.
         :param text: Text to send.
         :param reply: Message object or message_id to reply to.
         :param link_preview: Whether or not to show the link preview for this message
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
         """
         pass
 
@@ -318,7 +318,7 @@ class TWX(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def send_photo(self, peer: Peer, photo: str, caption: str=None, reply: int=None, callback: callable=None,
+    def send_photo(self, peer: Peer, photo: str, caption: str=None, reply: int=None, on_success: callable=None,
                    reply_markup: botapi.ReplyMarkup=None):
         """
         Send photo to peer.
@@ -326,70 +326,70 @@ class TWX(metaclass=ABCMeta):
         :param photo: File path to photo to send.
         :param caption: Caption for photo
         :param reply: Message object or message_id to reply to.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
         pass
 
     @abstractmethod
-    def send_audio(self, peer: Peer, audio: str, reply: int=None, callback: callable=None,
+    def send_audio(self, peer: Peer, audio: str, reply: int=None, on_success: callable=None,
                    reply_markup: botapi.ReplyMarkup=None):
         """
         Send audio clip to peer.
         :param peer: Peer to send message to.
         :param audio: File path to audio to send.
         :param reply: Message object or message_id to reply to.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
         pass
 
     @abstractmethod
-    def send_document(self, peer: Peer, document: str, reply: int=None, callback: callable=None,
+    def send_document(self, peer: Peer, document: str, reply: int=None, on_success: callable=None,
                       reply_markup: botapi.ReplyMarkup=None):
         """
         Send document to peer.
         :param peer: Peer to send message to.
         :param document: File path to document to send.
         :param reply: Message object or message_id to reply to.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
         pass
 
     @abstractmethod
-    def send_sticker(self, peer: Peer, sticker: str, reply: int=None, callback: callable=None,
+    def send_sticker(self, peer: Peer, sticker: str, reply: int=None, on_success: callable=None,
                      reply_markup: botapi.ReplyMarkup=None):
         """
         Send sticker to peer.
         :param peer: Peer to send message to.
         :param sticker: File path to sticker to send.
         :param reply: Message object or message_id to reply to.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
         pass
 
     @abstractmethod
-    def send_video(self, peer: Peer, video: str, reply: int=None, callback: callable=None,
+    def send_video(self, peer: Peer, video: str, reply: int=None, on_success: callable=None,
                    reply_markup: botapi.ReplyMarkup=None):
         """
         Send video to peer.
         :param peer: Peer to send message to.
         :param video: File path to video to send.
         :param reply: Message object or message_id to reply to.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
         pass
 
     @abstractmethod
-    def send_location(self, peer: Peer, latitude: float, longitude: float, reply: int=None, callback: callable=None,
+    def send_location(self, peer: Peer, latitude: float, longitude: float, reply: int=None, on_success: callable=None,
                       reply_markup: botapi.ReplyMarkup=None):
         """
         Send location to peer.
@@ -397,64 +397,64 @@ class TWX(metaclass=ABCMeta):
         :param latitude: Latitude of the location.
         :param longitude: Longitude of the location.
         :param reply: Message object or message_id to reply to.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
         pass
 
     @abstractmethod
-    def send_chat_action(self, peer: Peer, action: botapi.ChatAction, callback: callable=None):
+    def send_chat_action(self, peer: Peer, action: botapi.ChatAction, on_success: callable=None):
         """
         Send status to peer.
         :param peer: Peer to send status to.
         :param action: Type of action to send to peer.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         """
         pass
 
     @abstractmethod
-    def get_user_profile_photos(self, peer: Peer, callback: callable, offset: int=None, limit: int=None):
+    def get_user_profile_photos(self, peer: Peer, on_success: callable, offset: int=None, limit: int=None):
         pass
 
     @abstractmethod
-    def get_contact_list(self, callback: callable=None):
+    def get_contact_list(self, on_success: callable=None):
         """
         Retrieve contact list.
-        :param callback: Callback to call when server returns of contacts. If not specified,
+        :param on_success: Callback to call when server returns of contacts. If not specified,
                          just load the local version
         """
         pass
 
     @abstractmethod
-    def add_contact(self, phone_number: str, first_name: str, last_name: str=None, callback: callable=None):
+    def add_contact(self, phone_number: str, first_name: str, last_name: str=None, on_success: callable=None):
         """
         Add contact by phone number and name (last_name is optional).
         :param phone: Valid phone number for contact.
         :param first_name: First name to use.
         :param last_name: Last name to use. Optional.
-        :param callback: Callback to call when adding, will contain success status and the current contact list.
+        :param on_success: Callback to call when adding, will contain success status and the current contact list.
         """
         pass
 
     @abstractmethod
-    def del_contact(self, peer: Peer, callback: callable=None):
+    def del_contact(self, peer: Peer, on_success: callable=None):
         """
         Delete peer from contact list
         :param peer: Peer to delete
-        :param callback: Callback to call when deleting, will contain success status and the current contact list.
+        :param on_success: Callback to call when deleting, will contain success status and the current contact list.
         """
         pass
 
     @abstractmethod
-    def message_search(self, text: str, callback: callable, peer: Peer=None,
+    def message_search(self, text: str, on_success: callable, peer: Peer=None,
                        min_date: datetime=None, max_date: datetime=None,
                        max_id: int=None, offset: int=0, limit: int=255):
         """
         Search for messages.
         :param text: Text to search for in messages
-        :param callback: Callback to call containing all the matching messages.
+        :param on_success: Callback to call containing all the matching messages.
         :param peer: Peer to search, if None, search all dialogs.
         :param min_date: Start search from this datetime.
         :param max_date: Send search at this datetime.
@@ -466,30 +466,30 @@ class TWX(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def set_profile_photo(self, file_path: str, callback: callable=None):
+    def set_profile_photo(self, file_path: str, on_success: callable=None):
         """
         Sets the profile photo for the bot.
         :param file_path: Path to image file
-        :param callback: Callback to call with the status
+        :param on_success: Callback to call with the status
         """
         pass
 
     @abstractmethod
-    def create_secret_chat(self, user: User, callback: callable):
+    def create_secret_chat(self, user: User, on_success: callable):
         """
         Create a secret chat with the user.
         :param user: User to start secret chat with.
-        :param callback: Will return the chat and meta information.
+        :param on_success: Will return the chat and meta information.
         """
         pass
 
     @abstractmethod
-    def create_group_chat(self, user_list: list, name: str, callback: callable=None):
+    def create_group_chat(self, user_list: list, name: str, on_success: callable=None):
         """
         Create a new group with the specified list of users, must be at least 2 users.
         :param user_list: List of Peers.
         :param name: Name of group.
-        :param callback:
+        :param on_success:
         """
         pass
 
@@ -521,7 +521,7 @@ class TWXBotApi(TWX):
         def run(self):
             while True:
                 botapi.get_updates(offset=self.update_offset, timeout=300,
-                                   callback=self.new_updates, **self.twx.request_args).run().wait()
+                                   on_success=self.new_updates, **self.twx.request_args).run().wait()
 
         def new_updates(self, updates):
             for update in updates:
@@ -565,14 +565,14 @@ class TWXBotApi(TWX):
         self._bot_user = botapi.get_me(**self.request_args).run().wait()
 
     def send_message(self, peer: Peer, text: str, reply: int=None, link_preview: bool=None,
-                     callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
+                     on_success: callable=None, reply_markup: botapi.ReplyMarkup=None):
         """
         Send message to peer.
         :param peer: Peer to send message to.
         :param text: Text to send.
         :param reply: Message object or message_id to reply to.
         :param link_preview: Whether or not to show the link preview for this message
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
@@ -580,22 +580,22 @@ class TWXBotApi(TWX):
             reply = reply.id
 
         botapi.send_message(chat_id=peer.id, text=text, disable_web_page_preview=not link_preview,
-                            reply_to_message_id=reply, callback=callback, reply_markup=reply_markup,
+                            reply_to_message_id=reply, on_success=on_success, reply_markup=reply_markup,
                             **self.request_args).run()
 
-    def forward_message(self, peer: Peer, message: Message, callback: callable=None):
+    def forward_message(self, peer: Peer, message: Message, on_success: callable=None):
         """
         Use this method to forward messages of any kind.
 
         :param peer: Peer to send forwarded message too.
         :param message: Message to be forwarded.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :returns: On success, the sent Message is returned.
         """
         botapi.forward_message(peer.id, message.sender.id, message.id, **self.request_args).run()
 
-    def send_photo(self, peer: Peer, photo: str, caption: str=None, reply: int=None, callback: callable=None,
+    def send_photo(self, peer: Peer, photo: str, caption: str=None, reply: int=None, on_success: callable=None,
                    reply_markup: botapi.ReplyMarkup=None):
         """
         Send photo to peer.
@@ -603,7 +603,7 @@ class TWXBotApi(TWX):
         :param photo: File path to photo to send.
         :param caption: Caption for photo
         :param reply: Message object or message_id to reply to.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
@@ -612,17 +612,17 @@ class TWXBotApi(TWX):
 
         photo = botapi.InputFile('photo', botapi.InputFileInfo(photo, open(photo, 'rb'), get_mimetype(photo)))
 
-        botapi.send_photo(chat_id=peer.id, photo=photo, caption=caption, reply_to_message_id=reply, callback=callback,
+        botapi.send_photo(chat_id=peer.id, photo=photo, caption=caption, reply_to_message_id=reply, on_success=on_success,
                           reply_markup=reply_markup, **self.request_args).run()
 
-    def send_audio(self, peer: Peer, audio: str, reply: int=None, callback: callable=None,
+    def send_audio(self, peer: Peer, audio: str, reply: int=None, on_success: callable=None,
                    reply_markup: botapi.ReplyMarkup=None):
         """
         Send audio clip to peer.
         :param peer: Peer to send message to.
         :param audio: File path to audio to send.
         :param reply: Message object or message_id to reply to.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
@@ -631,17 +631,17 @@ class TWXBotApi(TWX):
 
         audio = botapi.InputFile('audio', botapi.InputFileInfo(audio, open(audio, 'rb'), get_mimetype(audio)))
 
-        botapi.send_audio(chat_id=peer.id, audio=audio, reply_to_message_id=reply, callback=callback,
+        botapi.send_audio(chat_id=peer.id, audio=audio, reply_to_message_id=reply, on_success=on_success,
                           reply_markup=reply_markup, **self.request_args).run()
 
-    def send_document(self, peer: Peer, document: str, reply: int=None, callback: callable=None,
+    def send_document(self, peer: Peer, document: str, reply: int=None, on_success: callable=None,
                       reply_markup: botapi.ReplyMarkup=None):
         """
         Send document to peer.
         :param peer: Peer to send message to.
         :param document: File path to document to send.
         :param reply: Message object or message_id to reply to.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
@@ -651,17 +651,17 @@ class TWXBotApi(TWX):
         document = botapi.InputFile('document', botapi.InputFileInfo(document, open(document, 'rb'),
                                                                      get_mimetype(document)))
 
-        botapi.send_document(chat_id=peer.id, document=document, reply_to_message_id=reply, callback=callback,
+        botapi.send_document(chat_id=peer.id, document=document, reply_to_message_id=reply, on_success=on_success,
                              reply_markup=reply_markup, **self.request_args).run()
 
-    def send_sticker(self, peer: Peer, sticker: str, reply: int=None, callback: callable=None,
+    def send_sticker(self, peer: Peer, sticker: str, reply: int=None, on_success: callable=None,
                      reply_markup: botapi.ReplyMarkup=None):
         """
         Send sticker to peer.
         :param peer: Peer to send message to.
         :param sticker: File path to sticker to send.
         :param reply: Message object or message_id to reply to.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
@@ -671,17 +671,17 @@ class TWXBotApi(TWX):
         sticker = botapi.InputFile('sticker', botapi.InputFileInfo(sticker, open(sticker, 'rb'),
                                                                    get_mimetype(sticker)))
 
-        botapi.send_sticker(chat_id=peer.id, sticker=sticker, reply_to_message_id=reply, callback=callback,
+        botapi.send_sticker(chat_id=peer.id, sticker=sticker, reply_to_message_id=reply, on_success=on_success,
                             reply_markup=reply_markup, **self.request_args).run()
         
     def send_video(self, peer: Peer, video: str, reply: int=None,
-                   callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
+                   on_success: callable=None, reply_markup: botapi.ReplyMarkup=None):
         """
         Send video to peer.
         :param peer: Peer to send message to.
         :param video: File path to video to send.
         :param reply: Message object or message_id to reply to.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
@@ -691,18 +691,18 @@ class TWXBotApi(TWX):
         video = botapi.InputFile('video', botapi.InputFileInfo(video, open(video, 'rb'),
                                                                get_mimetype(video)))
 
-        botapi.send_video(chat_id=peer.id, video=video, reply_to_message_id=reply, callback=callback,
+        botapi.send_video(chat_id=peer.id, video=video, reply_to_message_id=reply, on_success=on_success,
                           reply_markup=reply_markup, **self.request_args).run()
 
     def send_location(self, peer: Peer, latitude: float, longitude: float, reply: int=None,
-                      callback: callable=None, reply_markup: botapi.ReplyMarkup=None):
+                      on_success: callable=None, reply_markup: botapi.ReplyMarkup=None):
         """
         Send location to peer.
         :param peer: Peer to send message to.
         :param latitude: Latitude of the location.
         :param longitude: Longitude of the location.
         :param reply: Message object or message_id to reply to.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         :type reply: int or Message
         """
@@ -710,69 +710,69 @@ class TWXBotApi(TWX):
             reply = reply.id
 
         botapi.send_location(chat_id=peer.id, latitude=latitude, longitude=longitude,
-                             reply_to_message_id=reply, callback=callback, reply_markup=reply_markup,
+                             reply_to_message_id=reply, on_success=on_success, reply_markup=reply_markup,
                              **self.request_args).run()
 
-    def send_chat_action(self, peer: Peer, action: botapi.ChatAction, callback: callable=None):
+    def send_chat_action(self, peer: Peer, action: botapi.ChatAction, on_success: callable=None):
         """
         Send status to peer.
         :param peer: Peer to send status to.
         :param action: Type of action to send to peer.
-        :param callback: Callback to call when call is complete.
+        :param on_success: Callback to call when call is complete.
 
         """
-        botapi.send_chat_action(chat_id=peer.id, action=action, callback=callback, **self.request_args).run()
+        botapi.send_chat_action(chat_id=peer.id, action=action, on_success=on_success, **self.request_args).run()
 
-    def get_user_profile_photos(self, user: User, callback: callable, offset: int=None, limit: int=None):
+    def get_user_profile_photos(self, user: User, on_success: callable, offset: int=None, limit: int=None):
         # """
         # Get user profile photos.
         # :param user: User to get profile photos.
-        # :param callback: Callback with the requested photos
+        # :param on_success: Callback with the requested photos
         # :param offset: Sequential number of the first photo to be returned. By default, all photos are returned.
         # :param limit: Limits the number of photos to be retrieved. Values between 1—100 are accepted. Defaults to 100.
         # """
 
-        botapi.get_user_profile_photos(user_id=user.id, callback=callback, offset=offset, limit=limit,
+        botapi.get_user_profile_photos(user_id=user.id, on_success=on_success, offset=offset, limit=limit,
                                        **self.request_args).run()
 
     # region Unsupported in botapi
-    def get_contact_list(self, callback=None):
+    def get_contact_list(self, on_success=None):
         """
         Unsupported in the Bot API
         """
         raise TWXUnsupportedMethod()
 
-    def add_contact(self, phone, first_name, last_name=None, callback=None):
+    def add_contact(self, phone, first_name, last_name=None, on_success=None):
         """
         Unsupported in the Bot API
         """
         raise TWXUnsupportedMethod()
 
-    def del_contact(self, peer, callback=None):
+    def del_contact(self, peer, on_success=None):
         """
         Unsupported in the Bot API
         """
         raise TWXUnsupportedMethod()
 
-    def message_search(self, text, callback, peer=None, min_date=None, max_date=None, max_id=None, offset=0, limit=255):
+    def message_search(self, text, on_success, peer=None, min_date=None, max_date=None, max_id=None, offset=0, limit=255):
         """
         Unsupported in the Bot API
         """
         raise TWXUnsupportedMethod()
 
-    def set_profile_photo(self, file_path: str, callback: callable=None):
+    def set_profile_photo(self, file_path: str, on_success: callable=None):
         """
         Unsupported in the Bot API
         """
         raise TWXUnsupportedMethod()
 
-    def create_secret_chat(self, user, callback=None):
+    def create_secret_chat(self, user, on_success=None):
         """
         Unsupported in the Bot API
         """
         raise TWXUnsupportedMethod()
 
-    def create_group_chat(self, user_list, name, callback=None):
+    def create_group_chat(self, user_list, name, on_success=None):
         """
         Unsupported in the Bot API
         """
