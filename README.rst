@@ -24,6 +24,12 @@ For dev:
 
 ``pip install -i https://testpypi.python.org/pypi twx.botapi``
 
+=============
+Documentation
+=============
+
+Documentation can be found at http://pythonhosted.org/twx.botapi/
+
 ===========
 Quick Start
 ===========
