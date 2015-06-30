@@ -587,21 +587,34 @@ class RequestMethod(str, Enum):
     POST = 'POST'
 
 class TelegramBotRPCRequest:
+    """Class that handles creating the actual RPC request, and sending callbacks based on response
+
+    :param api_method: The API method to call. See https://core.telegram.org/bots/api#available-methods
+    :param token: The API token generated following the instructions at https://core.telegram.org/bots#botfather
+    :param params: A dictionary mapping the api method parameters to their arguments
+    :param on_result: a callback function that gets called before when te request finishes. The return value
+                      of this function gets passed to on_success. Useful if you wish to override the generated 
+                      result type
+    :param on_success: a callback function that gets called when the api call was successful, gets passed
+                       the return value from on_result
+    :param on_error: called when an error occurs
+    :param files: a list of :class:`InputFile`s to be sent to the server
+    :param request_method: ``RequestMethod.POST`` or ``RequestMethod.GET``
+
+    :type api_method: str
+    :type token: str
+    :type params: dict
+    :type on_result: callable
+    :type on_success: callable
+    :type on_error: callable
+    :type files: `list` of :class:`InputFile`
+    :type request_method: RequestMethod
+    """
+
     api_url_base = 'https://api.telegram.org/bot'
 
-    def __init__(self, api_method, token, params=None, on_result=None, on_success=None, callback=None, 
-                 on_error=None, files=None, request_method=RequestMethod.POST):
-        """
-        :param api_method: The API method to call. See https://core.telegram.org/bots/api#available-methods
-        :param token: The API token generated following the instructions at 
-                      https://core.telegram.org/bots#botfather
-        :param params: The api method parameters.
-
-        :type api_method: str
-        :type token: str
-        :type params: dict
-        """
-
+    def __init__(self, api_method, token, params=None, on_result=None, on_success=None, 
+                 on_error=None, files=None, request_method=RequestMethod.POST, *, callback=None):
         reply_markup = params.get('reply_markup') if params else None
         if reply_markup is not None:
             params['reply_markup'] = reply_markup.serialize()
