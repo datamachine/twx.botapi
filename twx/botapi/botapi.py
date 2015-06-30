@@ -583,6 +583,19 @@ class Error(_ErrorBase):
 RPC Objects
 """
 class RequestMethod(str, Enum):
+    """Used to specify the HTTP request method.
+
+    Attributes:
+        GET : 'GET'
+        POST: 'POST'
+
+    :example:
+
+    ::
+        
+        bot.get_me(request_method=RequestMethod.GET)
+
+    """  
     GET = 'GET'
     POST = 'POST'
 
@@ -598,7 +611,7 @@ class TelegramBotRPCRequest:
     :param on_success: a callback function that gets called when the api call was successful, gets passed
                        the return value from on_result
     :param on_error: called when an error occurs
-    :param files: a list of :class:`InputFile`s to be sent to the server
+    :param files: a list of :class:`InputFile`s to be sent to the server`
     :param request_method: ``RequestMethod.POST`` or ``RequestMethod.GET``
 
     :type api_method: str
@@ -609,6 +622,11 @@ class TelegramBotRPCRequest:
     :type on_error: callable
     :type files: `list` of :class:`InputFile`
     :type request_method: RequestMethod
+
+    .. note::
+
+        Typically you do not have to interact with this class directly. However, you may override any of these
+        arguments by specifiying it in the the `\*\*kwargs` of any api method.
     """
 
     api_url_base = 'https://api.telegram.org/bot'

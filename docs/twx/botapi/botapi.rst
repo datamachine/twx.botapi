@@ -97,6 +97,13 @@ Error
 
 .. autoclass:: Error
 
+Request Objects
+---------------
+
+.. autoclass:: RequestMethod
+
+.. autoclass:: TelegramBotRPCRequest
+
 Telegram Bot API Methods
 ------------------------
 
