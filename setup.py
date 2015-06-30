@@ -48,7 +48,7 @@ setup(
     author = 'Vince Castellano, Phillip Lopo',
     author_email = 'surye80@gmail.com, philliplopo@gmail.com',
     keywords = ['datamachine', 'telex', 'telegram', 'bot', 'api', 'rpc'],
-    url = 'https://github.com/datamachine/twx', 
+    url = 'https://github.com/datamachine/twx.botapi', 
     download_url = download_url, 
     install_requires=requirements,
     platforms = ['Linux', 'Unix', 'MacOsX', 'Windows'],
