@@ -631,8 +631,8 @@ class TelegramBotRPCRequest:
 
     api_url_base = 'https://api.telegram.org/bot'
 
-    def __init__(self, api_method, token, params=None, on_result=None, on_success=None, 
-                 on_error=None, files=None, request_method=RequestMethod.POST, *, callback=None):
+    def __init__(self, api_method, token, params=None, on_result=None, on_success=None, callback=None, 
+                 on_error=None, files=None, request_method=RequestMethod.POST):
         reply_markup = params.get('reply_markup') if params else None
         if reply_markup is not None:
             params['reply_markup'] = reply_markup.serialize()
