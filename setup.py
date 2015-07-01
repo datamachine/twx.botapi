@@ -1,7 +1,7 @@
 from setuptools import setup
 import sys
 
-__version__ = '1.0.1.dev1'
+__version__ = '1.0.1.dev2'
 
 github_tag = __version__
 if 'dev' in __version__:
@@ -14,7 +14,7 @@ print(download_url)
 
 requirements = ['requests']
 
-if sys.version_info.major < 3 or sys.version_info.minor < 4:
+if sys.version_info < (3, 4, 0):
     requirements.append('enum34')
 
 print(requirements)
@@ -42,6 +42,7 @@ setup(name='twx.botapi',
           'Programming Language :: Python :: 3.2',
           'Programming Language :: Python :: 3.3',
           'Programming Language :: Python :: 3.4',
+          'Programming Language :: Python :: 3.5',
           'Topic :: Communications :: Chat',
           'Topic :: Communications :: File Sharing',
           'Topic :: Software Development :: Libraries',
