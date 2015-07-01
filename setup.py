@@ -1,10 +1,10 @@
 from setuptools import setup
 import sys
 
-import twx.botapi
+__version__ = '1.0.1'
 
-github_tag = twx.botapi.__version__
-if 'dev' in twx.botapi.__version__:
+github_tag = __version__
+if 'dev' in __version__:
     github_tag = 'master'
 
 download_url = 'https://github.com/datamachine/twx.botapi/archive/{}.tar.gz'
@@ -21,7 +21,7 @@ print(requirements)
 
 setup(name='twx.botapi',
       packages=['twx', 'twx.botapi'],
-      version=twx.botapi.__version__,
+      version=__version__,
       description='Unofficial Telegram Bot API Library and Client',
       long_description=open("README.rst").read(),
       author='Vince Castellano, Phillip Lopo',
