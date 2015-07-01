@@ -1,5 +1,5 @@
 twx.botapi
-##########
+==========
 
 **twx.botapi: Unofficial Telegram Bot API Library and Client**
 
@@ -13,9 +13,15 @@ into a usable native python object.
 
 Support for the MTProto API is in the works, but considered pre-alpha right now.
 
-=======
+Support
+-------
+
+You can join our support chat at: https://telegram.me/joinchat/05c5c2f60112fa104d1c0c563b2fd34a
+
+or our dev chat at: https://telegram.me/joinchat/05c5c2f6018bd6653eb6bbdccb7106a8
+
 Install
-=======
+-------
 
 For stable:
 
@@ -25,15 +31,13 @@ For dev:
 
 ``pip install -i https://testpypi.python.org/pypi twx.botapi``
 
-=============
 Documentation
-=============
+-------------
 
 Documentation can be found at http://pythonhosted.org/twx.botapi/
 
-===========
 Quick Start
-===========
+-----------
 
 
 ::
