@@ -62,6 +62,5 @@ setup(name='twx.botapi',
           'Programming Language :: Python :: 3.2',
           'Programming Language :: Python :: 3.3',
           'Programming Language :: Python :: 3.4',
-          'Topic :: Communications :: Chat',
-          'Topic :: Communications :: File Sharing'
+          'Topic :: Communications :: Chat'
       ])
