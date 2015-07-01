@@ -1,35 +1,15 @@
 from setuptools import setup
 import sys
 
-revision = None
+import twx.botapi
 
-# must match PEP 440
-_MAJOR_VERSION = 1
-_MINOR_VERSION = 0
-_MICRO_VERSION = None
-_PRE_RELEASE_TYPE = None   # a | b | rc
-_PRE_RELEASE_VERSION = None
-_DEV_RELEASE_VERSION = 2
-
-version = '{}.{}'.format(_MAJOR_VERSION, _MINOR_VERSION)
-revision = None
-
-if _MICRO_VERSION is not None:
-    version += '.{}'.format(_MICRO_VERSION)
-
-if _PRE_RELEASE_TYPE is not None and _PRE_RELEASE_VERSION is not None:
-    version += '{}{}'.format(_PRE_RELEASE_TYPE, _PRE_RELEASE_VERSION)
-
-if _DEV_RELEASE_VERSION is not None:
-    version += '.dev{}'.format(_DEV_RELEASE_VERSION)
-    revision = 'master'
-else:
-    revision = version
+github_tag = twx.botapi.__version__
+if 'dev' in twx.botapi.__version__:
+    github_tag = 'master'
 
 download_url = 'https://github.com/datamachine/twx.botapi/archive/{}.tar.gz'
-download_url = download_url.format(revision)
+download_url = download_url.format(github_tag)
 
-print(version)
 print(download_url)
 
 requirements = ['requests']
@@ -41,8 +21,8 @@ print(requirements)
 
 setup(name='twx.botapi',
       packages=['twx', 'twx.botapi'],
-      version=version,
-      description='Unofficial Telegram Bot API Client',
+      version=twx.botapi.__version__,
+      description='Unofficial Telegram Bot API Library and Client',
       long_description=open("README.rst").read(),
       author='Vince Castellano, Phillip Lopo',
       author_email='surye80@gmail.com, philliplopo@gmail.com',
