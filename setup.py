@@ -52,7 +52,7 @@ setup(name='twx.botapi',
       install_requires=requirements,
       platforms=['Linux', 'Unix', 'MacOsX', 'Windows'],
       classifiers=[
-          'Development Status :: 4 - Beta',
+          'Development Status :: 5 - Production/Stable',
           'Intended Audience :: Developers',
           'License :: OSI Approved :: MIT License',
           'Operating System :: OS Independent',
@@ -62,5 +62,8 @@ setup(name='twx.botapi',
           'Programming Language :: Python :: 3.2',
           'Programming Language :: Python :: 3.3',
           'Programming Language :: Python :: 3.4',
-          'Topic :: Communications :: Chat'
+          'Topic :: Communications :: Chat',
+          'Topic :: Communications :: File Sharing',
+          'Topic :: Software Development :: Libraries',
+          'Topic :: Software Development :: Libraries :: Python Modules'
       ])
