@@ -66,7 +66,7 @@ Update
 InputFile
 ^^^^^^^^^
 
-.. autoclass:
+.. autoclass:: InputFile
 
 UserProfilePhotos
 ^^^^^^^^^^^^^^^^^
@@ -76,7 +76,7 @@ UserProfilePhotos
 ReplyKeyboardMarkup
 ^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:
+.. autoclass:: ReplyKeyboardMarkup
 
 ReplyKeyboardHide
 ^^^^^^^^^^^^^^^^^
