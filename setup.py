@@ -1,13 +1,13 @@
 from setuptools import setup
 import sys
 
-__version__ = '1.0.1.dev2'
+__version__ = '1.0.1.dev3'
 
 github_tag = __version__
 if 'dev' in __version__:
     github_tag = 'master'
 
-download_url = 'https://github.com/datamachine/twx.botapi/archive/{}.tar.gz'
+download_url = 'https://github.com/datamachine/twx.botapi/archive/{}.zip'
 download_url = download_url.format(github_tag)
 
 print(download_url)
