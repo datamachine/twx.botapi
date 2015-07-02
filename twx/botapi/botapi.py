@@ -756,7 +756,11 @@ class TelegramBotRPCRequest:
         s = Session()
         request = self._get_request()
         resp = s.send(request)
-        api_response = resp.json()
+
+        try:
+            api_response = resp.json()
+        except ValueError:
+            api_response = {'ok': False, 'description': 'Invalid Value in JSON response'}
 
         if api_response.get('ok'):
             result = api_response['result']
