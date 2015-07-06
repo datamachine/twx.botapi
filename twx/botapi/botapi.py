@@ -1399,7 +1399,7 @@ class TelegramBot:
         self._bot_user = response
 
     def update_bot_info(self):
-        return self.get_me(callback=self._update_bot_info)
+        return self.get_me(on_success=self._update_bot_info)
 
     @property
     def token(self):
