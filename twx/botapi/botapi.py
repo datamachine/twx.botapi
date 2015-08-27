@@ -1402,6 +1402,11 @@ class TelegramBot:
         self._bot_user = response
 
     def update_bot_info(self):
+        """See :func:`get_me`.
+
+        After calling this, you may access
+        :attr:`id`, :attr:`first_name`, :attr:`last_name` and :attr:`username`.
+        """
         return self.get_me(on_success=self._update_bot_info)
 
     @property
