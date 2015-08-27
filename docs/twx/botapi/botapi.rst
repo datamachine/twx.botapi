@@ -135,7 +135,7 @@ send_photo
 send_audio
 ^^^^^^^^^^
 
-.. autofunction:: send_audio(chat_id, audio, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
+.. autofunction:: send_audio(chat_id, audio, duration=None, performer=None, title=None, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
 
 send_document
 ^^^^^^^^^^^^^
