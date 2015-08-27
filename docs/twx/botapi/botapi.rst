@@ -48,6 +48,11 @@ Video
 
 .. autoclass:: Video
 
+Voice
+^^^^^
+
+.. autoclass:: Voice
+
 Contact
 ^^^^^^^
 
@@ -146,6 +151,11 @@ send_video
 ^^^^^^^^^^
 
 .. autofunction:: send_video(chat_id, video, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
+
+send_voice
+^^^^^^^^^^
+
+.. autofunction:: send_voice(chat_id, voice, duration=None, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
 
 send_location
 ^^^^^^^^^^^^^
