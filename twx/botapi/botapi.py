@@ -85,7 +85,7 @@ class Message(_MessageBase):
 
     Attributes:
         message_id            (int)                 :Unique message identifier
-        from                  (User)                :Sender
+        sender                (User)                :Sender
         date                  (int)                 :Date the message was sent in Unix time
         chat                  (User or GroupChat)   :Conversation the message belongs to — user in case of a private
                                                      message, GroupChat in case of a group
