@@ -130,7 +130,7 @@ forward_message
 send_photo
 ^^^^^^^^^^
 
-.. autofunction:: send_photo(chat_id,  photo, caption=None, reply_to_message_id=None, reply_markup, *, request_args=None, **kwargs)
+.. autofunction:: send_photo(chat_id, photo, caption=None, reply_to_message_id=None, reply_markup, *, request_args=None, **kwargs)
 
 send_audio
 ^^^^^^^^^^
@@ -150,7 +150,7 @@ send_sticker
 send_video
 ^^^^^^^^^^
 
-.. autofunction:: send_video(chat_id, video, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
+.. autofunction:: send_video(chat_id, video, duration=None, caption=None, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
 
 send_voice
 ^^^^^^^^^^

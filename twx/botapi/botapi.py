@@ -74,7 +74,7 @@ class GroupChat(_GroupChatBase):
 _MessageBase = namedtuple('Message', [
     'message_id', 'sender', 'date', 'chat', 'forward_from', 'forward_date',
     'reply_to_message', 'text', 'audio', 'document', 'photo', 'sticker',
-    'video', 'voice', 'contact', 'location', 'new_chat_participant',
+    'video', 'voice', 'caption', 'contact', 'location', 'new_chat_participant',
     'left_chat_participant', 'new_chat_title', 'new_chat_photo', 'delete_chat_photo',
     'group_chat_created'])
 
@@ -102,6 +102,7 @@ class Message(_MessageBase):
         sticker               (Sticker)             :*Optional.* Message is a sticker, information about the sticker
         video                 (Video)               :*Optional.* Message is a video, information about the video
         voice                 (Voice)               :*Optional.* Message is a voice message, information about the file
+        caption               (str)                 :*Optional.* Caption for the photo or video
         contact               (Contact)             :*Optional.* Message is a shared contact, information about
                                                                  the contact
         location              (Location)            :*Optional.* Message is a shared location, information about the
@@ -149,6 +150,7 @@ class Message(_MessageBase):
             sticker=Sticker.from_result(result.get('sticker')),
             video=Video.from_result(result.get('video')),
             voice=Voice.from_result(result.get('voice')),
+            caption=result.get('caption'),
             contact=Contact.from_result(result.get('contact')),
             location=Location.from_result(result.get('location')),
             new_chat_participant=User.from_result(result.get('new_chat_participant')),
@@ -228,7 +230,7 @@ class Document(_DocumentBase):
 
     Attributes:
         file_id    (str)        :Unique file identifier
-        thumb      (PhotoSize)  :Document thumbnail as defined by sender
+        thumb      (PhotoSize)  :*Optional.* Document thumbnail as defined by sender
         file_name  (str)        :*Optional.* Original filename as defined by sender
         mime_type  (str)        :*Optional.* MIME type of the file as defined by sender
         file_size  (int)        :*Optional.* File size
@@ -261,7 +263,7 @@ class Sticker(_StickerBase):
         file_id    (str)        :Unique identifier for this file
         width      (int)        :Sticker width
         height     (int)        :Sticker height
-        thumb      (PhotoSize)  :Sticker thumbnail in .webp or .jpg format
+        thumb      (PhotoSize)  :*Optional.* Sticker thumbnail in .webp or .jpg format
         file_size  (int)        :*Optional.* File size
 
     """
@@ -282,7 +284,7 @@ class Sticker(_StickerBase):
 
 
 _VideoBase = namedtuple('Video', [
-    'file_id', 'width', 'height', 'duration', 'thumb', 'mime_type', 'file_size', 'caption'])
+    'file_id', 'width', 'height', 'duration', 'thumb', 'mime_type', 'file_size'])
 
 
 class Video(_VideoBase):
@@ -294,10 +296,9 @@ class Video(_VideoBase):
         width       (int)       :Video width as defined by sender
         height      (int)       :Video height as defined by sender
         duration    (int)       :Duration of the video in seconds as defined by sender
-        thumb       (PhotoSize) :Video thumbnail
+        thumb       (PhotoSize) :*Optional.* Video thumbnail
         mime_type   (str)       :*Optional.* Mime type of a file as defined by sender
         file_size   (int)       :*Optional.* File size
-        caption     (str)       :*Optional.* Text description of the video (usually empty)
 
     """
     __slots__ = ()
@@ -314,8 +315,7 @@ class Video(_VideoBase):
             duration=result.get('duration'),
             thumb=PhotoSize.from_result(result.get('thumb')),
             mime_type=result.get('mime_type'),
-            file_size=result.get('file_size'),
-            caption=result.get('caption')
+            file_size=result.get('file_size')
             )
 
 
@@ -359,7 +359,7 @@ class Contact(_ContactBase):
         phone_number    (str)  :Contact's phone number
         first_name      (str)  :Contact's first name
         last_name       (str)  :*Optional.* Contact's last name
-        user_id         (str)  :*Optional.* Contact's user identifier in Telegram
+        user_id         (int)  :*Optional.* Contact's user identifier in Telegram
 
     """
     __slots__ = ()
@@ -1131,7 +1131,7 @@ def send_sticker(chat_id, sticker,
 
 
 def send_video(chat_id, video,
-               reply_to_message_id=None, reply_markup=None,
+               duration=None, caption=None, reply_to_message_id=None, reply_markup=None,
                **kwargs):
     """
     Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as Document).
@@ -1140,6 +1140,8 @@ def send_video(chat_id, video,
     :param video: Video to send. You can either pass a file_id as String to resend a
                   video that is already on the Telegram servers, or upload a new video
                   using multipart/form-data.
+    :param duration: Duration of sent video in seconds
+    :param caption: Video caption (may also be used when resending videos by file_id)
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a
                          custom reply keyboard, instructions to hide keyboard or to
@@ -1148,6 +1150,8 @@ def send_video(chat_id, video,
 
     :type chat_id: int
     :type video: InputFile or str
+    :type duration: int
+    :type caption: str
     :type reply_to_message_id: int
     :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
 
@@ -1170,6 +1174,8 @@ def send_video(chat_id, video,
     # optional args
     params.update(
         _clean_params(
+            duration=duration,
+            caption=caption,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup
         )
