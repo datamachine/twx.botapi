@@ -470,6 +470,33 @@ class UserProfilePhotos(_UserProfilePhotosBase):
             )
 
 
+_File = namedtuple('File', ['file_id', 'file_size', 'file_path'])
+
+
+class File(_File):
+
+    """This object represents a file ready to be downloaded.
+
+    Attributes:
+        file_id (str): Unique identifier for this file
+        file_size (int): *Optional.* File size, if known
+        file_path (str): *Optional.* File path. Use https://api.telegram.org/file/bot<token>/<file_path>
+                         to get the file. It is guaranteed that the link will be valid for at least 1 hour.
+    """
+    __slots__ = ()
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return File(
+            file_id=result.get('file_id'),
+            file_size=result.get('file_size'),
+            file_path=result.get('file_path')
+        )
+
+
 class ReplyMarkup:
     __metaclass__ = ABCMeta
     __slots__ = ()
@@ -1251,6 +1278,30 @@ def get_user_profile_photos(user_id,
                                  on_result=UserProfilePhotos.from_result, **kwargs)
 
 
+def get_file(file_id,
+             **kwargs):
+    """
+    Use this method to get basic info about a file and prepare it for downloading.
+
+    For the moment, bots can download files of up to 20MB in size. On success, a File object is returned. The file can
+    then be downloaded via the link https://api.telegram.org/file/bot<token>/<file_path>, where <file_path> is taken
+    from the response. It is guaranteed that the link will be valid for at least 1 hour. When the link expires, a new
+    one can be requested by calling getFile again.
+
+    :param file_id: File identifier to get info about
+
+    :type file_id: str
+
+    :returns: Returns a File object.
+    :rtype: TelegramBotRPCRequest
+    """
+    # required args
+    params = dict(file_id=file_id)
+
+    return TelegramBotRPCRequest('getFile', params=params,
+                                 on_result=File.from_result, **kwargs)
+
+
 def get_updates(offset=None, limit=None, timeout=None,
                 **kwargs):
     """
@@ -1389,6 +1440,10 @@ class TelegramBot:
     def get_user_profile_photos(self, *args, **kwargs):
         """See :func:`get_user_profile_photos`"""
         return get_user_profile_photos(*args, **self._merge_overrides(**kwargs)).run()
+
+    def get_file(self, *args, **kwargs):
+        """See :func:`get_file`"""
+        return get_file(*args, **self._merge_overrides(**kwargs)).run()
 
     def get_updates(self, *args, **kwargs):
         """See :func:`get_updates`"""
