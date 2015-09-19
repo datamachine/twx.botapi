@@ -859,13 +859,15 @@ def get_me(**kwargs):
 
 
 def send_message(chat_id, text,
-                 disable_web_page_preview=None, reply_to_message_id=None, reply_markup=None,
+                 parse_mode=None, disable_web_page_preview=None, reply_to_message_id=None, reply_markup=None,
                  **kwargs):
     """
     Use this method to send text messages.
 
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
     :param text: Text of the message to be sent
+    :param parse_mode: Send ``"Markdown"``, if you want Telegram apps to show bold,
+                       italic and inline URLs in your bot's message.
     :param disable_web_page_preview: Disables link previews for links in this message
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a
@@ -887,10 +889,12 @@ def send_message(chat_id, text,
     params = dict(chat_id=chat_id, text=text)
 
     # optional args
-    params.update(_clean_params(
-        disable_web_page_preview=disable_web_page_preview,
-        reply_to_message_id=reply_to_message_id,
-        reply_markup=reply_markup
+    params.update(
+        _clean_params(
+            parse_mode=parse_mode,
+            disable_web_page_preview=disable_web_page_preview,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup
         )
     )
 
