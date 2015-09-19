@@ -830,6 +830,83 @@ class TelegramBotRPCRequest:
         return self.result
 
 
+class TelegramDownloadRequest(TelegramBotRPCRequest):
+
+    """Class that handles creating the actual RPC request, and sending callbacks based on response
+
+    :param file_path: The remote file path received via :func:`get_file`
+    :param out_file: File to save to. Can be a file path (str) or a file-like object
+    :param token: The API token generated following the instructions at https://core.telegram.org/bots#botfather
+    :param on_success: a callback function that gets called when the api call was successful, gets passed
+                       the return value from on_result
+    :param on_error: called when an error occurs
+
+    :type file_path: str
+    :type out_file: str
+    :type token: str
+    :type on_success: callable
+    :type on_error: callable
+
+    .. note::
+
+        Typically you do not have to interact with this class directly.
+    """
+    download_url_base = 'https://api.telegram.org/file/bot'
+
+    def __init__(self, file_path, out_file, token, on_success=None,
+                 on_error=None, request_method=None):  # request_method eats the kwarg from TelegramBot.request_args
+        self.file_path = file_path
+        self.out_file = out_file
+        self.token = token
+        self.on_success = on_success
+        self.on_error = on_error
+        self.request_method = RequestMethod.GET  # Others are not allowed
+
+        self.params = None
+        self.files = None
+
+        self.result = None
+        self.error = None
+
+        self.thread = Thread(target=self._async_call)
+
+    def _get_url(self):
+        return '{base_url}{token}/{path}'.format(base_url=self.download_url_base,
+                                                 token=self.token,
+                                                 path=self.file_path)
+
+    def _do_download(self, resp, f):
+        for chunk in resp.iter_content(chunk_size=1024):
+            if chunk:  # filter out keep-alive chunks
+                f.write(chunk)
+
+    def _async_call(self):
+        s = Session()
+        request = self._get_request()
+        resp = s.send(request)
+
+        if not resp.status_code == 200:
+            self.error = RuntimeError("Bad HTTP Status Code", resp, resp.status_code)
+        else:
+            try:
+                if isinstance(self.out_file, str):
+                    with open(self.out_file, 'wb') as f:
+                        self._do_download(resp, f)
+
+                elif hasattr(self.out_file, 'write'):
+                    self._do_download(resp, self.out_file)
+            except OSError as e:
+                self.error = e
+
+        if self.error:
+            if self.on_error:
+                self.on_error(self.error)
+        else:
+            self.result = self.out_file
+            if self.on_success:
+                self.on_success(self.out_file)
+
+
 def _clean_params(**params):
     return {name: val for name, val in params.items() if val is not None}
 
@@ -1364,6 +1441,25 @@ def set_webhook(url=None, **kwargs):
     return TelegramBotRPCRequest('setWebhook', params=params, on_result=lambda result: result, **kwargs)
 
 
+def download_file(file_path, out_file, **kwargs):
+    """
+    Use this method to download a file from the telegram servers.
+
+    It is guaranteed that the link will be valid for at least 1 hour.
+
+    :param file_path: The remote file path received via :func:`get_file`
+    :param out_file: File to save to. Can be a file path (str) or a file-like object
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramDownloadRequest`
+
+    :type file_path: str
+    :type out_file: str or file-like object
+
+    :returns: Returns out_file on success or an Exception on error.
+    :rtype: TelegramDownloadRequest
+    """
+    return TelegramDownloadRequest(file_path, out_file, **kwargs)
+
+
 class TelegramBot:
 
     """A `TelegramBot` object represents a specific regisitered bot user as identified by its token. The bot
@@ -1458,6 +1554,10 @@ class TelegramBot:
 
     def update_bot_info(self):
         return self.get_me(on_success=self._update_bot_info)
+
+    def download_file(self, *args, **kwargs):
+        """See :func:`download_file`"""
+        return download_file(*args, **self._merge_overrides(**kwargs)).run()
 
     @property
     def token(self):
