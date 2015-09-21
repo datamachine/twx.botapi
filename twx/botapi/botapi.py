@@ -890,7 +890,7 @@ class TelegramDownloadRequest(TelegramBotRPCRequest):
         else:
             try:
                 if isinstance(self.out_file, str):
-                    with open(self.out_file, 'wb') as f:
+                    with open(self.out_file, 'w+b') as f:
                         self._do_download(resp, f)
 
                 elif hasattr(self.out_file, 'write'):
