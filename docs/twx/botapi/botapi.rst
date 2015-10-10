@@ -13,10 +13,10 @@ User
 
 .. autoclass:: User
 
-GroupChat
+Chat
 ^^^^^^^^^
 
-.. autoclass:: GroupChat
+.. autoclass:: Chat
 
 Message
 ^^^^^^^
