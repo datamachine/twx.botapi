@@ -503,10 +503,10 @@ class UserProfilePhotos(_UserProfilePhotosBase):
             )
 
 
-_File = namedtuple('File', ['file_id', 'file_size', 'file_path'])
+_FileBase = namedtuple('File', ['file_id', 'file_size', 'file_path'])
 
 
-class File(_File):
+class File(_FileBase):
 
     """This object represents a file ready to be downloaded.
 
