@@ -1527,7 +1527,7 @@ def get_updates(offset=None, limit=None, timeout=None,
     return TelegramBotRPCRequest('getUpdates', params=params, on_result=Update.from_result, **kwargs)
 
 
-def set_webhook(url=None, **kwargs):
+def set_webhook(url=None, certificate=None, **kwargs):
     """
     Use this method to specify a url and receive incoming updates via an outgoing webhook.
     Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a
@@ -1536,16 +1536,24 @@ def set_webhook(url=None, **kwargs):
     Please note that you will not be able to receive updates using getUpdates for as long as an outgoing
     webhook is set up.
 
+    To use a self-signed certificate, you need to upload your public key certificate using certificate parameter.
+    Please upload as InputFile, sending a String will not work.
+
+    Ports currently supported for Webhooks: 443, 80, 88, 8443.
+
     :param url: HTTPS url to send updates to. Use an empty string to remove webhook integration
+    :param certificate: Upload your public key certificate so that the root certificate in use can be checked.
+                        See telegram's self-signed guide for details (https://core.telegram.org/bots/self-signed).
     :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type url: str
+    :type certificate: InputFile
 
     :returns: Returns True on success.
     :rtype:  TelegramBotRPCRequest
     """
     # optional args
-    params = _clean_params(url=url)
+    params = _clean_params(url=url, certificate=certificate)
 
     return TelegramBotRPCRequest('setWebhook', params=params, on_result=lambda result: result, **kwargs)
 
