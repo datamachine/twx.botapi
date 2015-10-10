@@ -85,7 +85,7 @@ class Message(_MessageBase):
 
     Attributes:
         message_id            (int)                 :Unique message identifier
-        from                  (User)                :Sender
+        sender                (User)                :Sender
         date                  (int)                 :Date the message was sent in Unix time
         chat                  (User or GroupChat)   :Conversation the message belongs to — user in case of a private
                                                      message, GroupChat in case of a group
@@ -1667,6 +1667,11 @@ class TelegramBot:
         self._bot_user = response
 
     def update_bot_info(self):
+        """See :func:`get_me`.
+
+        After calling this, you may access
+        :attr:`id`, :attr:`first_name`, :attr:`last_name` and :attr:`username`.
+        """
         return self.get_me(on_success=self._update_bot_info)
 
     def download_file(self, *args, **kwargs):
