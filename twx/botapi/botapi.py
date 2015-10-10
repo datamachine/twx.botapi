@@ -46,18 +46,22 @@ class User(_UserBase):
             )
 
 
-_GroupChatBase = namedtuple('GroupChat', ['id', 'title'])
+_ChatBase = namedtuple('Chat', ['id', 'type', 'title', 'username', 'first_name', 'last_name'])
 
 
-class GroupChat(_GroupChatBase):
-
-    """This object represents a group chat.
+class Chat(_ChatBase):
+    """This object represents a chat.
 
     Attributes:
-        id    (int): Unique identifier for this group chat
-        title (str): Group name
+        id	        (int)	:Unique identifier for this chat, not exceeding 1e13 by absolute value
+        type	    (str)	:Type of chat, can be either “private”, or “group”, or “channel”
+        title	    (str)	:*Optional.* Title, for channels and group chats
+        username	(str)	:*Optional.* Username, for private chats and channels if available
+        first_name	(str)	:*Optional.* First name of the other party in a private chat
+        last_name	(str)	:*Optional.* Last name of the other party in a private chat
 
     """
+
     __slots__ = ()
 
     @staticmethod
@@ -65,11 +69,14 @@ class GroupChat(_GroupChatBase):
         if result is None:
             return None
 
-        return GroupChat(
+        return Chat(
             id=result.get('id'),
-            title=result.get('title')
-            )
-
+            type=result.get('type'),
+            title=result.get('title'),
+            username=result.get('username'),
+            first_name=result.get('first_name'),
+            last_name=result.get('last_name'),
+        )
 
 _MessageBase = namedtuple('Message', [
     'message_id', 'sender', 'date', 'chat', 'forward_from', 'forward_date',
@@ -85,10 +92,9 @@ class Message(_MessageBase):
 
     Attributes:
         message_id            (int)                 :Unique message identifier
-        sender                (User)                :Sender
+        from                  (User)                :*Optional.* Sender, can be empty for messages sent to channels
         date                  (int)                 :Date the message was sent in Unix time
-        chat                  (User or GroupChat)   :Conversation the message belongs to — user in case of a private
-                                                     message, GroupChat in case of a group
+        chat                  (Chat)                :Conversation the message belongs to
         forward_from          (User)                :*Optional.* For forwarded messages, sender of the original message
         forward_date          (int)                 :*Optional.* For forwarded messages, date the original message was
                                                                  sent in Unix time
@@ -123,13 +129,6 @@ class Message(_MessageBase):
         if result is None:
             return None
 
-        # Determine whether chat is GroupChat or User type
-        chat = result.get('chat')
-        if 'id' in chat and 'title' in chat:
-            chat = GroupChat.from_result(chat)
-        else:
-            chat = User.from_result(chat)
-
         # photo is a list of PhotoSize
         photo = result.get('photo')
         if photo is not None:
@@ -139,7 +138,7 @@ class Message(_MessageBase):
             message_id=result.get('message_id'),
             sender=User.from_result(result.get('from')),
             date=result.get('date'),
-            chat=chat,
+            chat=Chat.from_result(result.get('chat')),
             forward_from=User.from_result(result.get('forward_from')),
             forward_date=result.get('forward_date'),
             reply_to_message=Message.from_result(result.get('reply_to_message')),
@@ -865,7 +864,7 @@ class TelegramBotRPCRequest:
 
 class TelegramDownloadRequest(TelegramBotRPCRequest):
 
-    """Class that handles creating the actual RPC request, and sending callbacks based on response
+    """Class that handles downloading files from telegram.
 
     :param file_path: The remote file path received via :func:`get_file`
     :param out_file: File to save to. Can be a file path (str) or a file-like object
@@ -887,7 +886,7 @@ class TelegramDownloadRequest(TelegramBotRPCRequest):
     download_url_base = 'https://api.telegram.org/file/bot'
 
     def __init__(self, file_path, out_file, token, on_success=None,
-                 on_error=None, request_method=None):  # request_method eats the kwarg from TelegramBot.request_args
+                 on_error=None):  # request_method eats the kwarg from TelegramBot.request_args
         self.file_path = file_path
         self.out_file = out_file
         self.token = token
