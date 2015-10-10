@@ -74,7 +74,7 @@ class GroupChat(_GroupChatBase):
 _MessageBase = namedtuple('Message', [
     'message_id', 'sender', 'date', 'chat', 'forward_from', 'forward_date',
     'reply_to_message', 'text', 'audio', 'document', 'photo', 'sticker',
-    'video', 'contact', 'location', 'new_chat_participant',
+    'video', 'voice', 'caption', 'contact', 'location', 'new_chat_participant',
     'left_chat_participant', 'new_chat_title', 'new_chat_photo', 'delete_chat_photo',
     'group_chat_created'])
 
@@ -101,6 +101,8 @@ class Message(_MessageBase):
         photo                 (Sequence[PhotoSize]) :*Optional.* Message is a photo, available sizes of the photo
         sticker               (Sticker)             :*Optional.* Message is a sticker, information about the sticker
         video                 (Video)               :*Optional.* Message is a video, information about the video
+        voice                 (Voice)               :*Optional.* Message is a voice message, information about the file
+        caption               (str)                 :*Optional.* Caption for the photo or video
         contact               (Contact)             :*Optional.* Message is a shared contact, information about
                                                                  the contact
         location              (Location)            :*Optional.* Message is a shared location, information about the
@@ -147,6 +149,8 @@ class Message(_MessageBase):
             photo=photo,
             sticker=Sticker.from_result(result.get('sticker')),
             video=Video.from_result(result.get('video')),
+            voice=Voice.from_result(result.get('voice')),
+            caption=result.get('caption'),
             contact=Contact.from_result(result.get('contact')),
             location=Location.from_result(result.get('location')),
             new_chat_participant=User.from_result(result.get('new_chat_participant')),
@@ -191,11 +195,13 @@ _AudioBase = namedtuple('Audio', ['file_id', 'duration', 'mime_type', 'file_size
 
 class Audio(_AudioBase):
 
-    """This object represents an audio file (voice note).
+    """This object represents a generic audio file (not voice note).
 
     Attributes:
         file_id    (str)  :Unique identifier for this file
         duration   (int)  :Duration of the audio in seconds as defined by sender
+        performer  (str)  :*Optional.* Performer of the audio as defined by sender or by audio tags
+        title      (str)  :*Optional.* Title of the audio as defined by sender or by audio tags
         mime_type  (str)  :*Optional.* MIME type of the file as defined by sender
         file_size  (int)  :*Optional.* File size
 
@@ -224,7 +230,7 @@ class Document(_DocumentBase):
 
     Attributes:
         file_id    (str)        :Unique file identifier
-        thumb      (PhotoSize)  :Document thumbnail as defined by sender
+        thumb      (PhotoSize)  :*Optional.* Document thumbnail as defined by sender
         file_name  (str)        :*Optional.* Original filename as defined by sender
         mime_type  (str)        :*Optional.* MIME type of the file as defined by sender
         file_size  (int)        :*Optional.* File size
@@ -257,7 +263,7 @@ class Sticker(_StickerBase):
         file_id    (str)        :Unique identifier for this file
         width      (int)        :Sticker width
         height     (int)        :Sticker height
-        thumb      (PhotoSize)  :Sticker thumbnail in .webp or .jpg format
+        thumb      (PhotoSize)  :*Optional.* Sticker thumbnail in .webp or .jpg format
         file_size  (int)        :*Optional.* File size
 
     """
@@ -278,7 +284,7 @@ class Sticker(_StickerBase):
 
 
 _VideoBase = namedtuple('Video', [
-    'file_id', 'width', 'height', 'duration', 'thumb', 'mime_type', 'file_size', 'caption'])
+    'file_id', 'width', 'height', 'duration', 'thumb', 'mime_type', 'file_size'])
 
 
 class Video(_VideoBase):
@@ -290,10 +296,9 @@ class Video(_VideoBase):
         width       (int)       :Video width as defined by sender
         height      (int)       :Video height as defined by sender
         duration    (int)       :Duration of the video in seconds as defined by sender
-        thumb       (PhotoSize) :Video thumbnail
+        thumb       (PhotoSize) :*Optional.* Video thumbnail
         mime_type   (str)       :*Optional.* Mime type of a file as defined by sender
         file_size   (int)       :*Optional.* File size
-        caption     (str)       :*Optional.* Text description of the video (usually empty)
 
     """
     __slots__ = ()
@@ -310,9 +315,37 @@ class Video(_VideoBase):
             duration=result.get('duration'),
             thumb=PhotoSize.from_result(result.get('thumb')),
             mime_type=result.get('mime_type'),
-            file_size=result.get('file_size'),
-            caption=result.get('caption')
+            file_size=result.get('file_size')
             )
+
+
+_VoiceBase = namedtuple('Audio', ['file_id', 'duration', 'mime_type', 'file_size'])
+
+
+class Voice(_VoiceBase):
+
+    """This object represents an voice node audio file.
+
+    Attributes:
+        file_id    (str)  :Unique identifier for this file
+        duration   (int)  :Duration of the audio in seconds as defined by sender
+        mime_type  (str)  :*Optional.* MIME type of the file as defined by sender
+        file_size  (int)  :*Optional.* File size
+
+    """
+    __slots__ = ()
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return Audio(
+            file_id=result.get('file_id'),
+            duration=result.get('duration'),
+            mime_type=result.get('mime_type'),
+            file_size=result.get('file_size')
+        )
 
 
 _ContactBase = namedtuple('Contact', ['phone_number', 'first_name', 'last_name', 'user_id'])
@@ -326,7 +359,7 @@ class Contact(_ContactBase):
         phone_number    (str)  :Contact's phone number
         first_name      (str)  :Contact's first name
         last_name       (str)  :*Optional.* Contact's last name
-        user_id         (str)  :*Optional.* Contact's user identifier in Telegram
+        user_id         (int)  :*Optional.* Contact's user identifier in Telegram
 
     """
     __slots__ = ()
@@ -826,13 +859,15 @@ def get_me(**kwargs):
 
 
 def send_message(chat_id, text,
-                 disable_web_page_preview=None, reply_to_message_id=None, reply_markup=None,
+                 parse_mode=None, disable_web_page_preview=None, reply_to_message_id=None, reply_markup=None,
                  **kwargs):
     """
     Use this method to send text messages.
 
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
     :param text: Text of the message to be sent
+    :param parse_mode: Send ``"Markdown"``, if you want Telegram apps to show bold,
+                       italic and inline URLs in your bot's message.
     :param disable_web_page_preview: Disables link previews for links in this message
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a
@@ -854,10 +889,12 @@ def send_message(chat_id, text,
     params = dict(chat_id=chat_id, text=text)
 
     # optional args
-    params.update(_clean_params(
-        disable_web_page_preview=disable_web_page_preview,
-        reply_to_message_id=reply_to_message_id,
-        reply_markup=reply_markup
+    params.update(
+        _clean_params(
+            parse_mode=parse_mode,
+            disable_web_page_preview=disable_web_page_preview,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup
         )
     )
 
@@ -946,22 +983,34 @@ def send_photo(chat_id,  photo,
 
 
 def send_audio(chat_id, audio,
-               reply_to_message_id=None, reply_markup=None,
+               duration=None, performer=None, title=None, reply_to_message_id=None, reply_markup=None,
                **kwargs):
     """
-    Use this method to send audio files, if you want Telegram clients to display the file as a playable voice
-    message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent
-    as Document).
+    Use this method to send audio files, if you want Telegram clients to display them in the music player.
+
+    Your audio must be in the .mp3 format. On success, the sent Message is returned. Bots can currently send audio
+    files of up to 50 MB in size, this limit may be changed in the future.
+
+    For backward compatibility, when the fields title and performer are both empty and the mime-type of the file to
+    be sent is not audio/mpeg, the file will be sent as a playable voice message. For this to work, the audio must
+    be in an .ogg file encoded with OPUS. This behavior will be phased out in the future. For sending voice
+    messages, use the sendVoice method instead.
 
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
     :param audio: Audio file to send. You can either pass a file_id as String to resend an audio that is already on
                   the Telegram servers, or upload a new audio file using multipart/form-data.
+    :param duration: Duration of the audio in seconds
+    :param performer: Performer
+    :param title: Track name
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
     :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
     :type audio: InputFile or str
+    :param duration: int
+    :param performer: str
+    :param title: str
     :type reply_to_message_id: int
     :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
 
@@ -984,6 +1033,9 @@ def send_audio(chat_id, audio,
     # optional args
     params.update(
         _clean_params(
+            duration=duration,
+            performer=performer,
+            title=title,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup
         )
@@ -1083,7 +1135,7 @@ def send_sticker(chat_id, sticker,
 
 
 def send_video(chat_id, video,
-               reply_to_message_id=None, reply_markup=None,
+               duration=None, caption=None, reply_to_message_id=None, reply_markup=None,
                **kwargs):
     """
     Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as Document).
@@ -1092,6 +1144,8 @@ def send_video(chat_id, video,
     :param video: Video to send. You can either pass a file_id as String to resend a
                   video that is already on the Telegram servers, or upload a new video
                   using multipart/form-data.
+    :param duration: Duration of sent video in seconds
+    :param caption: Video caption (may also be used when resending videos by file_id)
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a
                          custom reply keyboard, instructions to hide keyboard or to
@@ -1100,6 +1154,8 @@ def send_video(chat_id, video,
 
     :type chat_id: int
     :type video: InputFile or str
+    :type duration: int
+    :type caption: str
     :type reply_to_message_id: int
     :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
 
@@ -1122,12 +1178,66 @@ def send_video(chat_id, video,
     # optional args
     params.update(
         _clean_params(
+            duration=duration,
+            caption=caption,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup
         )
     )
 
     return TelegramBotRPCRequest('sendVideo', params=params, files=files, on_result=Message.from_result, **kwargs)
+
+
+def send_voice(chat_id, voice,
+               duration=None, reply_to_message_id=None, reply_markup=None,
+               **kwargs):
+    """
+    Use this method to send audio files, if you want Telegram clients to display the file as a playable voice
+    message.
+
+    For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Audio or
+    Document). On success, the sent Message is returned. Bots can currently send voice messages of up to 50 MB in
+    size, this limit may be changed in the future.
+
+    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param voice: Audio file to send. You can either pass a file_id as String to resend an audio that is already on
+                  the Telegram servers, or upload a new audio file using multipart/form-data.
+    :param duration: Duration of sent audio in seconds
+    :param reply_to_message_id: If the message is a reply, ID of the original message
+    :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type chat_id: int
+    :type voice: InputFile or str
+    :type duration: int
+    :type reply_to_message_id: int
+    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+
+    :returns: On success, the sent Message is returned.
+    :rtype: TelegramBotRPCRequest
+    """
+    files = None
+    if isinstance(voice, InputFile):
+        files = [voice]
+        voice = None
+    elif not isinstance(voice, str):
+        raise Exception('voice must be instance of InputFile or str')
+
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        voice=voice
+    )
+
+    # optional args
+    params.update(
+        _clean_params(
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup
+        )
+    )
+
+    return TelegramBotRPCRequest('sendVoice', params=params, files=files, on_result=Message.from_result, **kwargs)
 
 
 def send_location(chat_id, latitude, longitude,
@@ -1377,6 +1487,10 @@ class TelegramBot:
     def send_video(self, *args, **kwargs):
         """See :func:`send_video`"""
         return send_video(*args, **self._merge_overrides(**kwargs)).run()
+
+    def send_voice(self, *args, **kwargs):
+        """See :func:`send_voice`"""
+        return send_voice(*args, **self._merge_overrides(**kwargs)).run()
 
     def send_location(self, *args, **kwargs):
         """See :func:`send_location`"""

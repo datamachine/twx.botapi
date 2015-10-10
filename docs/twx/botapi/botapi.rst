@@ -48,6 +48,11 @@ Video
 
 .. autoclass:: Video
 
+Voice
+^^^^^
+
+.. autoclass:: Voice
+
 Contact
 ^^^^^^^
 
@@ -125,12 +130,12 @@ forward_message
 send_photo
 ^^^^^^^^^^
 
-.. autofunction:: send_photo(chat_id,  photo, caption=None, reply_to_message_id=None, reply_markup, *, request_args=None, **kwargs)
+.. autofunction:: send_photo(chat_id, photo, caption=None, reply_to_message_id=None, reply_markup, *, request_args=None, **kwargs)
 
 send_audio
 ^^^^^^^^^^
 
-.. autofunction:: send_audio(chat_id, audio, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
+.. autofunction:: send_audio(chat_id, audio, duration=None, performer=None, title=None, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
 
 send_document
 ^^^^^^^^^^^^^
@@ -145,7 +150,12 @@ send_sticker
 send_video
 ^^^^^^^^^^
 
-.. autofunction:: send_video(chat_id, video, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
+.. autofunction:: send_video(chat_id, video, duration=None, caption=None, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
+
+send_voice
+^^^^^^^^^^
+
+.. autofunction:: send_voice(chat_id, voice, duration=None, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
 
 send_location
 ^^^^^^^^^^^^^
