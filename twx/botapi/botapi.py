@@ -886,7 +886,7 @@ class TelegramDownloadRequest(TelegramBotRPCRequest):
     download_url_base = 'https://api.telegram.org/file/bot'
 
     def __init__(self, file_path, out_file, token, on_success=None,
-                 on_error=None):  # request_method eats the kwarg from TelegramBot.request_args
+                 on_error=None, request_method=None):  # request_method eats the kwarg from TelegramBot.request_args
         self.file_path = file_path
         self.out_file = out_file
         self.token = token
