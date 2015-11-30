@@ -16,7 +16,7 @@ Support for the MTProto API is in the works, but considered pre-alpha right now.
 Support
 -------
 
-You can join our support chat at: https://telegram.me/joinchat/05c5c2f60112fa104d1c0c563b2fd34a
+You can join our support chat at: https://telegram.me/joinchat/BcXC9gES-hANjNJ-N53Qhg
 
 or our dev chat at: https://telegram.me/joinchat/05c5c2f6018bd6653eb6bbdccb7106a8
 
