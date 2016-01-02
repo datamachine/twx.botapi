@@ -161,6 +161,7 @@ class Message(_MessageBase):
             )
 
 
+
 _PhotoSizeBase = namedtuple('PhotoSize', ['file_id', 'width', 'height', 'file_size'])
 
 
@@ -527,6 +528,28 @@ class File(_FileBase):
             file_size=result.get('file_size'),
             file_path=result.get('file_path')
         )
+class File(_FileBase):
+
+    """This object represents a file ready to be downloaded.
+
+    Attributes:
+        file_id (str): Unique identifier for this file
+        file_size (int): *Optional.* File size, if known
+        file_path (str): *Optional.* File path. Use https://api.telegram.org/file/bot<token>/<file_path>
+                         to get the file. It is guaranteed that the link will be valid for at least 1 hour.
+    """
+    __slots__ = ()
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return File(
+            file_id=result.get('file_id'),
+            file_size=result.get('file_size'),
+            file_path=result.get('file_path')
+        )
 
 
 class ReplyMarkup:
@@ -685,6 +708,226 @@ class ForceReply(_ForceReplyBase, ReplyMarkup):
 
         return json.dumps(reply_markup)
 
+
+_InlineQueryBase = namedtuple('InlineQuery', ['id', 'from', 'query', 'offset'])
+
+class InlineQuery(_InlineQueryBase):
+    """ This object represents an incoming inline query. When the user sends an empty query,
+        your bot could return some default or trending results.
+
+    Attributes:
+        id     (str)  :Unique identifier for this query
+        sender (User) :Sender
+        query  (str)  :Text of the query
+        offset (str)  :Offset of the results to be returned, can be controlled by the bot
+
+    """
+    __slots__ = ()
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return InlineQuery(
+            id=result.get('id'),
+            sender=User.from_result(result.get('from')),
+            query=result.get('query'),
+            offset=result.get('offset'),
+            )
+
+
+"""
+InlineQuery Types
+"""
+
+
+class InlineQueryResult:
+    pass
+
+
+class InlineQueryResultArticle(InlineQueryResult):
+    """ Represents a link to an article or web page.
+
+    Attributes:
+        id                       (str)  :Unique identifier of this result
+        title                    (str)  :Title of the result
+        message_text             (str)  :Text of the query
+        parse_mode               (str)  :*Optional.* Send “Markdown”, if you want Telegram apps to show bold, italic and
+                                         inline URLs in your bot's message.
+        disable_web_page_preview (bool) :*Optional.* Disables link previews for links in the sent message
+        url	                     (str)  :*Optional.* URL of the result
+        hide_url	             (bool) :*Optional.* Pass True, if you don't want the URL to be shown in the message
+        description              (str)  :*Optional.* Short description of the result
+        thumb_url                (str)  :*Optional.* Url of the thumbnail for the result
+        thumb_width              (int)  :*Optional.* Thumbnail width
+        thumb_height             (int)  :*Optional.* Thumbnail height
+
+    """
+
+    def __init__(self, id, title, message_text,
+                 parse_mode=None, disable_web_page_preview=None, url=None, hide_url=None, description=None,
+                 thumb_url=None, thumb_width=None, thumb_height=None):
+        self.type = "article"
+        self.id = id
+        self.title = title
+        self.message_text = message_text
+        self.parse_mode = parse_mode
+        self.disable_web_page_preview = disable_web_page_preview
+        self.url = url
+        self.hide_url = hide_url
+        self.description = description
+        self.thumb_url = thumb_url
+        self.thumb_width = thumb_width
+        self.thumb_height = thumb_height
+
+
+class InlineQueryResultPhoto(InlineQueryResult):
+    """ Represents a link to a photo. By default, this photo will be sent by the user with optional caption.
+    Alternatively, you can provide message_text to send it instead of photo.
+
+    Attributes:
+        id                          (str)    :Unique identifier of this result
+        photo_url                   (str)    :A valid URL of the photo. Photo size must not exceed 5MB
+        mime_type                   (str)    :*Optional.* MIME type of the photo, defaults to image/jpeg
+        photo_width                 (int)    :*Optional.* Width of the photo
+        photo_height                (int)    :*Optional.* Height of the photo
+        thumb_url                   (str)    :*Optional.* URL of the thumbnail for the photo
+        title                       (str)    :*Optional.* Title for the result
+        description                 (str)    :*Optional.* Short description of the result
+        caption                     (str)    :*Optional.* Caption of the photo to be sent
+        message_text                (str)    :*Optional.* Text of a message to be sent instead of the photo
+        parse_mode                  (str)    :*Optional.* Send “Markdown”, if you want Telegram apps to show bold,
+                                                          italic and inline URLs in your bot's message.
+        disable_web_page_preview    (bool)   :*Optional.* Disables link previews for links in the sent message
+
+    """
+
+    def __init__(self, id, photo_url,
+                 mime_type=None, photo_width=None, photo_height=None, thumb_url=None, title=None,
+                 description=None, caption=None, message_text=None, parse_mode=None, disable_web_page_preview=None):
+        self.type = "photo"
+        self.id = id
+        self.photo_url = photo_url
+        self.mime_type = mime_type
+        self.photo_width = photo_width
+        self.photo_height = photo_height
+        self.thumb_url = thumb_url
+        self.title = title
+        self.description = description
+        self.caption = caption
+        self.message_text = message_text
+        self.parse_mode = parse_mode
+        self.disable_web_page_preview = disable_web_page_preview
+
+
+class InlineQueryResultGif(InlineQueryResult):
+    """ Represents a link to an animated GIF file. By default, this animated GIF file will be sent by the user with
+    optional caption. Alternatively, you can provide message_text to send it instead of the animation.
+
+    Attributes:
+        id                          (str)    :Unique identifier of this result
+        gif_url                     (str)    :A valid URL for the GIF file. File size must not exceed 1MB
+        gif_width                   (int)    :*Optional.* Width of the GIF
+        gif_height                  (int)    :*Optional.* Height of the GIF
+        thumb_url                   (str)    :*Optional.* URL of a static thumbnail for the result (jpeg or gif)
+        title                       (str)    :*Optional.* Title for the result
+        caption                     (str)    :*Optional.* Caption of the GIF file to be sent
+        message_text                (str)    :*Optional.* Text of a message to be sent instead of the animation
+        parse_mode                  (str)    :*Optional.* Send “Markdown”, if you want Telegram apps to show bold,
+                                                          italic and inline URLs in your bot's message.
+        disable_web_page_preview    (bool)   :*Optional.* Disables link previews for links in the sent message
+
+    """
+
+    def __init__(self, id, gif_url,
+                 gif_width=None, gif_height=None, thumb_url=None, title=None,
+                 caption=None, message_text=None, parse_mode=None, disable_web_page_preview=None):
+        self.type = "gif"
+        self.id = id
+        self.gif_url = gif_url
+        self.gif_width = gif_width
+        self.gif_height = gif_height
+        self.thumb_url = thumb_url
+        self.title = title
+        self.caption = caption
+        self.message_text = message_text
+        self.parse_mode = parse_mode
+        self.disable_web_page_preview = disable_web_page_preview
+
+
+class InlineQueryResultMpeg4Gif(InlineQueryResult):
+    """ Represents a link to a video animation (H.264/MPEG-4 AVC video without sound).
+    By default, this animated MPEG-4 file will be sent by the user with optional caption. Alternatively,
+    you can provide message_text to send it instead of the animation.
+
+    Attributes:
+        id                        (str)    :Unique identifier of this result
+        mpeg4_url                 (str)    :A valid URL for the mp4 file. File size must not exceed 1MB
+        mpeg4_width               (int)    :*Optional.* Width of the mp4
+        mpeg4_height              (int)    :*Optional.* Height of the mp4
+        thumb_url                 (str)    :*Optional.* URL of a static thumbnail for the result (jpeg or mpeg4)
+        title                     (str)    :*Optional.* Title for the result
+        caption                   (str)    :*Optional.* Caption of the mp4 file to be sent
+        message_text              (str)    :*Optional.* Text of a message to be sent instead of the animation
+        parse_mode                (str)    :*Optional.* Send “Markdown”, if you want Telegram apps to show bold,
+                                                        italic and inline URLs in your bot's message.
+        disable_web_page_preview  (bool)   :*Optional.* Disables link previews for links in the sent message
+
+    """
+
+    def __init__(self, id, mpeg4_url,
+                 mpeg4_width=None, mpeg4_height=None, thumb_url=None, title=None,
+                 caption=None, message_text=None, parse_mode=None, disable_web_page_preview=None):
+        self.type = "mpeg4_gif"
+        self.id = id
+        self.mpeg4_url = mpeg4_url
+        self.mpeg4_width = mpeg4_width
+        self.mpeg4_height = mpeg4_height
+        self.thumb_url = thumb_url
+        self.title = title
+        self.caption = caption
+        self.message_text = message_text
+        self.parse_mode = parse_mode
+        self.disable_web_page_preview = disable_web_page_preview
+
+
+class InlineQueryResultVideo(InlineQueryResult):
+    """ Represents link to a page containing an embedded video player or a video file.
+
+    Attributes:
+        type                     (str)     :Type of the result, must be video
+        id                       (str)     :Unique identifier of this result
+        video_url                (str)     :A valid URL for the embedded video player or video file
+        mime_type                (str)     :Mime type of the content of video url, i.e. “text/html” or “video/mp4”
+        message_text             (str)     :Text of a message to be sent instead of the video
+        parse_mode               (str)     :*Optional.* Send “Markdown”, if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
+        disable_web_page_preview (bool)    :*Optional.* Disables link previews for links in the sent message
+        video_width              (int)     :*Optional.* Video width
+        video_height             (int)     :*Optional.* Video height
+        video_duration           (int)     :*Optional.* Video duration in seconds
+        thumb_url                (str)     :*Optional.* URL of the thumbnail (jpeg only) for the video
+        title                    (str)     :*Optional.* Title for the result
+        description              (str)     :*Optional.* Short description of the result
+
+    """
+
+    def __init__(self, id, video_url, mime_type,
+                 message_text=None, parse_mode=None, disable_web_page_preview=None, video_width=None, video_height=None,
+                 video_duration=None, thumb_url=None, title=None, description=None):
+        self.type = "video"
+        self.id = id
+        self.video_url = video_url
+        self.mime_type = mime_type
+        self.message_text = message_text
+        self.parse_mode = parse_mode
+        self.disable_web_page_preview = disable_web_page_preview
+        self.video_width = video_width
+        self.video_height = video_height
+        self.video_duration = video_duration
+        self.thumb_url = thumb_url
+        self.title = title
+        self.description = description
 
 """
 Types added for utility purposes
@@ -1429,6 +1672,52 @@ def send_chat_action(chat_id, action,
     )
 
     return TelegramBotRPCRequest('sendChatAction', params=params, on_result=lambda result: result, **kwargs)
+
+
+def answer_inline_query(inline_query_id, results, cache_time=None, is_personal=None, next_offset=None, **kwargs):
+    """ Use this method to send answers to an inline query. On success, True is returned.
+
+    :param inline_query_id: Unique identifier for the message recipient — String
+    :param results: An array of results for the inline query — Array of InlineQueryResult
+    :param cache_time: The maximum amount of time the result of the inline query may be cached on the server
+    :param is_personal: Pass True, if results may be cached on the server side only for the user that sent the query.
+                        By default, results may be returned to any user who sends the same query
+    :param next_offset: Pass the offset that a client should send in the next query with the same text to receive more
+                        results. Pass an empty string if there are no more results or if you don‘t support pagination.
+                        Offset length can’t exceed 64 bytes.
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type inline_query_id: str
+    :type results: InlineQueryResult[]
+    :type cache_time: int
+    :type is_personal: bool
+    :type next_offset: stri
+
+
+    :returns: On success, the sent True is returned.
+    :rtype: bool
+    """
+
+    json_results = []
+    for result in results:
+        json_results.append(dict((k, v) for k, v in result.__dict__.iteritems() if v))  # Don't serialize None keys.
+
+    # required args
+    params = dict(
+        inline_query_id=inline_query_id,
+        results=json.dumps(json_results)
+    )
+
+    # optional args
+    params.update(
+        _clean_params(
+            cache_time=cache_time,
+            is_personal=is_personal,
+            next_offset=next_offset
+        )
+    )
+
+    return TelegramBotRPCRequest('answerInlineQuery', params=params, on_result=Message.from_result, **kwargs)
 
 
 def get_user_profile_photos(user_id,
