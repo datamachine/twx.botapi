@@ -1946,6 +1946,10 @@ class TelegramBot:
         """See :func:`get_me`"""
         return get_me(*args, **self._merge_overrides(**kwargs)).run()
 
+    def answer_inline_query(self, *args, **kwargs):
+        """See :func:`answer_inline_query`"""
+        return answer_inline_query(*args, **self._merge_overrides(**kwargs)).run()
+
     def send_message(self, *args, **kwargs):
         """See :func:`send_message`"""
         return send_message(*args, **self._merge_overrides(**kwargs)).run()
