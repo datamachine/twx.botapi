@@ -772,7 +772,7 @@ class ChosenInlineResult(_ChosenInlineResultBase):
         if result is None:
             return None
 
-        return InlineQuery(
+        return ChosenInlineResult(
             result_id=result.get('result_id'),
             sender=User.from_result(result.get('from')),
             query=result.get('query'),
@@ -1947,7 +1947,6 @@ class TelegramBot:
         return get_me(*args, **self._merge_overrides(**kwargs)).run()
 
     def answer_inline_query(self, *args, **kwargs):
-        """See :func:`answer_inline_query`"""
         return answer_inline_query(*args, **self._merge_overrides(**kwargs)).run()
 
     def send_message(self, *args, **kwargs):
