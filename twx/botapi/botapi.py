@@ -414,7 +414,7 @@ class Location(_LocationBase):
             )
 
 
-_UpdateBase = namedtuple('Update', ['update_id', 'message'])
+_UpdateBase = namedtuple('Update', ['update_id', 'message', 'inline_query', 'chosen_inline_result'])
 
 
 class Update(_UpdateBase):
