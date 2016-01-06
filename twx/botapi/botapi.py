@@ -83,7 +83,8 @@ _MessageBase = namedtuple('Message', [
     'reply_to_message', 'text', 'audio', 'document', 'photo', 'sticker',
     'video', 'voice', 'caption', 'contact', 'location', 'new_chat_participant',
     'left_chat_participant', 'new_chat_title', 'new_chat_photo', 'delete_chat_photo',
-    'group_chat_created'])
+    'group_chat_created', 'supergroup_chat_created', 'channel_chat_created', 'migrate_to_chat_id',
+    'migrate_from_chat_id'])
 
 
 class Message(_MessageBase):
@@ -91,36 +92,43 @@ class Message(_MessageBase):
     """This object represents a message.
 
     Attributes:
-        message_id            (int)                 :Unique message identifier
-        from                  (User)                :*Optional.* Sender, can be empty for messages sent to channels
-        date                  (int)                 :Date the message was sent in Unix time
-        chat                  (Chat)                :Conversation the message belongs to
-        forward_from          (User)                :*Optional.* For forwarded messages, sender of the original message
-        forward_date          (int)                 :*Optional.* For forwarded messages, date the original message was
-                                                                 sent in Unix time
-        reply_to_message      (Message)             :*Optional.* For replies, the original message. Note that the
-                                                                 Message object in this field will not contain further
-                                                                 reply_to_message fields even if it itself is a reply.
-        text                  (str)                 :*Optional.* For text messages, the actual UTF-8 text of the message
-        audio                 (Audio)               :*Optional.* Message is an audio file, information about the file
-        document              (Document)            :*Optional.* Message is a general file, information about the file
-        photo                 (Sequence[PhotoSize]) :*Optional.* Message is a photo, available sizes of the photo
-        sticker               (Sticker)             :*Optional.* Message is a sticker, information about the sticker
-        video                 (Video)               :*Optional.* Message is a video, information about the video
-        voice                 (Voice)               :*Optional.* Message is a voice message, information about the file
-        caption               (str)                 :*Optional.* Caption for the photo or video
-        contact               (Contact)             :*Optional.* Message is a shared contact, information about
-                                                                 the contact
-        location              (Location)            :*Optional.* Message is a shared location, information about the
-                                                                 location
-        new_chat_participant  (User)                :*Optional.* A new member was added to the group, information about
-                                                                 them (this member may be bot itself)
-        left_chat_participant (User)                :*Optional.* A member was removed from the group, information about
-                                                                 them (this member may be bot itself)
-        new_chat_title        (str)                 :*Optional.* A group title was changed to this value
-        new_chat_photo        (Sequence[PhotoSize]) :*Optional.* A group photo was change to this value
-        delete_chat_photo     (``True``)            :*Optional.* Informs that the group photo was deleted
-        group_chat_created    (``True``)            :*Optional.* Informs that the group has been created
+        message_id              (int)                 :Unique message identifier
+        from                    (User)                :*Optional.* Sender, can be empty for messages sent to channels
+        date                    (int)                 :Date the message was sent in Unix time
+        chat                    (Chat)                :Conversation the message belongs to
+        forward_from            (User)                :*Optional.* For forwarded messages, sender of the original message
+        forward_date            (int)                 :*Optional.* For forwarded messages, date the original message was
+                                                                  sent in Unix time
+        reply_to_message        (Message)             :*Optional.* For replies, the original message. Note that the
+                                                                   Message object in this field will not contain further
+                                                                   reply_to_message fields even if it itself is a reply.
+        text                    (str)                 :*Optional.* For text messages, the actual UTF-8 text of the message
+        audio                   (Audio)               :*Optional.* Message is an audio file, information about the file
+        document                (Document)            :*Optional.* Message is a general file, information about the file
+        photo                   (Sequence[PhotoSize]) :*Optional.* Message is a photo, available sizes of the photo
+        sticker                 (Sticker)             :*Optional.* Message is a sticker, information about the sticker
+        video                   (Video)               :*Optional.* Message is a video, information about the video
+        voice                   (Voice)               :*Optional.* Message is a voice message, information about the file
+        caption                 (str)                 :*Optional.* Caption for the photo or video
+        contact                 (Contact)             :*Optional.* Message is a shared contact, information about
+                                                                   the contact
+        location                (Location)            :*Optional.* Message is a shared location, information about the
+                                                                   location
+        new_chat_participant    (User)                :*Optional.* A new member was added to the group, information about
+                                                                   them (this member may be bot itself)
+        left_chat_participant   (User)                :*Optional.* A member was removed from the group, information about
+                                                                  them (this member may be bot itself)
+        new_chat_title          (str)                 :*Optional.* A group title was changed to this value
+        new_chat_photo          (Sequence[PhotoSize]) :*Optional.* A group photo was change to this value
+        delete_chat_photo       (bool)                :*Optional.* Informs that the group photo was deleted
+        group_chat_created      (bool)                :*Optional.* Informs that the group has been created
+        supergroup_chat_created (bool)                :*Optional.* Service message: the supergroup has been created
+        channel_chat_created    (bool)                :*Optional.* Service message: the channel has been created
+        migrate_to_chat_id		(int)                 :*Optional.* The group has been migrated to a supergroup with
+                                                       the specified identifier, not exceeding 1e13 by absolute value
+        migrate_from_chat_id    (int)                 :*Optional.* The supergroup has been migrated from a group
+                                                       with the specified identifier, not exceeding 1e13 by absolute value
+
     """
     __slots__ = ()
 
@@ -157,7 +165,11 @@ class Message(_MessageBase):
             new_chat_title=result.get('new_chat_title'),
             new_chat_photo=result.get('new_chat_photo'),
             delete_chat_photo=result.get('delete_chat_photo'),
-            group_chat_created=result.get('group_chat_created')
+            group_chat_created=result.get('group_chat_created'),
+            supergroup_chat_created=result.get('supergroup_chat_created'),
+            channel_chat_created=result.get('channel_chat_created'),
+            migrate_to_chat_id=result.get('migrate_to_chat_id'),
+            migrate_from_chat_id=result.get('migrate_from_chat_id'),
             )
 
 
@@ -410,11 +422,14 @@ class Update(_UpdateBase):
     """This object represents an incoming update.
 
     Attributes:
-        update_id   (int)     :The update‘s unique identifier. Update identifiers start from a certain
-                               positive number and increase sequentially. This ID becomes especially handy
-                               if you’re using Webhooks, since it allows you to ignore repeated updates or to
-                               restore the correct update sequence, should they get out of order.
-        message     (Message) :*Optional.* New incoming message of any kind — text, photo, sticker, etc.
+        update_id               (int)                :The update‘s unique identifier. Update identifiers start from a certain
+                                                      positive number and increase sequentially. This ID becomes especially handy
+                                                      if you’re using Webhooks, since it allows you to ignore repeated updates or to
+                                                      restore the correct update sequence, should they get out of order.
+        message                 (Message)            :*Optional.* New incoming message of any kind — text, photo, sticker, etc.
+        inline_query            (InlineQuery)        :*Optional.* New incoming inline query
+        chosen_inline_result	(ChosenInlineResult) :*Optional.* The result of a inline query that was chosen by
+                                                      a user and sent to their chat partner
 
     """
     __slots__ = ()
@@ -424,7 +439,10 @@ class Update(_UpdateBase):
         if message_update is None:
             return None
 
-        return Update(message_update.get('update_id'), Message.from_result(message_update.get('message')))
+        return Update(message_update.get('update_id'),
+                      Message.from_result(message_update.get('message')),
+                      InlineQuery.from_result(message_update.get('inline_query')),
+                      ChosenInlineResult.from_result(message_update.get('chosen_inline_result')))
 
     @staticmethod
     def from_result(result):
@@ -709,8 +727,7 @@ class ForceReply(_ForceReplyBase, ReplyMarkup):
         return json.dumps(reply_markup)
 
 
-_InlineQueryBase = namedtuple('InlineQuery', ['id', 'from', 'query', 'offset'])
-
+_InlineQueryBase = namedtuple('InlineQuery', ['id', 'sender', 'query', 'offset'])
 class InlineQuery(_InlineQueryBase):
     """ This object represents an incoming inline query. When the user sends an empty query,
         your bot could return some default or trending results.
@@ -736,6 +753,30 @@ class InlineQuery(_InlineQueryBase):
             offset=result.get('offset'),
             )
 
+
+_ChosenInlineResultBase = namedtuple('ChosenInlineResult', ['result_id', 'sender', 'query'])
+class ChosenInlineResult(_ChosenInlineResultBase):
+    """ This object represents an incoming inline query. When the user sends an empty query,
+        your bot could return some default or trending results.
+
+    Attributes:
+        result_id     (str)  :The unique identifier for the result that was chosen.
+        sender (User) :The user that chose the result.
+        query  (str)  :The query that was used to obtain the result.
+
+    """
+    __slots__ = ()
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return InlineQuery(
+            result_id=result.get('result_id'),
+            sender=User.from_result(result.get('from')),
+            query=result.get('query'),
+            )
 
 """
 InlineQuery Types
@@ -928,6 +969,8 @@ class InlineQueryResultVideo(InlineQueryResult):
         self.thumb_url = thumb_url
         self.title = title
         self.description = description
+
+
 
 """
 Types added for utility purposes
