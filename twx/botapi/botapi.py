@@ -1743,7 +1743,7 @@ def answer_inline_query(inline_query_id, results, cache_time=None, is_personal=N
 
     json_results = []
     for result in results:
-        json_results.append(dict((k, v) for k, v in result.__dict__.iteritems() if v))  # Don't serialize None keys.
+        json_results.append(dict((k, v) for k, v in result.__dict__.items() if v))  # Don't serialize None keys.
 
     # required args
     params = dict(
