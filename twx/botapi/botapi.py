@@ -172,8 +172,6 @@ class Message(_MessageBase):
             migrate_from_chat_id=result.get('migrate_from_chat_id'),
             )
 
-
-
 _PhotoSizeBase = namedtuple('PhotoSize', ['file_id', 'width', 'height', 'file_size'])
 
 
@@ -546,6 +544,8 @@ class File(_FileBase):
             file_size=result.get('file_size'),
             file_path=result.get('file_path')
         )
+
+
 class File(_FileBase):
 
     """This object represents a file ready to be downloaded.
@@ -1249,7 +1249,7 @@ def get_me(**kwargs):
 
 def send_message(chat_id, text,
                  parse_mode=None, disable_web_page_preview=None, reply_to_message_id=None, reply_markup=None,
-                 **kwargs):
+                 disable_notification=False, **kwargs):
     """
     Use this method to send text messages.
 
@@ -1262,6 +1262,8 @@ def send_message(chat_id, text,
     :param reply_markup: Additional interface options. A JSON-serialized object for a
                          custom reply keyboard, instructions to hide keyboard or to
                          force a reply from the user.
+    :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
+                                 will receive a notification with no sound. Other apps coming soon.
     :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
@@ -1283,14 +1285,15 @@ def send_message(chat_id, text,
             parse_mode=parse_mode,
             disable_web_page_preview=disable_web_page_preview,
             reply_to_message_id=reply_to_message_id,
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
+            disable_notification=disable_notification,
         )
     )
 
     return TelegramBotRPCRequest('sendMessage', params=params, on_result=Message.from_result, **kwargs)
 
 
-def forward_message(chat_id, from_chat_id, message_id,
+def forward_message(chat_id, from_chat_id, message_id, disable_notification=False,
                     **kwargs):
     """
     Use this method to forward messages of any kind.
@@ -1299,6 +1302,8 @@ def forward_message(chat_id, from_chat_id, message_id,
     :param from_chat_id: Unique identifier for the chat where the original message was sent — User or
                          GroupChat id
     :param message_id: Unique message identifier
+    :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
+                                 will receive a notification with no sound. Other apps coming soon.
     :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
@@ -1313,14 +1318,15 @@ def forward_message(chat_id, from_chat_id, message_id,
     params = dict(
         chat_id=chat_id,
         from_chat_id=from_chat_id,
-        message_id=message_id
+        message_id=message_id,
+        disable_notification=disable_notification,
     )
 
     return TelegramBotRPCRequest('forwardMessage', params=params, on_result=Message.from_result, **kwargs)
 
 
 def send_photo(chat_id,  photo,
-               caption=None, reply_to_message_id=None, reply_markup=None,
+               caption=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
                **kwargs):
     """
     Use this method to send photos.
@@ -1334,6 +1340,8 @@ def send_photo(chat_id,  photo,
     :param reply_markup: Additional interface options. A JSON-serialized object for a
                          custom reply keyboard, instructions to hide keyboard or to
                          force a reply from the user.
+    :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
+                                 will receive a notification with no sound. Other apps coming soon.
     :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
@@ -1364,7 +1372,8 @@ def send_photo(chat_id,  photo,
         _clean_params(
             caption=caption,
             reply_to_message_id=reply_to_message_id,
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
+            disable_notification=disable_notification,
         )
     )
 
@@ -1373,7 +1382,7 @@ def send_photo(chat_id,  photo,
 
 def send_audio(chat_id, audio,
                duration=None, performer=None, title=None, reply_to_message_id=None, reply_markup=None,
-               **kwargs):
+               disable_notification=False, **kwargs):
     """
     Use this method to send audio files, if you want Telegram clients to display them in the music player.
 
@@ -1393,6 +1402,8 @@ def send_audio(chat_id, audio,
     :param title: Track name
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
+    :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
+                                 will receive a notification with no sound. Other apps coming soon.
     :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
@@ -1426,7 +1437,8 @@ def send_audio(chat_id, audio,
             performer=performer,
             title=title,
             reply_to_message_id=reply_to_message_id,
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
+            disable_notification=disable_notification,
         )
     )
 
@@ -1434,7 +1446,7 @@ def send_audio(chat_id, audio,
 
 
 def send_document(chat_id, document,
-                  reply_to_message_id=None, reply_markup=None,
+                  reply_to_message_id=None, reply_markup=None, disable_notification=False,
                   **kwargs):
     """
     Use this method to send general files.
@@ -1445,6 +1457,8 @@ def send_document(chat_id, document,
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
                          instructions to hide keyboard or to force a reply from the user.
+    :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
+                                 will receive a notification with no sound. Other apps coming soon.
     :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
@@ -1472,7 +1486,8 @@ def send_document(chat_id, document,
     params.update(
         _clean_params(
             reply_to_message_id=reply_to_message_id,
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
+            disable_notification=disable_notification,
         )
     )
 
@@ -1480,7 +1495,7 @@ def send_document(chat_id, document,
 
 
 def send_sticker(chat_id, sticker,
-                 reply_to_message_id=None, reply_markup=None,
+                 reply_to_message_id=None, reply_markup=None, disable_notification=False,
                  **kwargs):
     """
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
@@ -1489,6 +1504,8 @@ def send_sticker(chat_id, sticker,
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
                          instructions to hide keyboard or to force a reply from the user.
+    :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
+                                 will receive a notification with no sound. Other apps coming soon.
     :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
@@ -1516,7 +1533,8 @@ def send_sticker(chat_id, sticker,
     params.update(
         _clean_params(
             reply_to_message_id=reply_to_message_id,
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
+            disable_notification=disable_notification,
         )
     )
 
@@ -1524,7 +1542,7 @@ def send_sticker(chat_id, sticker,
 
 
 def send_video(chat_id, video,
-               duration=None, caption=None, reply_to_message_id=None, reply_markup=None,
+               duration=None, caption=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
                **kwargs):
     """
     Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as Document).
@@ -1539,6 +1557,8 @@ def send_video(chat_id, video,
     :param reply_markup: Additional interface options. A JSON-serialized object for a
                          custom reply keyboard, instructions to hide keyboard or to
                          force a reply from the user.
+    :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
+                                 will receive a notification with no sound. Other apps coming soon.
     :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
@@ -1570,7 +1590,8 @@ def send_video(chat_id, video,
             duration=duration,
             caption=caption,
             reply_to_message_id=reply_to_message_id,
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
+            disable_notification=disable_notification,
         )
     )
 
@@ -1578,7 +1599,7 @@ def send_video(chat_id, video,
 
 
 def send_voice(chat_id, voice,
-               duration=None, reply_to_message_id=None, reply_markup=None,
+               duration=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
                **kwargs):
     """
     Use this method to send audio files, if you want Telegram clients to display the file as a playable voice
@@ -1594,6 +1615,8 @@ def send_voice(chat_id, voice,
     :param duration: Duration of sent audio in seconds
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
+    :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
+                                 will receive a notification with no sound. Other apps coming soon.
     :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
@@ -1622,7 +1645,8 @@ def send_voice(chat_id, voice,
     params.update(
         _clean_params(
             reply_to_message_id=reply_to_message_id,
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
+            disable_notification=disable_notification,
         )
     )
 
@@ -1630,7 +1654,7 @@ def send_voice(chat_id, voice,
 
 
 def send_location(chat_id, latitude, longitude,
-                  reply_to_message_id=None, reply_markup=None,
+                  reply_to_message_id=None, reply_markup=None, disable_notification=False,
                   **kwargs):
     """
     Use this method to send point on the map.
@@ -1642,6 +1666,8 @@ def send_location(chat_id, latitude, longitude,
     :param reply_markup: Additional interface options. A JSON-serialized object for a
                          custom reply keyboard, instructions to hide keyboard or to
                          force a reply from the user.
+    :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
+                                 will receive a notification with no sound. Other apps coming soon.
     :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
@@ -1665,7 +1691,8 @@ def send_location(chat_id, latitude, longitude,
     params.update(
         _clean_params(
             reply_to_message_id=reply_to_message_id,
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
+            disable_notification=disable_notification,
         )
     )
 
