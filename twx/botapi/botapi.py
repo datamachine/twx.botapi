@@ -18,8 +18,6 @@ import json
 Telegram Bot API Types as defined at https://core.telegram.org/bots/api#available-types
 """
 _UserBase = namedtuple('User', ['id', 'first_name', 'last_name', 'username'])
-
-
 class User(_UserBase):
 
     """This object represents a Telegram user or bot.
@@ -47,8 +45,6 @@ class User(_UserBase):
 
 
 _ChatBase = namedtuple('Chat', ['id', 'type', 'title', 'username', 'first_name', 'last_name'])
-
-
 class Chat(_ChatBase):
     """This object represents a chat.
 
@@ -80,57 +76,71 @@ class Chat(_ChatBase):
 
 _MessageBase = namedtuple('Message', [
     'message_id', 'sender', 'date', 'chat', 'forward_from', 'forward_date',
-    'reply_to_message', 'text', 'audio', 'document', 'photo', 'sticker',
-    'video', 'voice', 'caption', 'contact', 'location', 'new_chat_participant',
-    'left_chat_participant', 'new_chat_title', 'new_chat_photo', 'delete_chat_photo',
+    'reply_to_message', 'text', 'entities', 'audio', 'document', 'photo', 'sticker',
+    'video', 'voice', 'caption', 'contact', 'location', 'venue', 'new_chat_member',
+    'left_chat_member', 'new_chat_title', 'new_chat_photo', 'delete_chat_photo',
     'group_chat_created', 'supergroup_chat_created', 'channel_chat_created', 'migrate_to_chat_id',
-    'migrate_from_chat_id'])
-
-
+    'migrate_from_chat_id', 'pinned_message'])
 class Message(_MessageBase):
 
     """This object represents a message.
 
     Attributes:
-        message_id              (int)                 :Unique message identifier
-        from                    (User)                :*Optional.* Sender, can be empty for messages sent to channels
-        date                    (int)                 :Date the message was sent in Unix time
-        chat                    (Chat)                :Conversation the message belongs to
-        forward_from            (User)                :*Optional.* For forwarded messages, sender of the original message
-        forward_date            (int)                 :*Optional.* For forwarded messages, date the original message was
-                                                                  sent in Unix time
-        reply_to_message        (Message)             :*Optional.* For replies, the original message. Note that the
-                                                                   Message object in this field will not contain further
-                                                                   reply_to_message fields even if it itself is a reply.
-        text                    (str)                 :*Optional.* For text messages, the actual UTF-8 text of the message
-        audio                   (Audio)               :*Optional.* Message is an audio file, information about the file
-        document                (Document)            :*Optional.* Message is a general file, information about the file
-        photo                   (Sequence[PhotoSize]) :*Optional.* Message is a photo, available sizes of the photo
-        sticker                 (Sticker)             :*Optional.* Message is a sticker, information about the sticker
-        video                   (Video)               :*Optional.* Message is a video, information about the video
-        voice                   (Voice)               :*Optional.* Message is a voice message, information about the file
-        caption                 (str)                 :*Optional.* Caption for the photo or video
-        contact                 (Contact)             :*Optional.* Message is a shared contact, information about
-                                                                   the contact
-        location                (Location)            :*Optional.* Message is a shared location, information about the
-                                                                   location
-        new_chat_participant    (User)                :*Optional.* A new member was added to the group, information about
-                                                                   them (this member may be bot itself)
-        left_chat_participant   (User)                :*Optional.* A member was removed from the group, information about
-                                                                  them (this member may be bot itself)
-        new_chat_title          (str)                 :*Optional.* A group title was changed to this value
-        new_chat_photo          (Sequence[PhotoSize]) :*Optional.* A group photo was change to this value
-        delete_chat_photo       (bool)                :*Optional.* Informs that the group photo was deleted
-        group_chat_created      (bool)                :*Optional.* Informs that the group has been created
-        supergroup_chat_created (bool)                :*Optional.* Service message: the supergroup has been created
-        channel_chat_created    (bool)                :*Optional.* Service message: the channel has been created
-        migrate_to_chat_id		(int)                 :*Optional.* The group has been migrated to a supergroup with
-                                                       the specified identifier, not exceeding 1e13 by absolute value
-        migrate_from_chat_id    (int)                 :*Optional.* The supergroup has been migrated from a group
-                                                       with the specified identifier, not exceeding 1e13 by absolute value
+        message_id       (int)                           :Unique message identifier
+        from             (User)                          :*Optional.* Sender, can be empty for messages sent to channels
+        date             (int)                           :Date the message was sent in Unix time
+        chat             (Chat)                          :Conversation the message belongs to
+        forward_from     (User)                          :*Optional.* For forwarded messages, sender of the original message
+        forward_date     (int)                           :*Optional.* For forwarded messages, date the original message was
+                                                                     sent in Unix time
+        reply_to_message (Message)                       :*Optional.* For replies, the original message. Note that the
+                                                                      Message object in this field will not contain further
+                                                                      reply_to_message fields even if it itself is a reply.
+        text             (str)                           :*Optional.* For text messages, the actual UTF-8 text of the message
+        entities         (Sequence[MessageEntity])       :*Optional.*For text messages, special entities like usernames,
+                                                                     URLs, bot commands, etc. that appear in the text
+        audio            (Audio)                         :*Optional.* Message is an audio file, information about the file
+        document         (Document)                      :*Optional.* Message is a general file, information about the file
+        photo            (Sequence[PhotoSize])           :*Optional.* Message is a photo, available sizes of the photo
+        sticker          (Sticker)                       :*Optional.* Message is a sticker, information about the sticker
+        video            (Video)                         :*Optional.* Message is a video, information about the video
+        voice            (Voice)                         :*Optional.* Message is a voice message, information about the file
+        caption          (str)                           :*Optional.* Caption for the photo or video
+        contact          (Contact)                       :*Optional.* Message is a shared contact, information about
+                                                                      the contact
+        location         (Location)                     :*Optional.* Message is a shared location, information about the
+                                                                     location
+        venue           (Venue)                         :*Optional.* Message is a venue, information about the venue
+        new_chat_member    (User)                       :*Optional.* A new member was added to the group, information about
+                                                                     them (this member may be bot itself)
+        left_chat_member   (User)                       :*Optional.* A member was removed from the group, information about
+                                                                     them (this member may be bot itself)
+        new_chat_title          (str)                   :*Optional.* A group title was changed to this value
+        new_chat_photo          (Sequence[PhotoSize])   :*Optional.* A group photo was change to this value
+        delete_chat_photo       (bool)                  :*Optional.* Informs that the group photo was deleted
+        group_chat_created      (bool)                  :*Optional.* Informs that the group has been created
+        supergroup_chat_created (bool)                  :*Optional.* Service message: the supergroup has been created
+        channel_chat_created    (bool)                  :*Optional.* Service message: the channel has been created
+        migrate_to_chat_id		(int)                   :*Optional.* The group has been migrated to a supergroup with
+                                                                     the specified identifier, not exceeding 1e13 by absolute value
+        migrate_from_chat_id    (int)                   :*Optional.* The supergroup has been migrated from a group
+                                                                     with the specified identifier, not exceeding 1e13 by absolute value
+        pinned_message          (Message)               :*Optional.* Specified message was pinned. Note that the Message object in this
+                                                                     field will not contain further reply_to_message fields even if it
+                                                                     is itself a reply.
 
     """
     __slots__ = ()
+
+    @property
+    def new_chat_participant(self):
+        print("DEPRECATED: new_chat_participant is now new_chat_member")
+        return self.new_chat_member
+
+    @property
+    def left_chat_participant(self):
+        print("DEPRECATED: left_chat_participant is now left_chat_member")
+        return self.left_chat_member
 
     @staticmethod
     def from_result(result):
@@ -142,6 +152,11 @@ class Message(_MessageBase):
         if photo is not None:
             photo = [PhotoSize.from_result(photo_size) for photo_size in photo]
 
+        # entities is a list of MessageEntity
+        entities = result.get('entities')
+        if entities is not None:
+            entities = [MessageEntity.from_result(entity) for entity in entities]
+
         return Message(
             message_id=result.get('message_id'),
             sender=User.from_result(result.get('from')),
@@ -151,6 +166,7 @@ class Message(_MessageBase):
             forward_date=result.get('forward_date'),
             reply_to_message=Message.from_result(result.get('reply_to_message')),
             text=result.get('text'),
+            entities=entities,
             audio=Audio.from_result(result.get('audio')),
             document=Document.from_result(result.get('document')),
             photo=photo,
@@ -160,8 +176,9 @@ class Message(_MessageBase):
             caption=result.get('caption'),
             contact=Contact.from_result(result.get('contact')),
             location=Location.from_result(result.get('location')),
-            new_chat_participant=User.from_result(result.get('new_chat_participant')),
-            left_chat_participant=User.from_result(result.get('left_chat_participant')),
+            venue=Venue.from_result(result.get('venue')),
+            new_chat_memeber=User.from_result(result.get('new_chat_memeber')),
+            left_chat_memeber=User.from_result(result.get('left_chat_memeber')),
             new_chat_title=result.get('new_chat_title'),
             new_chat_photo=result.get('new_chat_photo'),
             delete_chat_photo=result.get('delete_chat_photo'),
@@ -170,11 +187,38 @@ class Message(_MessageBase):
             channel_chat_created=result.get('channel_chat_created'),
             migrate_to_chat_id=result.get('migrate_to_chat_id'),
             migrate_from_chat_id=result.get('migrate_from_chat_id'),
-            )
+            pinned_message=Message.from_result(result.get('pinned_message'))
+        )
+
+
+_MessageEntityBase = namedtuple('MessageEntity', ['type', 'offset', 'length', 'url'])
+class MessageEntity(_MessageEntityBase):
+    """This object represents a chat.
+
+    Attributes:
+        type	(str)	:Type of the entity. One of mention (@username), hashtag, bot_command, url, email, bold (bold text),
+                         italic (italic text), code (monowidth string), pre (monowidth block), text_link (for clickable text URLs)
+        offset	(int)	:Offset in UTF-16 code units to the start of the entity
+        length	(int)	:Length of the entity in UTF-16 code units
+        url	    (str)	:*Optional.* For “text_link” only, url that will be opened after user taps on the text
+    """
+
+    __slots__ = ()
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return MessageEntity(
+            type=result.get('type'),
+            offset=result.get('offset'),
+            length=result.get('length'),
+            url=result.get('url'),
+        )
+
 
 _PhotoSizeBase = namedtuple('PhotoSize', ['file_id', 'width', 'height', 'file_size'])
-
-
 class PhotoSize(_PhotoSizeBase):
 
     """This object represents one size of a photo or a file / sticker thumbnail.
@@ -201,8 +245,6 @@ class PhotoSize(_PhotoSizeBase):
 
 
 _AudioBase = namedtuple('Audio', ['file_id', 'duration', 'mime_type', 'file_size'])
-
-
 class Audio(_AudioBase):
 
     """This object represents a generic audio file (not voice note).
@@ -232,8 +274,6 @@ class Audio(_AudioBase):
 
 
 _DocumentBase = namedtuple('Document', ['file_id', 'thumb', 'file_name', 'mime_type', 'file_size'])
-
-
 class Document(_DocumentBase):
 
     """This object represents a general file (as opposed to photos and audio files).
@@ -263,8 +303,6 @@ class Document(_DocumentBase):
 
 
 _StickerBase = namedtuple('Sticker', ['file_id', 'width', 'height', 'thumb', 'file_size'])
-
-
 class Sticker(_StickerBase):
 
     """This object represents a sticker.
@@ -295,8 +333,6 @@ class Sticker(_StickerBase):
 
 _VideoBase = namedtuple('Video', [
     'file_id', 'width', 'height', 'duration', 'thumb', 'mime_type', 'file_size'])
-
-
 class Video(_VideoBase):
 
     """This object represents a video file.
@@ -330,8 +366,6 @@ class Video(_VideoBase):
 
 
 _VoiceBase = namedtuple('Audio', ['file_id', 'duration', 'mime_type', 'file_size'])
-
-
 class Voice(_VoiceBase):
 
     """This object represents an voice node audio file.
@@ -359,8 +393,6 @@ class Voice(_VoiceBase):
 
 
 _ContactBase = namedtuple('Contact', ['phone_number', 'first_name', 'last_name', 'user_id'])
-
-
 class Contact(_ContactBase):
 
     """This object represents a phone contact.
@@ -388,8 +420,6 @@ class Contact(_ContactBase):
 
 
 _LocationBase = namedtuple('Location', ['longitude', 'latitude'])
-
-
 class Location(_LocationBase):
 
     """This object represents a point on the map.
@@ -412,9 +442,34 @@ class Location(_LocationBase):
             )
 
 
-_UpdateBase = namedtuple('Update', ['update_id', 'message', 'inline_query', 'chosen_inline_result'])
+_VenueBase = namedtuple('Venue', ['location', 'title', 'address', 'foursquare_id'])
+class Venue(_VenueBase):
+
+    """This object represents a venue.
+
+    Attributes:
+        location       (Location) :Venue location
+        title          (str)      :Name of the venue
+        address        (str)      :Address of the venue
+        foursquare_id  (str)      :*Optional.* Foursquare identifier of the venue
+    """
+    __slots__ = ()
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return Venue(
+            location=result.get('location'),
+            title=result.get('title'),
+            address=result.get('address'),
+            foursquare_id=result.get('foursquare_id'),
+        )
 
 
+
+_UpdateBase = namedtuple('Update', ['update_id', 'message', 'inline_query', 'chosen_inline_result', 'callback_query'])
 class Update(_UpdateBase):
 
     """This object represents an incoming update.
@@ -428,6 +483,7 @@ class Update(_UpdateBase):
         inline_query            (InlineQuery)        :*Optional.* New incoming inline query
         chosen_inline_result	(ChosenInlineResult) :*Optional.* The result of a inline query that was chosen by
                                                       a user and sent to their chat partner
+        callback_query          (CallbackQuery)      :*Optional.* New incoming callback query
 
     """
     __slots__ = ()
@@ -440,7 +496,8 @@ class Update(_UpdateBase):
         return Update(message_update.get('update_id'),
                       Message.from_result(message_update.get('message')),
                       InlineQuery.from_result(message_update.get('inline_query')),
-                      ChosenInlineResult.from_result(message_update.get('chosen_inline_result')))
+                      ChosenInlineResult.from_result(message_update.get('chosen_inline_result')),
+                      CallbackQuery.from_result(message_update.get('callback_query')))
 
     @staticmethod
     def from_result(result):
@@ -451,15 +508,11 @@ class Update(_UpdateBase):
 
 
 _InputFileInfoBase = namedtuple('InputFileInfo', ['file_name', 'fp', 'mime_type'])
-
-
 class InputFileInfo(_InputFileInfoBase):
     __slots__ = ()
 
 
 _InputFileBase = namedtuple('InputFile', ['form', 'file_info'])
-
-
 class InputFile(_InputFileBase):
 
     """This object represents the contents of a file to be uploaded. Must be posted using multipart/form-data
@@ -491,8 +544,6 @@ class InputFile(_InputFileBase):
 
 
 _UserProfilePhotosBase = namedtuple('UserProfilePhotos', ['total_count', 'photos'])
-
-
 class UserProfilePhotos(_UserProfilePhotosBase):
 
     """This object represent a user's profile pictures.
@@ -520,32 +571,6 @@ class UserProfilePhotos(_UserProfilePhotosBase):
 
 
 _FileBase = namedtuple('File', ['file_id', 'file_size', 'file_path'])
-
-
-class File(_FileBase):
-
-    """This object represents a file ready to be downloaded.
-
-    Attributes:
-        file_id (str): Unique identifier for this file
-        file_size (int): *Optional.* File size, if known
-        file_path (str): *Optional.* File path. Use https://api.telegram.org/file/bot<token>/<file_path>
-                         to get the file. It is guaranteed that the link will be valid for at least 1 hour.
-    """
-    __slots__ = ()
-
-    @staticmethod
-    def from_result(result):
-        if result is None:
-            return None
-
-        return File(
-            file_id=result.get('file_id'),
-            file_size=result.get('file_size'),
-            file_path=result.get('file_path')
-        )
-
-
 class File(_FileBase):
 
     """This object represents a file ready to be downloaded.
@@ -579,16 +604,36 @@ class ReplyMarkup:
         raise NotImplementedError("")
 
 
+_KeyboardButtonBase = namedtuple('KeyboardButton', ['text', 'request_contact', 'request_location'])
+class KeyboardButton(_KeyboardButtonBase):
+    """This object represents one button of the reply keyboard. For simple text buttons String can be used instead
+       of this object to specify text of the button. Optional fields are mutually exclusive.
+
+    Attributes:
+        text (str): Unique identifier for this file
+        request_contact (bool): *Optional.* If True, the user's phone number will be sent as a contact when the
+                                button is pressed. Available in private chats only
+        request_location (bool): *Optional.* If True, the user's current location will be sent when the button
+                                 is pressed. Available in private chats only
+    """
+    __slots__ = ()
+
+    @staticmethod
+    def create(text, request_contact=None, request_location=None):
+        if request_contact == request_location:
+            raise ValueError("Optional fields are mutually exclusive")
+        return KeyboardButton(text, request_contact, request_location)
+
+
 _ReplyKeyboardMarkupBase = namedtuple('ReplyKeyboardMarkup', [
     'keyboard', 'resize_keyboard', 'one_time_keyboard', 'selective'])
-
-
 class ReplyKeyboardMarkup(_ReplyKeyboardMarkupBase, ReplyMarkup):
 
     """This object represents a custom keyboard with reply options (see Introduction to bots for details and examples).
 
     Attributes:
-        keyboard            (list of list of str)   :Array of button rows, each represented by an Array of Strings
+        keyboard            (Sequence[Sequence[KeyboardButton or str]])   :Array of button rows, each represented by
+                                                                           an Array of KeyboardButton objects or strings
         resize_keyboard     (bool)  :*Optional.* Requests clients to resize the keyboard vertically for optimal
                                         fit (e.g., make the keyboard smaller if there are just two rows of buttons).
                                         Defaults to false, in which case the custom keyboard is always of the
@@ -727,7 +772,7 @@ class ForceReply(_ForceReplyBase, ReplyMarkup):
         return json.dumps(reply_markup)
 
 
-_InlineQueryBase = namedtuple('InlineQuery', ['id', 'sender', 'query', 'offset'])
+_InlineQueryBase = namedtuple('InlineQuery', ['id', 'sender', 'location', 'query', 'offset'])
 class InlineQuery(_InlineQueryBase):
     """ This object represents an incoming inline query. When the user sends an empty query,
         your bot could return some default or trending results.
@@ -735,6 +780,7 @@ class InlineQuery(_InlineQueryBase):
     Attributes:
         id     (str)  :Unique identifier for this query
         sender (User) :Sender
+        location (Location) :*Optional.* Sender location, only for bots that request user location
         query  (str)  :Text of the query
         offset (str)  :Offset of the results to be returned, can be controlled by the bot
 
@@ -749,6 +795,7 @@ class InlineQuery(_InlineQueryBase):
         return InlineQuery(
             id=result.get('id'),
             sender=User.from_result(result.get('from')),
+            location=Location.from_result(result.get('location')),
             query=result.get('query'),
             offset=result.get('offset'),
             )
@@ -762,6 +809,10 @@ class ChosenInlineResult(_ChosenInlineResultBase):
     Attributes:
         result_id     (str)  :The unique identifier for the result that was chosen.
         sender (User) :The user that chose the result.
+        location (Location) :*Optional.* Sender location, only for bots that require user location
+        inline_message_id (str) :*Optional.* Identifier of the sent inline message. Available only
+                                 if there is an inline keyboard attached to the message. Will be
+                                 also received in callback queries and can be used to edit the message.
         query  (str)  :The query that was used to obtain the result.
 
     """
@@ -775,13 +826,82 @@ class ChosenInlineResult(_ChosenInlineResultBase):
         return ChosenInlineResult(
             result_id=result.get('result_id'),
             sender=User.from_result(result.get('from')),
+            location=Location.from_result(result.get('location')),
+            inline_message_id=result.get('inline_message_id'),
             query=result.get('query'),
             )
+
+_CallbackQueryBase = namedtuple('CallbackQuery', ['id', 'from', 'messages', 'inline_message_id', 'data'])
+class CallbackQuery(_CallbackQueryBase):
+    """ This object represents an incoming callback query from a callback button in an inline keyboard. If
+        the button that originated the query was attached to a message sent by the bot, the field message
+        will be presented. If the button was attached to a message sent via the bot (in inline mode), the
+        field inline_message_id will be presented.
+
+
+    Attributes:
+        id                 (str)      :Unique identifier for this query.
+        sender             (User)     :Sender.
+        message            (Message)  :*Optional.* Message with the callback button that originated the query. Note
+                                       that message content and message date will not be available if the message is too old
+        inline_message_id  (str)      :*Optional.* Identifier of the message sent via the bot in inline mode, that originated the query
+        data               (str)      :Data associated with the callback button. Be aware that a bad client can send arbitrary data in this field
+
+    """
+    __slots__ = ()
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return CallbackQuery(
+            id=result.get('id'),
+            sender=User.from_result(result.get('from')),
+            message=Message.from_result(result.get('message')),
+            inline_message_id=result.get('inline_message_id'),
+            data=result.get('data'),
+        )
+
+class InlineKeyboardMarkup:
+    """ This object represents an inline keyboard that appears right next to the message it belongs to.
+
+    Attributes:
+        inline_keyboard     (Sequence[Sequence[InlineKeyboardButton]])  :Array of button rows, each represented by an Array of InlineKeyboardButton objects
+    """
+
+    def __init__(self, inline_keyboard):
+        self.inline_keyboard = inline_keyboard
+
+class InlineKeyboardButton:
+    """ This object represents one button of an inline keyboard. You must use exactly one of the optional fields.
+
+    Attributes:
+        text     (str)  :Label text on the button
+        url      (str)  :*Optional.* HTTP url to be opened when button is pressed
+        callback_data (str) :*Optional.* Data to be sent in a callback query to the bot when button is pressed
+        switch_inline_query (str) :*Optional.* If set, pressing the button will prompt the user to select
+                                   one of their chats, open that chat and insert the bot‘s username and
+                                   the specified inline query in the input field. Can be empty, in which case just the bot’s username will be inserted.
+
+                                   Note: This offers an easy way for users to start using your bot in inline mode when they are currently in a private
+                                   chat with it. Especially useful when combined with switch_pm… actions – in this case the user will be automatically
+                                   returned to the chat they switched from, skipping the chat selection screen.
+    """
+
+    def __init__(self, text, url=None, callback_data=None, switch_inline_query=None):
+        self.text = text
+        self.url = url
+        self.callback_data = callback_data
+        self.switch_inline_query = switch_inline_query
+
+        if url is None and callback_data is None and switch_inline_query is None:
+            raise ValueError("You must use exactly one of the optional fields.")
+
 
 """
 InlineQuery Types
 """
-
 
 class InlineQueryResult:
     pass
@@ -791,12 +911,10 @@ class InlineQueryResultArticle(InlineQueryResult):
     """ Represents a link to an article or web page.
 
     Attributes:
-        id                       (str)  :Unique identifier of this result
+        id                       (str)  :Unique identifier for this result, 1-64 bytes
         title                    (str)  :Title of the result
-        message_text             (str)  :Text of the query
-        parse_mode               (str)  :*Optional.* Send “Markdown”, if you want Telegram apps to show bold, italic and
-                                         inline URLs in your bot's message.
-        disable_web_page_preview (bool) :*Optional.* Disables link previews for links in the sent message
+        input_message_content    (InputMessageContent) :Content of the message to be sent
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
         url	                     (str)  :*Optional.* URL of the result
         hide_url	             (bool) :*Optional.* Pass True, if you don't want the URL to be shown in the message
         description              (str)  :*Optional.* Short description of the result
@@ -806,15 +924,14 @@ class InlineQueryResultArticle(InlineQueryResult):
 
     """
 
-    def __init__(self, id, title, message_text,
-                 parse_mode=None, disable_web_page_preview=None, url=None, hide_url=None, description=None,
+    def __init__(self, id, title, input_message_content, reply_markup=None,
+                 url=None, hide_url=None, description=None,
                  thumb_url=None, thumb_width=None, thumb_height=None):
         self.type = "article"
         self.id = id
         self.title = title
-        self.message_text = message_text
-        self.parse_mode = parse_mode
-        self.disable_web_page_preview = disable_web_page_preview
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
         self.url = url
         self.hide_url = hide_url
         self.description = description
@@ -828,7 +945,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
     Alternatively, you can provide message_text to send it instead of photo.
 
     Attributes:
-        id                          (str)    :Unique identifier of this result
+        id                          (str)    :Unique identifier for this result, 1-64 bytes
         photo_url                   (str)    :A valid URL of the photo. Photo size must not exceed 5MB
         mime_type                   (str)    :*Optional.* MIME type of the photo, defaults to image/jpeg
         photo_width                 (int)    :*Optional.* Width of the photo
@@ -836,17 +953,14 @@ class InlineQueryResultPhoto(InlineQueryResult):
         thumb_url                   (str)    :*Optional.* URL of the thumbnail for the photo
         title                       (str)    :*Optional.* Title for the result
         description                 (str)    :*Optional.* Short description of the result
-        caption                     (str)    :*Optional.* Caption of the photo to be sent
-        message_text                (str)    :*Optional.* Text of a message to be sent instead of the photo
-        parse_mode                  (str)    :*Optional.* Send “Markdown”, if you want Telegram apps to show bold,
-                                                          italic and inline URLs in your bot's message.
-        disable_web_page_preview    (bool)   :*Optional.* Disables link previews for links in the sent message
-
+        caption                     (str)    :*Optional.* Caption of the photo to be sent, 0-200 characters
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.*Content of the message to be sent instead of the photo
     """
 
     def __init__(self, id, photo_url,
                  mime_type=None, photo_width=None, photo_height=None, thumb_url=None, title=None,
-                 description=None, caption=None, message_text=None, parse_mode=None, disable_web_page_preview=None):
+                 description=None, caption=None, input_message_content=None, reply_markup=None):
         self.type = "photo"
         self.id = id
         self.photo_url = photo_url
@@ -857,33 +971,58 @@ class InlineQueryResultPhoto(InlineQueryResult):
         self.title = title
         self.description = description
         self.caption = caption
-        self.message_text = message_text
-        self.parse_mode = parse_mode
-        self.disable_web_page_preview = disable_web_page_preview
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
 
+
+class InlineQueryResultCachedPhoto(InlineQueryResult):
+    """ Represents a link to a photo stored on the Telegram servers. By default, this photo will be sent by the
+        user with an optional caption. Alternatively, you can use input_message_content to send a message with
+        the specified content instead of the photo.
+
+
+    Attributes:
+        id                          (str)    :Unique identifier for this result, 1-64 bytes
+        photo_file_id               (str)    :A valid file identifier of the photo
+        title                       (str)    :*Optional.* Title for the result
+        description                 (str)    :*Optional.* Short description of the result
+        caption                     (str)    :*Optional.* Caption of the photo to be sent, 0-200 characters
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.*Content of the message to be sent instead of the photo
+    """
+
+    def __init__(self, id, photo_file_id, title=None, description=None, caption=None,
+                 input_message_content=None, reply_markup=None):
+        self.type = "photo"
+        self.id = id
+        self.photo_file_id = photo_file_id
+        self.title = title
+        self.description = description
+        self.caption = caption
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
 
 class InlineQueryResultGif(InlineQueryResult):
     """ Represents a link to an animated GIF file. By default, this animated GIF file will be sent by the user with
     optional caption. Alternatively, you can provide message_text to send it instead of the animation.
 
     Attributes:
-        id                          (str)    :Unique identifier of this result
+        id                          (str)    :Unique identifier for this result, 1-64 bytes
         gif_url                     (str)    :A valid URL for the GIF file. File size must not exceed 1MB
         gif_width                   (int)    :*Optional.* Width of the GIF
         gif_height                  (int)    :*Optional.* Height of the GIF
         thumb_url                   (str)    :*Optional.* URL of a static thumbnail for the result (jpeg or gif)
         title                       (str)    :*Optional.* Title for the result
-        caption                     (str)    :*Optional.* Caption of the GIF file to be sent
-        message_text                (str)    :*Optional.* Text of a message to be sent instead of the animation
-        parse_mode                  (str)    :*Optional.* Send “Markdown”, if you want Telegram apps to show bold,
-                                                          italic and inline URLs in your bot's message.
-        disable_web_page_preview    (bool)   :*Optional.* Disables link previews for links in the sent message
+        caption                     (str)    :*Optional.* Caption of the GIF file to be sent, 0-200 characters
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.*Content of the message to be sent instead of the GIF animation
+
 
     """
 
     def __init__(self, id, gif_url,
                  gif_width=None, gif_height=None, thumb_url=None, title=None,
-                 caption=None, message_text=None, parse_mode=None, disable_web_page_preview=None):
+                 caption=None, input_message_content=None, reply_markup=None):
         self.type = "gif"
         self.id = id
         self.gif_url = gif_url
@@ -892,9 +1031,35 @@ class InlineQueryResultGif(InlineQueryResult):
         self.thumb_url = thumb_url
         self.title = title
         self.caption = caption
-        self.message_text = message_text
-        self.parse_mode = parse_mode
-        self.disable_web_page_preview = disable_web_page_preview
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+
+
+class InlineQueryResultCachedGif(InlineQueryResult):
+    """ Represents a link to an animated GIF file stored on the Telegram servers. By default, this animated GIF file will be
+    sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with
+    specified content instead of the animation.
+
+    Attributes:
+        id                          (str)    :Unique identifier for this result, 1-64 bytes
+        gif_file_id                 (str)    :A valid file identifier for the GIF file
+        title                       (str)    :*Optional.* Title for the result
+        caption                     (str)    :*Optional.* Caption of the GIF file to be sent, 0-200 characters
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.*Content of the message to be sent instead of the GIF animation
+
+
+    """
+
+    def __init__(self, id, gif_file_id, title=None,
+                 caption=None, input_message_content=None, reply_markup=None):
+        self.type = "gif"
+        self.id = id
+        self.gif_file_id = gif_file_id
+        self.title = title
+        self.caption = caption
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
 
 
 class InlineQueryResultMpeg4Gif(InlineQueryResult):
@@ -903,23 +1068,20 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
     you can provide message_text to send it instead of the animation.
 
     Attributes:
-        id                        (str)    :Unique identifier of this result
+        id                        (str)    :Unique identifier for this result, 1-64 bytes
         mpeg4_url                 (str)    :A valid URL for the mp4 file. File size must not exceed 1MB
         mpeg4_width               (int)    :*Optional.* Width of the mp4
         mpeg4_height              (int)    :*Optional.* Height of the mp4
         thumb_url                 (str)    :*Optional.* URL of a static thumbnail for the result (jpeg or mpeg4)
         title                     (str)    :*Optional.* Title for the result
-        caption                   (str)    :*Optional.* Caption of the mp4 file to be sent
-        message_text              (str)    :*Optional.* Text of a message to be sent instead of the animation
-        parse_mode                (str)    :*Optional.* Send “Markdown”, if you want Telegram apps to show bold,
-                                                        italic and inline URLs in your bot's message.
-        disable_web_page_preview  (bool)   :*Optional.* Disables link previews for links in the sent message
-
+        caption                   (str)    :*Optional.* Caption of the mp4 file to be sent, 0-200 characters
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.*Content of the message to be sent instead of the video animation
     """
 
     def __init__(self, id, mpeg4_url,
                  mpeg4_width=None, mpeg4_height=None, thumb_url=None, title=None,
-                 caption=None, message_text=None, parse_mode=None, disable_web_page_preview=None):
+                 caption=None, input_message_content=None, reply_markup=None):
         self.type = "mpeg4_gif"
         self.id = id
         self.mpeg4_url = mpeg4_url
@@ -928,49 +1090,442 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         self.thumb_url = thumb_url
         self.title = title
         self.caption = caption
-        self.message_text = message_text
-        self.parse_mode = parse_mode
-        self.disable_web_page_preview = disable_web_page_preview
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+
+
+class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
+    """ Represents a link to a video animation (H.264/MPEG-4 AVC video without sound) stored
+    on the Telegram servers. By default, this animated MPEG-4 file will be sent by the user with
+    an optional caption. Alternatively, you can use input_message_content to send a message with
+    the specified content instead of the animation.
+
+    Attributes:
+        id                        (str)    :Unique identifier for this result, 1-64 bytes
+        mpeg4_file_id             (str)    :A valid file identifier for the MP4 file
+        title                     (str)    :*Optional.* Title for the result
+        caption                   (str)    :*Optional.* Caption of the mp4 file to be sent, 0-200 characters
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.*Content of the message to be sent instead of the video animation
+    """
+    def __init__(self, id, mpeg4_file_id, title=None, caption=None, input_message_content=None, reply_markup=None):
+        self.type = "mpeg4_gif"
+        self.id = id
+        self.mpeg4_file_id = mpeg4_file_id
+        self.title = title
+        self.caption = caption
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+
 
 
 class InlineQueryResultVideo(InlineQueryResult):
     """ Represents link to a page containing an embedded video player or a video file.
 
     Attributes:
-        type                     (str)     :Type of the result, must be video
-        id                       (str)     :Unique identifier of this result
+        id                       (str)     :Unique identifier for this result, 1-64 bytes
         video_url                (str)     :A valid URL for the embedded video player or video file
         mime_type                (str)     :Mime type of the content of video url, i.e. “text/html” or “video/mp4”
-        message_text             (str)     :Text of a message to be sent instead of the video
-        parse_mode               (str)     :*Optional.* Send “Markdown”, if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
-        disable_web_page_preview (bool)    :*Optional.* Disables link previews for links in the sent message
+        title                    (str)     :Title for the result
         video_width              (int)     :*Optional.* Video width
         video_height             (int)     :*Optional.* Video height
         video_duration           (int)     :*Optional.* Video duration in seconds
         thumb_url                (str)     :*Optional.* URL of the thumbnail (jpeg only) for the video
-        title                    (str)     :*Optional.* Title for the result
         description              (str)     :*Optional.* Short description of the result
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.* Content of the message to be sent instead of the video
 
     """
 
-    def __init__(self, id, video_url, mime_type,
-                 message_text=None, parse_mode=None, disable_web_page_preview=None, video_width=None, video_height=None,
-                 video_duration=None, thumb_url=None, title=None, description=None):
+    def __init__(self, id, video_url, mime_type, title=None,
+                 video_width=None, video_height=None, video_duration=None, thumb_url=None,
+                 description=None, input_message_content=None, reply_markup=None):
         self.type = "video"
         self.id = id
         self.video_url = video_url
         self.mime_type = mime_type
-        self.message_text = message_text
-        self.parse_mode = parse_mode
-        self.disable_web_page_preview = disable_web_page_preview
         self.video_width = video_width
         self.video_height = video_height
         self.video_duration = video_duration
         self.thumb_url = thumb_url
         self.title = title
         self.description = description
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
 
 
+class InlineQueryResultCachedVideo(InlineQueryResult):
+    """ Represents a link to a video file stored on the Telegram servers. By default, this video file will be sent
+     by the user with an optional caption. Alternatively, you can use input_message_content to send a message with
+     the specified content instead of the video.
+
+    Attributes:
+        id                       (str)     :Unique identifier for this result, 1-64 bytes
+        video_file_id            (str)     :A valid file identifier for the video file
+        title                    (str)     :Title for the result
+        description              (str)     :*Optional.* Short description of the result
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.* Content of the message to be sent instead of the video
+
+    """
+
+    def __init__(self, id, video_file_id, title, description=None, input_message_content=None, reply_markup=None):
+        self.type = "video"
+        self.id = id
+        self.video_file_id = video_file_id
+        self.title = title
+        self.description = description
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+
+
+class InlineQueryResultAudio(InlineQueryResult):
+    """ Represents a link to an mp3 audio file. By default, this audio file will be sent by the user. Alternatively,
+    you can use input_message_content to send a message with the specified content instead of the audio.
+
+    Attributes:
+        id                       (str)     :Unique identifier for this result, 1-64 bytes
+        audio_url                (str)     :A valid URL for the audio file
+        title                    (str)     :Title
+        performer                (str)     :*Optional.* Performer
+        audio_duration                 (int)     :*Optional.* Audio duration in seconds
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.* Content of the message to be sent instead of the audio
+
+    """
+
+    def __init__(self, id, audio_url, title, performer=None, audio_duration=None, input_message_content=None, reply_markup=None):
+        self.type = "audio"
+        self.id = id
+        self.audio_url = audio_url
+        self.performer = performer
+        self.audio_duration = audio_duration
+        self.title = title
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+
+
+class InlineQueryResultCachedAudio(InlineQueryResult):
+    """ Represents a link to an mp3 audio file stored on the Telegram servers. By default, this audio file will
+    be sent by the user. Alternatively, you can use input_message_content to send a message with the specified
+    content instead of the audio.
+
+    Attributes:
+        id                       (str)     :Unique identifier for this result, 1-64 bytes
+        audio_file_id            (str)     :A valid file identifier for the audio file
+        title                    (str)     :Title
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.* Content of the message to be sent instead of the audio
+
+    """
+
+    def __init__(self, id, audio_file_id, title, input_message_content=None, reply_markup=None):
+        self.type = "audio"
+        self.id = id
+        self.audio_file_id = audio_file_id
+        self.title = title
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+
+
+class InlineQueryResultVoice(InlineQueryResult):
+    """ Represents a link to a voice recording in an .ogg container encoded with OPUS. By default, this voice recording
+    will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified
+    content instead of the the voice message.
+
+    Attributes:
+        id                       (str)     :Unique identifier for this result, 1-64 bytes
+        voice_url                (str)     :A valid URL for the audio file
+        title                    (str)     :Title
+        voice_duration           (int)     :*Optional.* Recording duration in seconds
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.* Content of the message to be sent instead of the voice recording
+
+    """
+
+    def __init__(self, id, voice_url, title, voice_duration=None, input_message_content=None, reply_markup=None):
+        self.type = "voice"
+        self.id = id
+        self.voice_url = voice_url
+        self.voice_duration = voice_duration
+        self.title = title
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+
+
+class InlineQueryResultCachedVoice(InlineQueryResult):
+    """ Represents a link to a voice message stored on the Telegram servers. By default, this voice message will be sent by the user.
+    Alternatively, you can use input_message_content to send a message with the specified content instead of the voice message.
+
+
+
+    Attributes:
+        id                       (str)     :Unique identifier for this result, 1-64 bytes
+        voice_file_id            (str)     :A valid URL for the audio file
+        title                    (str)     :Title
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.* Content of the message to be sent instead of the voice recording
+
+    """
+
+    def __init__(self, id, voice_file_id, title, input_message_content=None, reply_markup=None):
+        self.type = "voice"
+        self.id = id
+        self.voice_file_id = voice_file_id
+        self.title = title
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+
+
+class InlineQueryResultDocument(InlineQueryResult):
+    """ Represents a link to a file. By default, this file will be sent by the user with an optional caption.
+    Alternatively, you can use input_message_content to send a message with the specified content instead of
+    the file. Currently, only .PDF and .ZIP files can be sent using this method.
+
+    Attributes:
+        id                       (str)     :Unique identifier for this result, 1-64 bytes
+        document_url             (str)     :A valid URL for the file
+        title                    (str)     :Title
+        mime_type                (str)     :Mime type of the content of the file, either “application/pdf” or “application/zip”
+        caption                  (str)     :*Optional.* Caption of the document to be sent, 0-200 characters
+        description              (str)     :*Optional.* Short description of the result
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.* Content of the message to be sent instead of the document
+        thumb_url                (str)  :*Optional.* URL of the thumbnail (jpeg only) for the file
+        thumb_width              (int)  :*Optional.* Thumbnail width
+        thumb_height             (int)  :*Optional.* Thumbnail height
+    """
+
+    def __init__(self, id, document_url, title, mime_type, caption=None, description=None, input_message_content=None, reply_markup=None,
+                 thumb_url=None, thumb_width=None, thumb_height=None):
+        self.type = "document"
+        self.id = id
+        self.document_url = document_url
+        self.mime_type = mime_type
+        self.caption = caption
+        self.description = description
+        self.title = title
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+        self.thumb_url = thumb_url
+        self.thumb_width = thumb_width
+        self.thumb_height = thumb_height
+
+
+class InlineQueryResultCachedDocument(InlineQueryResult):
+    """ Represents a link to a file stored on the Telegram servers. By default, this file will be sent by the user with an optional caption.
+    Alternatively, you can use input_message_content to send a message with the specified content instead of the file. Currently,
+    only pdf-files and zip archives can be sent using this method.
+
+    Attributes:
+        id                       (str)     :Unique identifier for this result, 1-64 bytes
+        document_file_id         (str)     :A valid file identifier for the file
+        title                    (str)     :Title
+        caption                  (str)     :*Optional.* Caption of the document to be sent, 0-200 characters
+        description              (str)     :*Optional.* Short description of the result
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.* Content of the message to be sent instead of the document
+    """
+
+    def __init__(self, id, document_file_id, title, caption=None, description=None, input_message_content=None, reply_markup=None):
+        self.type = "document"
+        self.id = id
+        self.document_file_id = document_file_id
+        self.caption = caption
+        self.description = description
+        self.title = title
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+
+
+class InlineQueryResultLocation(InlineQueryResult):
+    """ Represents a location on a map. By default, the location will be sent by the user.
+    Alternatively, you can use input_message_content to send a message with the specified
+    content instead of the location.
+
+    Attributes:
+        id                       (str)     :Unique identifier for this result, 1-64 bytes
+        latitude                 (str)     :Location latitude in degrees
+        longitude                (str)     :Location longitude in degrees
+        title                    (str)     :Title
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.* Content of the message to be sent instead of the location
+        thumb_url                (str)  :*Optional.* URL of the thumbnail (jpeg only) for the file
+        thumb_width              (int)  :*Optional.* Thumbnail width
+        thumb_height             (int)  :*Optional.* Thumbnail height
+    """
+
+    def __init__(self, id, latitude, longitude, title, input_message_content=None, reply_markup=None,
+                 thumb_url=None, thumb_width=None, thumb_height=None):
+        self.type = "location"
+        self.id = id
+        self.latitude = latitude
+        self.longitude = longitude
+        self.title = title
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+        self.thumb_url = thumb_url
+        self.thumb_width = thumb_width
+        self.thumb_height = thumb_height
+
+
+class InlineQueryResultVenue(InlineQueryResult):
+    """ Represents a venue. By default, the venue will be sent by the user. Alternatively, you
+    can use input_message_content to send a message with the specified content instead of the venue.
+
+    Attributes:
+        id                       (str)     :Unique identifier for this result, 1-64 bytes
+        latitude                 (str)     :Location latitude in degrees
+        longitude                (str)     :Location longitude in degrees
+        title                    (str)     :Title
+        address                  (str)     :Address of the venue
+        foursquare_id            (str)     :*Optional.* Foursquare identifier of the venue if known
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.* Content of the message to be sent instead of the venue
+        thumb_url                (str)  :*Optional.* URL of the thumbnail (jpeg only) for the file
+        thumb_width              (int)  :*Optional.* Thumbnail width
+        thumb_height             (int)  :*Optional.* Thumbnail height
+    """
+
+    def __init__(self, id, latitude, longitude, title, address, foursquare_id=None,
+                 input_message_content=None, reply_markup=None,
+                 thumb_url=None, thumb_width=None, thumb_height=None):
+        self.type = "venue"
+        self.id = id
+        self.latitude = latitude
+        self.longitude = longitude
+        self.title = title
+        self.address = address
+        self.foursquare_id = foursquare_id
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+        self.thumb_url = thumb_url
+        self.thumb_width = thumb_width
+        self.thumb_height = thumb_height
+
+
+class InlineQueryResultContact(InlineQueryResult):
+    """ Represents a contact with a phone number. By default, this contact will be sent by the user.
+    Alternatively, you can use input_message_content to send a message with the specified content
+    instead of the contact.
+
+
+    Attributes:
+        id                       (str)     :Unique identifier for this result, 1-64 bytes
+        phone_number             (str)     :Contact's phone number
+        first_name               (str)     :Contact's first name
+        last_name                (str)     :*Optional.* Contact's last name
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.* Content of the message to be sent instead of the contact
+        thumb_url                (str)  :*Optional.* URL of the thumbnail (jpeg only) for the file
+        thumb_width              (int)  :*Optional.* Thumbnail width
+        thumb_height             (int)  :*Optional.* Thumbnail height
+    """
+
+    def __init__(self, id, phone_number, first_name, last_name=None,
+                 input_message_content=None, reply_markup=None,
+                 thumb_url=None, thumb_width=None, thumb_height=None):
+        self.type = "contact"
+        self.id = id
+        self.phone_number = phone_number
+        self.first_name = first_name
+        self.last_name = last_name
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+        self.thumb_url = thumb_url
+        self.thumb_width = thumb_width
+        self.thumb_height = thumb_height
+
+
+class InlineQueryResultCachedSticker(InlineQueryResult):
+    """ Represents a link to a sticker stored on the Telegram servers. By default, this sticker will be sent by the
+    user. Alternatively, you can use input_message_content to send a message with the specified content instead
+    of the sticker.
+
+    Attributes:
+        id                       (str)     :Unique identifier for this result, 1-64 bytes
+        sticker_file_id          (str)     :A valid file identifier of the sticker
+        reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
+        input_message_content    (InputMessageContent) :*Optional.* Content of the message to be sent instead of the document
+    """
+
+    def __init__(self, id, sticker_file_id, input_message_content=None, reply_markup=None):
+        self.type = "sticker"
+        self.id = id
+        self.sticker_file_id = sticker_file_id
+        self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+
+
+class InputMessageContent:
+    """ This object represents the content of a message to be sent as a result of an inline query. """
+    pass
+
+class InputTextMessageContent(InputMessageContent):
+    """
+    Represents the content of a text message to be sent as the result of an inline query.
+
+    Attributes:
+        message_text             (str)     :Text of the message to be sent, 1-4096 characters
+        parse_mode               (str)     :*Optional.* Send Markdown or HTML, if you want Telegram apps to show
+                                            bold, italic, fixed-width text or inline URLs in your bot's message.
+        disable_web_page_preview (bool) :*Optional.* Disables link previews for links in the sent message
+    """
+
+    def __init__(self, message_text, parse_mode, disable_web_page_preview=None):
+        self.message_text = message_text
+        self.parse_mode = parse_mode
+        self.disable_web_page_preview = disable_web_page_preview
+
+
+class InputLocationMessageContent(InputMessageContent):
+    """
+    Represents the content of a location message to be sent as the result of an inline query.
+
+    Attributes:
+        latitude             (float)     :Latitude of the location in degrees
+        longitude            (float)     :Longitude of the location in degrees
+    """
+
+    def __init__(self, latitude, longitude):
+        self.latitude = latitude
+        self.longitude = longitude
+
+
+class InputVenueMessageContent(InputMessageContent):
+    """
+    Represents the content of a location message to be sent as the result of an inline query.
+
+    Attributes:
+        latitude             (float)   :Latitude of the venue in degrees
+        longitude            (float)   :Longitude of the venue in degrees
+        title                (str)     :Name of the venue
+        address              (str)     :Address of the venue
+        foursquare_id        (str)     :*Optional.* Foursquare identifier of the venue, if known
+    """
+
+    def __init__(self, latitude, longitude, title, address, foursquare_id=None):
+        self.latitude = latitude
+        self.longitude = longitude
+        self.title = title
+        self.address = address
+        self.foursquare_id = foursquare_id
+
+
+class InputContactMessageContent(InputMessageContent):
+    """
+    Represents the content of a contact message to be sent as the result of an inline query.
+
+    Attributes:
+        phone_number    (str)     :Contact's phone number
+        first_name      (str)     :Contact's first name
+        last_name       (str)     :*Optional.* Contact's last name
+    """
+
+    def __init__(self, phone_number, first_name, last_name=None):
+        self.phone_number = phone_number
+        self.first_name = first_name
+        self.last_name = last_name
 
 """
 Types added for utility purposes
@@ -1698,6 +2253,115 @@ def send_location(chat_id, latitude, longitude,
 
     return TelegramBotRPCRequest('sendLocation', params=params, on_result=Message.from_result, **kwargs)
 
+def send_venue(chat_id, latitude, longitude, title, address,
+               foursquare_id=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
+               **kwargs):
+
+    """
+    Use this method to send information about a venue.
+
+    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param latitude: Latitude of location.
+    :param longitude: Longitude of location.
+    :param title: Name of the venue.
+    :param address: Address of the venue.
+    :param foursquare_id: Foursquare identifier of the venue.
+    :param reply_to_message_id: If the message is a reply, ID of the original message
+    :param reply_markup: Additional interface options. A JSON-serialized object for a
+                         custom reply keyboard, instructions to hide keyboard or to
+                         force a reply from the user.
+    :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
+                                 will receive a notification with no sound. Other apps coming soon.
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type chat_id: int
+    :type latitude: float
+    :type longitude: float
+    :type title: str
+    :type address: str
+    :type foursquare_id: str
+
+    :type reply_to_message_id: int
+    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+    :type disable_notification: bool
+
+    :returns: On success, the sent Message is returned.
+    :rtype:  TelegramBotRPCRequest
+    """
+
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        latitude=latitude,
+        longitude=longitude,
+        title=title,
+        address=address,
+    )
+
+    # optional args
+    params.update(
+        _clean_params(
+            foursquare_id=foursquare_id,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            disable_notification=disable_notification,
+        )
+    )
+
+    return TelegramBotRPCRequest('sendVenue', params=params, on_result=Message.from_result, **kwargs)
+
+
+def send_contact(chat_id, phone_number, first_name,
+                 last_name=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
+                 **kwargs):
+
+    """
+    Use this method to send phone contacts.
+
+
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param phone_number: Contact's phone number.
+    :param first_name: Contact's first name.
+    :param last_name: Contact's last name.
+    :param reply_to_message_id: If the message is a reply, ID of the original message
+    :param reply_markup: Additional interface options. A JSON-serialized object for a
+                         custom reply keyboard, instructions to hide keyboard or to
+                         force a reply from the user.
+    :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
+                                 will receive a notification with no sound. Other apps coming soon.
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type chat_id: int
+    :type phone_number: str
+    :type first_name: str
+    :type last_name: str
+
+    :type reply_to_message_id: int
+    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+    :type disable_notification: bool
+
+    :returns: On success, the sent Message is returned.
+    :rtype:  TelegramBotRPCRequest
+    """
+
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        phone_number=phone_number,
+        first_name=first_name,
+    )
+
+    # optional args
+    params.update(
+        _clean_params(
+            last_name=last_name,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            disable_notification=disable_notification,
+        )
+    )
+
+    return TelegramBotRPCRequest('sendContact', params=params, on_result=Message.from_result, **kwargs)
 
 class ChatAction(str, Enum):
     TEXT = 'typing'
@@ -1744,7 +2408,237 @@ def send_chat_action(chat_id, action,
     return TelegramBotRPCRequest('sendChatAction', params=params, on_result=lambda result: result, **kwargs)
 
 
-def answer_inline_query(inline_query_id, results, cache_time=None, is_personal=None, next_offset=None, **kwargs):
+def kick_chat_member(chat_id, user_id, **kwargs):
+
+        """
+        Use this method to kick a user from a group or a supergroup. In the case of supergroups, the user will not
+        be able to return to the group on their own using invite links, etc., unless unbanned first. The bot must
+        be an administrator in the group for this to work. Returns True on success.
+
+        Note: This will method only work if the ‘All Members Are Admins’ setting is off in the target group. Otherwise
+        members may only be removed by the group's creator or by the member that added them.
+
+        :param chat_id: Unique identifier for the target group or username of the target supergroup (in the format @supergroupusername)
+        :param user_id: Unique identifier of the target user
+        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+        :type chat_id: int or str
+        :type user_id: int
+
+        :returns: Returns True on success.
+        :rtype: bool
+        """
+
+        # required args
+        params = dict(
+            chat_id=chat_id,
+            user_id=user_id,
+        )
+
+        return TelegramBotRPCRequest('kickChatMember', params=params, on_result=lambda result: result, **kwargs)
+
+def unban_chat_member(chat_id, user_id, **kwargs):
+
+        """
+        Use this method to unban a previously kicked user in a supergroup. The user will not return to the group automatically,
+        but will be able to join via link, etc. The bot must be an administrator in the group for this to work
+
+        :param chat_id: Unique identifier for the target group or username of the target supergroup (in the format @supergroupusername)
+        :param user_id: Unique identifier of the target user
+        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+        :type chat_id: int or str
+        :type user_id: int
+
+        :returns: Returns True on success.
+        :rtype: bool
+        """
+
+        # required args
+        params = dict(
+            chat_id=chat_id,
+            user_id=user_id,
+        )
+
+        return TelegramBotRPCRequest('unbanChatMember', params=params, on_result=lambda result: result, **kwargs)
+
+def answer_callback_query(callback_query_id, text=None, show_alert=None, **kwargs):
+        """
+        Use this method to send answers to callback queries sent from inline keyboards. The answer will be displayed
+        to the user as a notification at the top of the chat screen or as an alert.
+
+
+        :param callback_query_id: Unique identifier for the query to be answered
+        :param text: Text of the notification. If not specified, nothing will be shown to the user
+        :param show_alert: If true, an alert will be shown by the client instead of a notificaiton at the top of
+                           the chat screen. Defaults to false.
+        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+        :type callback_query_id: str
+        :type text: str
+        :type show_alert: bool
+
+        :returns: Returns True on success.
+        :rtype: bool
+        """
+
+        # required args
+        params = dict(
+            callback_query_id=callback_query_id,
+        )
+
+        # optional args
+        params.update(
+            _clean_params(
+                text=text,
+                show_alert=show_alert,
+            )
+        )
+
+        return TelegramBotRPCRequest('answerCallbackQuery', params=params, on_result=lambda result: result, **kwargs)
+
+
+def edit_message_text(text, chat_id=None, message_id=None, inline_message_id=None,
+                      parse_mode=None, disable_web_page_preview=None, reply_markup=None, **kwargs):
+    """
+    Use this method to edit text messages sent by the bot or via the bot (for inline bots).
+
+    :param text: New text of the message
+    :param chat_id: Required if inline_message_id is not specified. Unique identifier for the target chat or username of
+                    the target channel (in the format @channelusername)
+    :param message_id: Required if inline_message_id is not specified. Unique identifier of the sent message
+    :param inline_message_id: Required if chat_id and message_id are not specified. Identifier of the inline message
+    :param parse_mode: Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline
+                      URLs in your bot's message.
+    :param disable_web_page_preview: Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width
+                                     text or inline URLs in your bot's message.
+    :param reply_markup: A JSON-serialized object for an inline keyboard.
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type text: str
+    :type chat_id: str or int
+    :type message_id: int
+    :type inline_message_id: str
+    :type parse_mode: str
+    :type disable_web_page_preview: bool
+    :type reply_markup: InlineKeyboardMarkup
+
+    :returns: On success, the edited Message is returned.
+    :rtype: Message
+    """
+
+    if not chat_id and not message_id and not inline_message_id:
+        raise ValueError("Must specify chat_id and message_id or inline_message_id")
+    if (chat_id and not message_id) or (not chat_id and message_id):
+        raise ValueError("Must specify chat_id and message_id together")
+
+    # required args
+    params = dict(
+        text=text,
+    )
+
+    # optional args
+    params.update(
+        _clean_params(
+            chat_id=chat_id,
+            message_id=message_id,
+            inline_message_id=inline_message_id,
+            parse_mode=parse_mode,
+            disable_web_page_preview=disable_web_page_preview,
+            reply_markup=reply_markup
+        )
+    )
+
+    return TelegramBotRPCRequest('editMessageText', params=params, on_result=Message.from_result, **kwargs)
+
+def edit_message_caption(caption, chat_id=None, message_id=None, inline_message_id=None, reply_markup=None, **kwargs):
+    """
+    Use this method to edit text messages sent by the bot or via the bot (for inline bots).
+
+    :param caption : New caption of the message
+    :param chat_id: Required if inline_message_id is not specified. Unique identifier for the target chat or username of
+                    the target channel (in the format @channelusername)
+    :param message_id: Required if inline_message_id is not specified. Unique identifier of the sent message
+    :param inline_message_id: Required if chat_id and message_id are not specified. Identifier of the inline message
+    :param reply_markup: A JSON-serialized object for an inline keyboard.
+    :param *\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type caption: str
+    :type chat_id: str or int
+    :type message_id: int
+    :type inline_message_id: str
+    :type reply_markup: InlineKeyboardMarkup
+
+    :returns: On success, the edited Message is returned.
+    :rtype: Message
+    """
+
+    if not chat_id and not message_id and not inline_message_id:
+        raise ValueError("Must specify chat_id and message_id or inline_message_id")
+    if (chat_id and not message_id) or (not chat_id and message_id):
+        raise ValueError("Must specify chat_id and message_id together")
+
+    # required args
+    params = dict(
+        caption=caption,
+    )
+
+    # optional args
+    params.update(
+        _clean_params(
+            chat_id=chat_id,
+            message_id=message_id,
+            inline_message_id=inline_message_id,
+            reply_markup=reply_markup
+        )
+    )
+
+    return TelegramBotRPCRequest('editMessageCaption', params=params, on_result=Message.from_result, **kwargs)
+
+
+def edit_message_reply_markup(chat_id=None, message_id=None, inline_message_id=None, reply_markup=None, **kwargs):
+    """
+    Use this method to edit text messages sent by the bot or via the bot (for inline bots).
+
+    :param chat_id: Required if inline_message_id is not specified. Unique identifier for the target chat or username of
+                    the target channel (in the format @channelusername)
+    :param message_id: Required if inline_message_id is not specified. Unique identifier of the sent message
+    :param inline_message_id: Required if chat_id and message_id are not specified. Identifier of the inline message
+    :param reply_markup: A JSON-serialized object for an inline keyboard.
+    :param *\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type chat_id: str or int
+    :type message_id: int
+    :type inline_message_id: str
+    :type reply_markup: InlineKeyboardMarkup
+
+    :returns: On success, the edited Message is returned.
+    :rtype: Message
+    """
+
+    if not chat_id and not message_id and not inline_message_id:
+        raise ValueError("Must specify chat_id and message_id or inline_message_id")
+    if (chat_id and not message_id) or (not chat_id and message_id):
+        raise ValueError("Must specify chat_id and message_id together")
+
+    # required args
+    params = dict(
+    )
+
+    # optional args
+    params.update(
+        _clean_params(
+            chat_id=chat_id,
+            message_id=message_id,
+            inline_message_id=inline_message_id,
+            reply_markup=reply_markup
+        )
+    )
+
+    return TelegramBotRPCRequest('editMessageReplyMarkup', params=params, on_result=Message.from_result, **kwargs)
+
+
+def answer_inline_query(inline_query_id, results, cache_time=None, is_personal=None, next_offset=None, switch_pm_text=None, switch_pm_parameter=None, **kwargs):
     """ Use this method to send answers to an inline query. On success, True is returned.
 
     :param inline_query_id: Unique identifier for the message recipient — String
@@ -1755,13 +2649,25 @@ def answer_inline_query(inline_query_id, results, cache_time=None, is_personal=N
     :param next_offset: Pass the offset that a client should send in the next query with the same text to receive more
                         results. Pass an empty string if there are no more results or if you don‘t support pagination.
                         Offset length can’t exceed 64 bytes.
+    :param switch_pm_text: If passed, clients will display a button with specified text that switches the user to a private
+                           that with the bot and sends the bot a start message with the parameter switch_pm_parameter
+    :param switch_pm_parameter: Parameter for the start message sent to the bot when user presses the switch button
+                                *Example:* An inline bot that sends YouTube videos can ask the user to connect the bot
+                                to their YouTube account to adapt search results accordingly. To do this, it displays a
+                                ‘Connect your YouTube account’ button above the results, or even before showing any. The
+                                user presses the button, switches to a private chat with the bot and, in doing so, passes
+                                a start parameter that instructs the bot to return an oauth link. Once done, the bot can
+                                offer a switch_inline button so that the user can easily return to the chat where they
+                                wanted to use the bot's inline capabilities.
     :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type inline_query_id: str
     :type results: InlineQueryResult[]
     :type cache_time: int
     :type is_personal: bool
-    :type next_offset: stri
+    :type next_offset: str
+    :type switch_pm_text: str
+    :type switch_pm_parameter: str
 
 
     :returns: On success, the sent True is returned.
@@ -1783,7 +2689,9 @@ def answer_inline_query(inline_query_id, results, cache_time=None, is_personal=N
         _clean_params(
             cache_time=cache_time,
             is_personal=is_personal,
-            next_offset=next_offset
+            next_offset=next_offset,
+            switch_pm_text=switch_pm_text,
+            switch_pm_parameter=switch_pm_parameter,
         )
     )
 
@@ -2012,6 +2920,14 @@ class TelegramBot:
         """See :func:`send_location`"""
         return send_location(*args, **self._merge_overrides(**kwargs)).run()
 
+    def send_venue(self, *args, **kwargs):
+        """See :func:`send_venue`"""
+        return send_venue(*args, **self._merge_overrides(**kwargs)).run()
+
+    def send_contact(self, *args, **kwargs):
+        """See :func:`send_contact`"""
+        return send_contact(*args, **self._merge_overrides(**kwargs)).run()
+
     def send_chat_action(self, *args, **kwargs):
         """See :func:`send_chat_action`"""
         return send_chat_action(*args, **self._merge_overrides(**kwargs)).run()
@@ -2023,6 +2939,26 @@ class TelegramBot:
     def get_file(self, *args, **kwargs):
         """See :func:`get_file`"""
         return get_file(*args, **self._merge_overrides(**kwargs)).run()
+
+    def edit_message_text(self, *args, **kwargs):
+        """See :func:`edit_message_text`"""
+        return edit_message_text(*args, **self._merge_overrides(**kwargs)).run()
+
+    def edit_message_caption(self, *args, **kwargs):
+        """See :func:`edit_message_caption`"""
+        return edit_message_caption(*args, **self._merge_overrides(**kwargs)).run()
+
+    def kick_chat_member(self, *args, **kwargs):
+        """See :func:`kick_chat_member`"""
+        return kick_chat_member(*args, **self._merge_overrides(**kwargs)).run()
+
+    def unban_chat_member(self, *args, **kwargs):
+        """See :func:`unban_chat_member`"""
+        return unban_chat_member(*args, **self._merge_overrides(**kwargs)).run()
+
+    def edit_message_reply_markup(self, *args, **kwargs):
+        """See :func:`edit_message_reply_markup`"""
+        return edit_message_reply_markup(*args, **self._merge_overrides(**kwargs)).run()
 
     def get_updates(self, *args, **kwargs):
         """See :func:`get_updates`"""
