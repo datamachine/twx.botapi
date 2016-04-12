@@ -620,7 +620,7 @@ class KeyboardButton(_KeyboardButtonBase):
 
     @staticmethod
     def create(text, request_contact=None, request_location=None):
-        if request_contact == request_location:
+        if request_contact == request_location and (request_contact or request_location):
             raise ValueError("Optional fields are mutually exclusive")
         return KeyboardButton(text, request_contact, request_location)
 
@@ -831,7 +831,7 @@ class ChosenInlineResult(_ChosenInlineResultBase):
             query=result.get('query'),
             )
 
-_CallbackQueryBase = namedtuple('CallbackQuery', ['id', 'from', 'messages', 'inline_message_id', 'data'])
+_CallbackQueryBase = namedtuple('CallbackQuery', ['id', 'sender', 'messages', 'inline_message_id', 'data'])
 class CallbackQuery(_CallbackQueryBase):
     """ This object represents an incoming callback query from a callback button in an inline keyboard. If
         the button that originated the query was attached to a message sent by the bot, the field message
@@ -1472,7 +1472,7 @@ class InputTextMessageContent(InputMessageContent):
         disable_web_page_preview (bool) :*Optional.* Disables link previews for links in the sent message
     """
 
-    def __init__(self, message_text, parse_mode, disable_web_page_preview=None):
+    def __init__(self, message_text, parse_mode=None, disable_web_page_preview=None):
         self.message_text = message_text
         self.parse_mode = parse_mode
         self.disable_web_page_preview = disable_web_page_preview
@@ -2676,7 +2676,23 @@ def answer_inline_query(inline_query_id, results, cache_time=None, is_personal=N
 
     json_results = []
     for result in results:
-        json_results.append(dict((k, v) for k, v in result.__dict__.items() if v))  # Don't serialize None keys.
+        result_dict = dict((k, v) for k, v in result.__dict__.items() if v)  # Don't serialize None keys.
+        result_dict['input_message_content'] = dict((k, v) for k, v in result_dict['input_message_content'].__dict__.items() if v)  # Serialize InputMessageContent
+
+        keyboard_buttons = result_dict['reply_markup'].inline_keyboard
+        serialized_buttons = []
+
+        for row in keyboard_buttons:
+            new_row = []
+            for column in row:
+                serialized_button = dict((k, v) for k, v in column._asdict().items() if v)
+                new_row.append(serialized_button)
+            serialized_buttons.append(new_row)
+
+        result_dict['reply_markup'] = {
+            'inline_keyboard': serialized_buttons
+        }
+        json_results.append(result_dict)
 
     # required args
     params = dict(
