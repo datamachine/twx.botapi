@@ -177,8 +177,8 @@ class Message(_MessageBase):
             contact=Contact.from_result(result.get('contact')),
             location=Location.from_result(result.get('location')),
             venue=Venue.from_result(result.get('venue')),
-            new_chat_memeber=User.from_result(result.get('new_chat_memeber')),
-            left_chat_memeber=User.from_result(result.get('left_chat_memeber')),
+            new_chat_member=User.from_result(result.get('new_chat_member')),
+            left_chat_member=User.from_result(result.get('left_chat_member')),
             new_chat_title=result.get('new_chat_title'),
             new_chat_photo=result.get('new_chat_photo'),
             delete_chat_photo=result.get('delete_chat_photo'),
@@ -503,8 +503,8 @@ class Update(_UpdateBase):
     def from_result(result):
         if result is None:
             return None
-
-        return [Update.from_dict(message_update) for message_update in result]
+        updates = [Update.from_dict(message_update) for message_update in result]
+        return updates
 
 
 _InputFileInfoBase = namedtuple('InputFileInfo', ['file_name', 'fp', 'mime_type'])
