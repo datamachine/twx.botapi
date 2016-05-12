@@ -75,7 +75,7 @@ class Chat(_ChatBase):
         )
 
 _MessageBase = namedtuple('Message', [
-    'message_id', 'sender', 'date', 'chat', 'forward_from', 'forward_date',
+    'message_id', 'sender', 'date', 'chat', 'forward_from', 'forward_from_chat', 'forward_date',
     'reply_to_message', 'text', 'entities', 'audio', 'document', 'photo', 'sticker',
     'video', 'voice', 'caption', 'contact', 'location', 'venue', 'new_chat_member',
     'left_chat_member', 'new_chat_title', 'new_chat_photo', 'delete_chat_photo',
@@ -91,6 +91,8 @@ class Message(_MessageBase):
         date             (int)                           :Date the message was sent in Unix time
         chat             (Chat)                          :Conversation the message belongs to
         forward_from     (User)                          :*Optional.* For forwarded messages, sender of the original message
+        forward_from_chat (Chat)                         :*Optional.* For messages forwarded from a channel, information about
+                                                                      the original channel
         forward_date     (int)                           :*Optional.* For forwarded messages, date the original message was
                                                                      sent in Unix time
         reply_to_message (Message)                       :*Optional.* For replies, the original message. Note that the
@@ -163,6 +165,7 @@ class Message(_MessageBase):
             date=result.get('date'),
             chat=Chat.from_result(result.get('chat')),
             forward_from=User.from_result(result.get('forward_from')),
+            forward_from_chat=Chat.from_result(result.get('forward_from_chat')),
             forward_date=result.get('forward_date'),
             reply_to_message=Message.from_result(result.get('reply_to_message')),
             text=result.get('text'),
@@ -302,7 +305,7 @@ class Document(_DocumentBase):
             )
 
 
-_StickerBase = namedtuple('Sticker', ['file_id', 'width', 'height', 'thumb', 'file_size'])
+_StickerBase = namedtuple('Sticker', ['file_id', 'width', 'height', 'thumb', 'emoji', 'file_size'])
 class Sticker(_StickerBase):
 
     """This object represents a sticker.
@@ -312,6 +315,7 @@ class Sticker(_StickerBase):
         width      (int)        :Sticker width
         height     (int)        :Sticker height
         thumb      (PhotoSize)  :*Optional.* Sticker thumbnail in .webp or .jpg format
+        emoji      (str)        :*Optional.* Emoji associated with the sticker
         file_size  (int)        :*Optional.* File size
 
     """
@@ -327,6 +331,7 @@ class Sticker(_StickerBase):
             width=result.get('width'),
             height=result.get('height'),
             thumb=PhotoSize.from_result(result.get('thumb')),
+            emoji=result.get('emoji')
             file_size=result.get('file_size')
             )
 
