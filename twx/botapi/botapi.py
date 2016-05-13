@@ -331,7 +331,7 @@ class Sticker(_StickerBase):
             width=result.get('width'),
             height=result.get('height'),
             thumb=PhotoSize.from_result(result.get('thumb')),
-            emoji=result.get('emoji')
+            emoji=result.get('emoji'),
             file_size=result.get('file_size')
             )
 
