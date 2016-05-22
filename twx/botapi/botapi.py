@@ -44,6 +44,45 @@ class User(_UserBase):
             )
 
 
+_ChatMemberBase = namedtuple('ChatMember', ['user', 'status'])
+class ChatMember(_ChatMemberBase):
+    """This object contains information about one member of the chat.
+
+    Attributes:
+        user (User): Information about the user
+        status (str): The member's status in the chat. Can be “creator”, “administrator”, “member”, “left” or “kicked”
+
+
+    """
+    __slots__ = ()
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return User(
+            user=User.from_result(result.get('user')),
+            status=result.get('status'),
+            )
+
+    @staticmethod
+    def from_result_list(results):
+        if results is None:
+            return None
+
+        ret = []
+        for result in results:
+            ret.append(
+                User(
+                    user=User.from_result(result.get('user')),
+                    status=result.get('status'),
+                )
+            )
+
+        return ret
+
+
 _ChatBase = namedtuple('Chat', ['id', 'type', 'title', 'username', 'first_name', 'last_name'])
 class Chat(_ChatBase):
     """This object represents a chat.
@@ -75,7 +114,7 @@ class Chat(_ChatBase):
         )
 
 _MessageBase = namedtuple('Message', [
-    'message_id', 'sender', 'date', 'chat', 'forward_from', 'forward_from_chat', 'forward_date',
+    'message_id', 'sender', 'date', 'edit_date', 'chat', 'forward_from', 'forward_from_chat', 'forward_date',
     'reply_to_message', 'text', 'entities', 'audio', 'document', 'photo', 'sticker',
     'video', 'voice', 'caption', 'contact', 'location', 'venue', 'new_chat_member',
     'left_chat_member', 'new_chat_title', 'new_chat_photo', 'delete_chat_photo',
@@ -98,6 +137,7 @@ class Message(_MessageBase):
         reply_to_message (Message)                       :*Optional.* For replies, the original message. Note that the
                                                                       Message object in this field will not contain further
                                                                       reply_to_message fields even if it itself is a reply.
+        edit_date        (int)                           :*Optional.* Date the message was last edited in Unix time
         text             (str)                           :*Optional.* For text messages, the actual UTF-8 text of the message
         entities         (Sequence[MessageEntity])       :*Optional.*For text messages, special entities like usernames,
                                                                      URLs, bot commands, etc. that appear in the text
@@ -163,6 +203,7 @@ class Message(_MessageBase):
             message_id=result.get('message_id'),
             sender=User.from_result(result.get('from')),
             date=result.get('date'),
+            edit_date=result.get('edit_date'),
             chat=Chat.from_result(result.get('chat')),
             forward_from=User.from_result(result.get('forward_from')),
             forward_from_chat=Chat.from_result(result.get('forward_from_chat')),
@@ -194,16 +235,18 @@ class Message(_MessageBase):
         )
 
 
-_MessageEntityBase = namedtuple('MessageEntity', ['type', 'offset', 'length', 'url'])
+_MessageEntityBase = namedtuple('MessageEntity', ['type', 'offset', 'length', 'url', 'text_mention', 'user'])
 class MessageEntity(_MessageEntityBase):
     """This object represents a chat.
 
     Attributes:
         type	(str)	:Type of the entity. One of mention (@username), hashtag, bot_command, url, email, bold (bold text),
-                         italic (italic text), code (monowidth string), pre (monowidth block), text_link (for clickable text URLs)
+                         italic (italic text), code (monowidth string), pre (monowidth block), text_link (for clickable text URLs),
+                         text_mention (for users without usernames)
         offset	(int)	:Offset in UTF-16 code units to the start of the entity
         length	(int)	:Length of the entity in UTF-16 code units
         url	    (str)	:*Optional.* For “text_link” only, url that will be opened after user taps on the text
+        user    (User0  :*Optional.* For “text_mention” only, the mentioned user
     """
 
     __slots__ = ()
@@ -218,6 +261,7 @@ class MessageEntity(_MessageEntityBase):
             offset=result.get('offset'),
             length=result.get('length'),
             url=result.get('url'),
+            user=User.from_result(result.get('user'))
         )
 
 
@@ -474,7 +518,7 @@ class Venue(_VenueBase):
 
 
 
-_UpdateBase = namedtuple('Update', ['update_id', 'message', 'inline_query', 'chosen_inline_result', 'callback_query'])
+_UpdateBase = namedtuple('Update', ['update_id', 'message', 'edited_message', 'inline_query', 'chosen_inline_result', 'callback_query'])
 class Update(_UpdateBase):
 
     """This object represents an incoming update.
@@ -485,6 +529,7 @@ class Update(_UpdateBase):
                                                       if you’re using Webhooks, since it allows you to ignore repeated updates or to
                                                       restore the correct update sequence, should they get out of order.
         message                 (Message)            :*Optional.* New incoming message of any kind — text, photo, sticker, etc.
+        edited_message          (Message)            :*Optional.* New version of a message that is known to the bot and was edited.
         inline_query            (InlineQuery)        :*Optional.* New incoming inline query
         chosen_inline_result	(ChosenInlineResult) :*Optional.* The result of a inline query that was chosen by
                                                       a user and sent to their chat partner
@@ -500,6 +545,7 @@ class Update(_UpdateBase):
 
         return Update(message_update.get('update_id'),
                       Message.from_result(message_update.get('message')),
+                      Message.from_result(message_update.get('edited_message')),
                       InlineQuery.from_result(message_update.get('inline_query')),
                       ChosenInlineResult.from_result(message_update.get('chosen_inline_result')),
                       CallbackQuery.from_result(message_update.get('callback_query')))
@@ -2466,6 +2512,124 @@ def unban_chat_member(chat_id, user_id, **kwargs):
         )
 
         return TelegramBotRPCRequest('unbanChatMember', params=params, on_result=lambda result: result, **kwargs)
+
+
+def get_chat(chat_id, **kwargs):
+
+        """
+        Use this method to get up to date information about the chat (current name of the user for one-on-one conversations, current username
+        of a user, group or channel, etc.).
+
+
+        :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
+        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+        :type chat_id: int or str
+
+        :returns: Returns a Chat object on success.
+        :rtype: Chat
+        """
+
+        # required args
+        params = dict(
+            chat_id=chat_id,
+        )
+
+        return TelegramBotRPCRequest('getChat', params=params, on_result=lambda result: Chat.from_result(result), **kwargs)
+
+
+def leave_chat(chat_id, **kwargs):
+
+        """
+        Use this method for your bot to leave a group, supergroup or channel.
+
+        :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
+        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+        :type chat_id: int or str
+
+        :returns: Returns true on success.
+        :rtype: bool
+        """
+
+        # required args
+        params = dict(
+            chat_id=chat_id,
+        )
+
+        return TelegramBotRPCRequest('leaveChat', params=params, on_result=lambda result: result, **kwargs)
+
+
+def get_chat_administrators(chat_id, **kwargs):
+
+        """
+        Use this method to get a list of administrators in a chat. On success, returns an Array of ChatMember objects that
+        contains information about all chat administrators except other bots. If the chat is a group or a supergroup and no
+        administrators were appointed, only the creator will be returned.
+
+
+        :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
+        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+        :type chat_id: int or str
+
+        :returns: List of Chat Members on success.
+        :rtype: list[ChatMember]
+        """
+
+        # required args
+        params = dict(
+            chat_id=chat_id,
+        )
+
+        return TelegramBotRPCRequest('getChatAdministrators', params=params, on_result=lambda result: ChatMember.from_result_list(result), **kwargs)
+
+
+def get_chat_member(chat_id, **kwargs):
+
+        """
+        Use this method to get information about a member of a chat
+
+        :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
+        :param user_id: Unique identifier of the target user
+        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+        :type chat_id: int or str
+        :type user_id: int
+
+        :returns: Returns ChatMember on success.
+        :rtype: ChatMember
+        """
+
+        # required args
+        params = dict(
+            chat_id=chat_id,
+        )
+
+        return TelegramBotRPCRequest('getChatMember', params=params, on_result=lambda result: ChatMember.from_result(result), **kwargs)
+
+
+def get_chat_members_count(chat_id, **kwargs):
+
+        """
+        Use this method to get the number of members in a chat.
+
+        :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
+        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+        :type chat_id: int or str
+
+        :returns: Returns count on success.
+        :rtype: int
+        """
+
+        # required args
+        params = dict(
+            chat_id=chat_id,
+        )
+
+        return TelegramBotRPCRequest('getChatMembersCount', params=params, on_result=lambda result: result, **kwargs)
+
 
 def answer_callback_query(callback_query_id, text=None, show_alert=None, **kwargs):
         """
