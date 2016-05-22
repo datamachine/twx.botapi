@@ -235,7 +235,7 @@ class Message(_MessageBase):
         )
 
 
-_MessageEntityBase = namedtuple('MessageEntity', ['type', 'offset', 'length', 'url', 'text_mention', 'user'])
+_MessageEntityBase = namedtuple('MessageEntity', ['type', 'offset', 'length', 'url', 'user'])
 class MessageEntity(_MessageEntityBase):
     """This object represents a chat.
 
