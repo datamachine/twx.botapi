@@ -882,7 +882,7 @@ class ChosenInlineResult(_ChosenInlineResultBase):
             query=result.get('query'),
             )
 
-_CallbackQueryBase = namedtuple('CallbackQuery', ['id', 'sender', 'messages', 'inline_message_id', 'data'])
+_CallbackQueryBase = namedtuple('CallbackQuery', ['id', 'sender', 'message', 'inline_message_id', 'data'])
 class CallbackQuery(_CallbackQueryBase):
     """ This object represents an incoming callback query from a callback button in an inline keyboard. If
         the button that originated the query was attached to a message sent by the bot, the field message
