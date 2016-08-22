@@ -925,10 +925,10 @@ class InlineKeyboardMarkup:
         self.inline_keyboard = inline_keyboard
 
     def serialize(self):
-        inline_keyboard = []*0
+        inline_keyboard = []
 
         for button_list in self.inline_keyboard:
-            temp_list = []*0
+            temp_list = []
             for button in button_list:
                 temp_list.append(button.serialize())
             inline_keyboard.append(temp_list)
