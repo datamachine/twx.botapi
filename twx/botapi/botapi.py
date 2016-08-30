@@ -291,7 +291,7 @@ class PhotoSize(_PhotoSizeBase):
             )
 
 
-_AudioBase = namedtuple('Audio', ['file_id', 'duration', 'mime_type', 'file_size'])
+_AudioBase = namedtuple('Audio', ['file_id', 'duration', 'performer', 'title', 'mime_type', 'file_size'])
 class Audio(_AudioBase):
 
     """This object represents a generic audio file (not voice note).
@@ -315,6 +315,8 @@ class Audio(_AudioBase):
         return Audio(
             file_id=result.get('file_id'),
             duration=result.get('duration'),
+            performer=result.get('performer'),
+            title=result.get('title'),
             mime_type=result.get('mime_type'),
             file_size=result.get('file_size')
             )
@@ -414,7 +416,7 @@ class Video(_VideoBase):
             )
 
 
-_VoiceBase = namedtuple('Audio', ['file_id', 'duration', 'mime_type', 'file_size'])
+_VoiceBase = namedtuple('Voice', ['file_id', 'duration', 'mime_type', 'file_size'])
 class Voice(_VoiceBase):
 
     """This object represents an voice node audio file.
@@ -433,7 +435,7 @@ class Voice(_VoiceBase):
         if result is None:
             return None
 
-        return Audio(
+        return Voice(
             file_id=result.get('file_id'),
             duration=result.get('duration'),
             mime_type=result.get('mime_type'),
@@ -510,7 +512,7 @@ class Venue(_VenueBase):
             return None
 
         return Venue(
-            location=result.get('location'),
+            location=Location.from_result(result.get('location')),
             title=result.get('title'),
             address=result.get('address'),
             foursquare_id=result.get('foursquare_id'),
