@@ -884,7 +884,7 @@ class ChosenInlineResult(_ChosenInlineResultBase):
             query=result.get('query'),
             )
 
-_CallbackQueryBase = namedtuple('CallbackQuery', ['id', 'sender', 'messages', 'inline_message_id', 'data'])
+_CallbackQueryBase = namedtuple('CallbackQuery', ['id', 'sender', 'message', 'inline_message_id', 'data'])
 class CallbackQuery(_CallbackQueryBase):
     """ This object represents an incoming callback query from a callback button in an inline keyboard. If
         the button that originated the query was attached to a message sent by the bot, the field message
@@ -926,6 +926,19 @@ class InlineKeyboardMarkup:
     def __init__(self, inline_keyboard):
         self.inline_keyboard = inline_keyboard
 
+    def serialize(self):
+        inline_keyboard = []
+
+        for button_list in self.inline_keyboard:
+            temp_list = []
+            for button in button_list:
+                temp_list.append(button.serialize())
+            inline_keyboard.append(temp_list)
+
+        reply_markup = dict(inline_keyboard=inline_keyboard)
+
+        return json.dumps(reply_markup)
+
 class InlineKeyboardButton:
     """ This object represents one button of an inline keyboard. You must use exactly one of the optional fields.
 
@@ -951,6 +964,18 @@ class InlineKeyboardButton:
         if url is None and callback_data is None and switch_inline_query is None:
             raise ValueError("You must use exactly one of the optional fields.")
 
+    def serialize(self):
+        reply_markup = dict()
+
+        reply_markup['text'] = self.text
+        if self.url is not None:
+            reply_markup['url'] = self.url
+        if self.callback_data is not None:
+            reply_markup['callback_data'] = self.callback_data
+        if self.switch_inline_query is not None:
+            reply_markup['switch_inline_query'] = self.switch_inline_query
+
+        return reply_markup
 
 """
 InlineQuery Types
