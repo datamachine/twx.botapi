@@ -562,12 +562,20 @@ class Update(_UpdateBase):
 
 _InputFileInfoBase = namedtuple('InputFileInfo', ['file_name', 'fp', 'mime_type'])
 class InputFileInfo(_InputFileInfoBase):
+    """This object represents the contents of a file to be uploaded. Must be posted using multipart/form-data
+            in the usual way that files are uploaded via the browser.
+
+            Attributes:
+                file_name        (str)           :The full file name
+                fp               (file object)   :File object obtained via open()
+                mime_type        (str)           :*Optional.* Mimetype to use when sending.
+
+        """
     __slots__ = ()
 
 
 _InputFileBase = namedtuple('InputFile', ['form', 'file_info'])
 class InputFile(_InputFileBase):
-
     """This object represents the contents of a file to be uploaded. Must be posted using multipart/form-data
         in the usual way that files are uploaded via the browser.
 
@@ -591,7 +599,6 @@ class InputFile(_InputFileBase):
                 While creating the FileInput currently requires a reasonable amount
                 of preparation just to send a file. This class will be extended
                 in the future to make the process easier.
-
     """
     __slots__ = ()
 
@@ -1515,7 +1522,7 @@ class InlineQueryResultContact(InlineQueryResult):
         self.thumb_height = thumb_height
 
 
-class InlineQueryResultCachedSticker(InlineQueryResult):
+class InlineQueryResultContact(InlineQueryResult):
     """ Represents a link to a sticker stored on the Telegram servers. By default, this sticker will be sent by the
     user. Alternatively, you can use input_message_content to send a message with the specified content instead
     of the sticker.
@@ -2943,8 +2950,7 @@ def get_user_profile_photos(user_id,
                                  on_result=UserProfilePhotos.from_result, **kwargs)
 
 
-def get_file(file_id,
-             **kwargs):
+def get_file(file_id, **kwargs):
     """
     Use this method to get basic info about a file and prepare it for downloading.
 
