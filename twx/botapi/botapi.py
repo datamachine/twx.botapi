@@ -3390,7 +3390,7 @@ def download_file(file_path, out_file, **kwargs):
     return TelegramDownloadRequest(file_path, out_file, **kwargs)
 
 
-class TelegramBot:
+class TelegramBot(object):
 
     """A `TelegramBot` object represents a specific regisitered bot user as identified by its token. The bot
     object also helps try to maintain state and simplify interaction for library users.
