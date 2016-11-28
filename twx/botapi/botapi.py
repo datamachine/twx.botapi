@@ -115,7 +115,7 @@ class Chat(_ChatBase):
         )
 
 _MessageBase = namedtuple('Message', [
-    'message_id', 'sender', 'date', 'edit_date', 'chat', 'forward_from', 'forward_from_chat', 'forward_date',
+    'message_id', 'sender', 'date', 'edit_date', 'chat', 'forward_from', 'forward_from_chat', 'forward_from_message_id', 'forward_date',
     'reply_to_message', 'text', 'entities', 'audio', 'document', 'photo', 'sticker',
     'video', 'voice', 'caption', 'contact', 'location', 'venue', 'new_chat_member',
     'left_chat_member', 'new_chat_title', 'new_chat_photo', 'delete_chat_photo',
@@ -133,6 +133,7 @@ class Message(_MessageBase):
         forward_from     (User)                          :*Optional.* For forwarded messages, sender of the original message
         forward_from_chat (Chat)                         :*Optional.* For messages forwarded from a channel, information about
                                                                       the original channel
+        forward_from_message_id (int)                    :*Optional.* For forwarded channel posts, identifier of the original message in the channel
         forward_date     (int)                           :*Optional.* For forwarded messages, date the original message was
                                                                      sent in Unix time
         reply_to_message (Message)                       :*Optional.* For replies, the original message. Note that the
@@ -650,7 +651,7 @@ class WebhookInfo(_WebhookInfoBase):
             last_error_message=result.get('last_error_message'),
         )
 
-_UpdateBase = namedtuple('Update', ['update_id', 'message', 'edited_message', 'inline_query', 'chosen_inline_result', 'callback_query'])
+_UpdateBase = namedtuple('Update', ['update_id', 'message', 'edited_message', 'channel_post', 'edited_channel_post', 'inline_query', 'chosen_inline_result', 'callback_query'])
 class Update(_UpdateBase):
 
     """This object represents an incoming update.
@@ -662,6 +663,8 @@ class Update(_UpdateBase):
                                                       restore the correct update sequence, should they get out of order.
         message                 (Message)            :*Optional.* New incoming message of any kind — text, photo, sticker, etc.
         edited_message          (Message)            :*Optional.* New version of a message that is known to the bot and was edited.
+        channel_post            (Message)            :*Optional.* New incoming channel post of any kind — text, photo, sticker, etc.
+        edited_channel_post     (Message)            :*Optional.* New version of a channel post that is known to the bot and was edited
         inline_query            (InlineQuery)        :*Optional.* New incoming inline query
         chosen_inline_result	(ChosenInlineResult) :*Optional.* The result of a inline query that was chosen by
                                                       a user and sent to their chat partner
@@ -879,18 +882,29 @@ class ReplyKeyboardMarkup(_ReplyKeyboardMarkupBase, ReplyMarkup):
         return json.dumps(reply_markup)
 
 
-_ReplyKeyboardHideBase = namedtuple('ReplyKeyboardHide', ['hide_keyboard', 'selective'])
+
+class ReplyKeyboardHide():
+    """
+    DEPRECATED: ReplyKeyboardHide is now ReplyKeyboardRemove
+    """
+    @staticmethod
+    def create(selective=None):
+        print("DEPRECATED: ReplyKeyboardHide is now ReplyKeyboardRemove")
+        return ReplyKeyboardRemove(True, selective)
 
 
-class ReplyKeyboardHide(_ReplyKeyboardHideBase, ReplyMarkup):
+_ReplyKeyboardRemoveBase = namedtuple('ReplyKeyboardRemove', ['remove_keyboard', 'selective'])
+class ReplyKeyboardRemove(_ReplyKeyboardRemoveBase, ReplyMarkup):
 
-    """Upon receiving a message with this object, Telegram clients will hide the current custom keyboard and
-        display the default letter-keyboard. By default, custom keyboards are displayed until a new keyboard
-        is sent by a bot. An exception is made for one-time keyboards that are hidden immediately after the
-        user presses a button (see :class:`ReplyKeyboardMarkup`).
+    """Upon receiving a message with this object, Telegram clients will remove the current
+       custom keyboard and display the default letter-keyboard. By default, custom keyboards
+       are displayed until a new keyboard is sent by a bot. An exception is made for one-time
+       keyboards that are hidden immediately after the user presses a button (see :class:`ReplyKeyboardMarkup`).
 
     Attributes:
-        hide_keyboard   (``True``)  :Requests clients to hide the custom keyboard
+        remove_keyboard   (``True``)  :Requests clients to remove the custom keyboard (user will not be able to summon this keyboard;
+                                       if you want to hide the keyboard from sight but keep it accessible, use one_time_keyboard
+                                       in :class:`ReplyKeyboardMarkup`)
         selective       (bool)      :*Optional.* Use this parameter if you want to hide keyboard for specific
                                     users only. Targets:
 
@@ -907,7 +921,7 @@ class ReplyKeyboardHide(_ReplyKeyboardHideBase, ReplyMarkup):
 
     @staticmethod
     def create(selective=None):
-        return ReplyKeyboardHide(True, selective)
+        return ReplyKeyboardRemove(True, selective)
 
     def serialize(self):
         reply_markup = dict(
@@ -2824,7 +2838,7 @@ def get_chat_members_count(chat_id, **kwargs):
         return TelegramBotRPCRequest('getChatMembersCount', params=params, on_result=lambda result: result, **kwargs)
 
 
-def answer_callback_query(callback_query_id, text=None, show_alert=None, url=None, **kwargs):
+def answer_callback_query(callback_query_id, text=None, show_alert=None, url=None, cache_time=0, **kwargs):
         """
         Use this method to send answers to callback queries sent from inline keyboards. The answer will be displayed
         to the user as a notification at the top of the chat screen or as an alert.
@@ -2837,12 +2851,15 @@ def answer_callback_query(callback_query_id, text=None, show_alert=None, url=Non
         :param url: URL that will be opened by the user's client. If you have created a Game and accepted the conditions via @Botfather,
                     specify the URL that opens your game – note that this will only work if the query comes from a callback_game button.
                     Otherwise, you may use links like telegram.me/your_bot?start=XXXX that open your bot with a parameter.
+        :param cache_time: The maximum amount of time in seconds that the result of the callback query may be cached client-side. Telegram
+                           apps will support caching starting in version 3.14. Defaults to 0.
         :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
         :type callback_query_id: str
         :type text: str
         :type url: str
         :type show_alert: bool
+        :type cache_time: int
 
         :returns: Returns True on success.
         :rtype: bool
@@ -2858,7 +2875,8 @@ def answer_callback_query(callback_query_id, text=None, show_alert=None, url=Non
             _clean_params(
                 text=text,
                 show_alert=show_alert,
-                url=url
+                url=url,
+                cache_time=cache_time,
             )
         )
 
