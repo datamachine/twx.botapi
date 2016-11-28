@@ -83,7 +83,7 @@ class ChatMember(_ChatMemberBase):
         return ret
 
 
-_ChatBase = namedtuple('Chat', ['id', 'type', 'title', 'username', 'first_name', 'last_name'])
+_ChatBase = namedtuple('Chat', ['id', 'type', 'title', 'username', 'first_name', 'last_name', 'all_members_are_administrators'])
 class Chat(_ChatBase):
     """This object represents a chat.
 
@@ -94,7 +94,7 @@ class Chat(_ChatBase):
         username	(str)	:*Optional.* Username, for private chats and channels if available
         first_name	(str)	:*Optional.* First name of the other party in a private chat
         last_name	(str)	:*Optional.* Last name of the other party in a private chat
-
+        all_members_are_administrators (bool) :*Optional.* True if a group has ‘All Members Are Admins’ enabled.
     """
 
     __slots__ = ()
@@ -111,6 +111,7 @@ class Chat(_ChatBase):
             username=result.get('username'),
             first_name=result.get('first_name'),
             last_name=result.get('last_name'),
+            all_members_are_administrators=result.get('all_members_are_administrators'),
         )
 
 _MessageBase = namedtuple('Message', [
@@ -143,6 +144,7 @@ class Message(_MessageBase):
                                                                      URLs, bot commands, etc. that appear in the text
         audio            (Audio)                         :*Optional.* Message is an audio file, information about the file
         document         (Document)                      :*Optional.* Message is a general file, information about the file
+        game             (Game)                          :*Optional.* Message is a game, information about the game.
         photo            (Sequence[PhotoSize])           :*Optional.* Message is a photo, available sizes of the photo
         sticker          (Sticker)                       :*Optional.* Message is a sticker, information about the sticker
         video            (Video)                         :*Optional.* Message is a video, information about the video
@@ -519,6 +521,134 @@ class Venue(_VenueBase):
         )
 
 
+_GameBase = namedtuple('Game', ['title', 'description', 'photo', 'text', 'text_entities', 'animation'])
+class Game(_GameBase):
+
+    """This object represents a game. Use BotFather to create and edit games, their short names will act as unique identifiers.
+
+
+    Attributes:
+        title          (str)                     :Title of the game
+        description    (str)                     :Description of the game
+        photo          (Sequence[PhotoSize])     :Photo that will be displayed in the game message in chats.
+        text           (str)                     :*Optional.* Brief description of the game or high scores included in the game message. Can be automatically
+                                                              edited to include current high scores for the game when the bot calls setGameScore, or manually
+                                                              edited using editMessageText. 0-4096 characters.
+        text_entities  (Sequence[MessageEntity]) :*Optional.* Special entities that appear in text, such as usernames, URLs, bot commands, etc.
+        animation      (Animation)               :*Optional.* Animation that will be displayed in the game message in chats. Upload via BotFather
+    """
+    __slots__ = ()
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        # photo is a list of PhotoSize
+        photo = result.get('photo')
+        if photo is not None:
+            photo = [PhotoSize.from_result(photo_size) for photo_size in photo]
+
+        # entities is a list of MessageEntity
+        text_entities = result.get('entities')
+        if text_entities is not None:
+            text_entities = [MessageEntity.from_result(entity) for entity in text_entities]
+
+        return Game(
+            title=result.get('title'),
+            description=result.get('description'),
+            photo=photo,
+            text=result.get('text'),
+            text_entities=text_entities,
+            animation=Animation.from_result(result.get('animation')),
+        )
+
+
+_AnimationBase = namedtuple('Animation', ['file_id', 'thumb', 'file_name', 'mime_type', 'file_size'])
+class Animation(_GameBase):
+    """You can provide an animation for your game so that it looks stylish in chats. This object represents an animation file to be
+    displayed in the message containing a game.
+
+    Attributes:
+        file_id    (str)        :Unique file identifier
+        thumb      (PhotoSize)  :*Optional.* Animation thumbnail as defined by sender
+        file_name  (str)        :*Optional.* Original animation filename as defined by sender
+        mime_type  (str)        :*Optional.* MIME type of the file as defined by sender
+        file_size  (int)        :*Optional.* File size
+    """
+    __slots__ = ()
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return Animation(
+            file_id=result.get('file_id'),
+            thumb=PhotoSize.from_result(result.get('thumb')),
+            file_name=result.get('file_name'),
+            mime_type=result.get('mime_type'),
+            file_size=result.get('file_size')
+            )
+
+
+_GameHighScoreBase = namedtuple('GameHighScore', ['position', 'user', 'score'])
+class GameHighScore(_GameHighScoreBase):
+    """
+    This object represents one row of the high scores table for a game.
+
+    Attributes:
+        position    (int)  :Position in high score table for the game
+        user        (User) :User
+        score       (int)  :Score
+    """
+
+    __slots__ = ()
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return GameHighScore(
+            position=result.get('position'),
+            user=User.from_result(result.get('user')),
+            score=result.get('score'),
+        )
+
+    @staticmethod
+    def from_array_result(result):
+        if result is None:
+            return None
+
+        [GameHighScore.from_result(score) for score in result]
+
+_WebhookInfoBase = namedtuple('WebhookInfo', ['url', 'has_custom_certificate', 'pending_update_count', 'last_error_date', 'last_error_message'])
+class WebhookInfo(_WebhookInfoBase):
+    """
+    Contains information about the current status of a webhook.
+
+    Attributes:
+        url                     (str) :Webhook URL, may be empty if webhook is not set up
+        has_custom_certificate  (bool :True, if a custom certificate was provided for webhook certificate checks
+        pending_update_count    (int) :Number of updates awaiting delivery
+        last_error_date         (int) :*Optional.* Unix time for the most recent error that happened when trying to deliver an update via webhook
+        last_error_message      (str) :*Optional.* Error message in human-readable format for the most recent error that happened when trying to deliver an update via webhook
+    """
+    __slots__ = ()
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return WebhookInfo(
+            url=result.get('url'),
+            has_custom_certificate=result.get('has_custom_certificate'),
+            pending_update_count=result.get('pending_update_count'),
+            last_error_date=result.get('last_error_date'),
+            last_error_message=result.get('last_error_message'),
+        )
 
 _UpdateBase = namedtuple('Update', ['update_id', 'message', 'edited_message', 'inline_query', 'chosen_inline_result', 'callback_query'])
 class Update(_UpdateBase):
@@ -601,6 +731,8 @@ class InputFile(_InputFileBase):
                 in the future to make the process easier.
     """
     __slots__ = ()
+
+
 
 
 _UserProfilePhotosBase = namedtuple('UserProfilePhotos', ['total_count', 'photos'])
@@ -953,6 +1085,7 @@ class InlineKeyboardButton:
         text     (str)  :Label text on the button
         url      (str)  :*Optional.* HTTP url to be opened when button is pressed
         callback_data (str) :*Optional.* Data to be sent in a callback query to the bot when button is pressed
+
         switch_inline_query (str) :*Optional.* If set, pressing the button will prompt the user to select
                                    one of their chats, open that chat and insert the bot‘s username and
                                    the specified inline query in the input field. Can be empty, in which case just the bot’s username will be inserted.
@@ -960,13 +1093,23 @@ class InlineKeyboardButton:
                                    Note: This offers an easy way for users to start using your bot in inline mode when they are currently in a private
                                    chat with it. Especially useful when combined with switch_pm… actions – in this case the user will be automatically
                                    returned to the chat they switched from, skipping the chat selection screen.
+        switch_inline_query_current_chat (str) :*Optional.* If set, pressing the button will insert the bot‘s username and the specified inline query
+                                                in the current chat's input field. Can be empty, in which case only the bot’s username will be inserted.
+
+                                                This offers a quick way for the user to open your bot in inline mode in the same chat – good for
+                                                selecting something from multiple options.
+        callback_game (str) :*Optional.*  Description of the game that will be launched when the user presses the button.
+
+                                          NOTE: This type of button must always be the first button in the first row.
     """
 
-    def __init__(self, text, url=None, callback_data=None, switch_inline_query=None):
+    def __init__(self, text, url=None, callback_data=None, switch_inline_query=None, switch_inline_query_current_chat=None, callback_game=None):
         self.text = text
         self.url = url
         self.callback_data = callback_data
         self.switch_inline_query = switch_inline_query
+        self.switch_inline_query_current_chat = switch_inline_query_current_chat
+        self.callback_game = callback_game
 
         if url is None and callback_data is None and switch_inline_query is None:
             raise ValueError("You must use exactly one of the optional fields.")
@@ -981,6 +1124,8 @@ class InlineKeyboardButton:
             reply_markup['callback_data'] = self.callback_data
         if self.switch_inline_query is not None:
             reply_markup['switch_inline_query'] = self.switch_inline_query
+        if self.switch_inline_query_current_chat is not None:
+            reply_markup['switch_inline_query_current_chat'] = self.switch_inline_query_current_chat
 
         return reply_markup
 
@@ -1272,6 +1417,7 @@ class InlineQueryResultAudio(InlineQueryResult):
         id                       (str)     :Unique identifier for this result, 1-64 bytes
         audio_url                (str)     :A valid URL for the audio file
         title                    (str)     :Title
+        caption                  (str)     :*Optional.* Caption, 0-200 characters
         performer                (str)     :*Optional.* Performer
         audio_duration                 (int)     :*Optional.* Audio duration in seconds
         reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
@@ -1279,10 +1425,11 @@ class InlineQueryResultAudio(InlineQueryResult):
 
     """
 
-    def __init__(self, id, audio_url, title, performer=None, audio_duration=None, input_message_content=None, reply_markup=None):
+    def __init__(self, id, audio_url, title, caption=None, performer=None, audio_duration=None, input_message_content=None, reply_markup=None):
         self.type = "audio"
         self.id = id
         self.audio_url = audio_url
+        self.caption = caption
         self.performer = performer
         self.audio_duration = audio_duration
         self.title = title
@@ -1299,16 +1446,18 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
         id                       (str)     :Unique identifier for this result, 1-64 bytes
         audio_file_id            (str)     :A valid file identifier for the audio file
         title                    (str)     :Title
+        caption                  (str)     :*Optional.* Caption, 0-200 characters
         reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
         input_message_content    (InputMessageContent) :*Optional.* Content of the message to be sent instead of the audio
 
     """
 
-    def __init__(self, id, audio_file_id, title, input_message_content=None, reply_markup=None):
+    def __init__(self, id, audio_file_id, title, caption=None, input_message_content=None, reply_markup=None):
         self.type = "audio"
         self.id = id
         self.audio_file_id = audio_file_id
         self.title = title
+        self.caption = caption
         self.input_message_content = input_message_content
         self.reply_markup = reply_markup
 
@@ -1322,16 +1471,18 @@ class InlineQueryResultVoice(InlineQueryResult):
         id                       (str)     :Unique identifier for this result, 1-64 bytes
         voice_url                (str)     :A valid URL for the audio file
         title                    (str)     :Title
+        caption                  (str)     :*Optional.* Caption, 0-200 characters
         voice_duration           (int)     :*Optional.* Recording duration in seconds
         reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
         input_message_content    (InputMessageContent) :*Optional.* Content of the message to be sent instead of the voice recording
 
     """
 
-    def __init__(self, id, voice_url, title, voice_duration=None, input_message_content=None, reply_markup=None):
+    def __init__(self, id, voice_url, title, caption=None, voice_duration=None, input_message_content=None, reply_markup=None):
         self.type = "voice"
         self.id = id
         self.voice_url = voice_url
+        self.caption = caption
         self.voice_duration = voice_duration
         self.title = title
         self.input_message_content = input_message_content
@@ -1348,16 +1499,18 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         id                       (str)     :Unique identifier for this result, 1-64 bytes
         voice_file_id            (str)     :A valid URL for the audio file
         title                    (str)     :Title
+        caption                  (str)     :*Optional.* Caption, 0-200 characters
         reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
         input_message_content    (InputMessageContent) :*Optional.* Content of the message to be sent instead of the voice recording
 
     """
 
-    def __init__(self, id, voice_file_id, title, input_message_content=None, reply_markup=None):
+    def __init__(self, id, voice_file_id, title, caption=None, input_message_content=None, reply_markup=None):
         self.type = "voice"
         self.id = id
         self.voice_file_id = voice_file_id
         self.title = title
+        self.caption = caption
         self.input_message_content = input_message_content
         self.reply_markup = reply_markup
 
@@ -1972,9 +2125,9 @@ def send_photo(chat_id,  photo,
     Use this method to send photos.
 
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
-    :param photo: Photo to send. You can either pass a file_id as String to resend a
-                  photo that is already on the Telegram servers, or upload a new photo
-                  using multipart/form-data.
+    :param photo: Pass a file_id as String to send a photo that exists on the Telegram servers (recommended),
+                  pass an HTTP URL as a String for Telegram to get a photo from the Internet, or upload a new
+                  photo using multipart/form-data.
     :param caption: Photo caption (may also be used when resending photos by file_id).
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a
@@ -2021,7 +2174,7 @@ def send_photo(chat_id,  photo,
 
 
 def send_audio(chat_id, audio,
-               duration=None, performer=None, title=None, reply_to_message_id=None, reply_markup=None,
+               caption=None, duration=None, performer=None, title=None, reply_to_message_id=None, reply_markup=None,
                disable_notification=False, **kwargs):
     """
     Use this method to send audio files, if you want Telegram clients to display them in the music player.
@@ -2035,8 +2188,9 @@ def send_audio(chat_id, audio,
     messages, use the sendVoice method instead.
 
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
-    :param audio: Audio file to send. You can either pass a file_id as String to resend an audio that is already on
-                  the Telegram servers, or upload a new audio file using multipart/form-data.
+    :param audio: Audio file to send. Pass a file_id as String to send an audio file that exists on the Telegram servers (recommended),
+                  pass an HTTP URL as a String for Telegram to get an audio file from the Internet, or upload a new one using multipart/form-data.
+    :param caption: Audio caption, 0-200 characters
     :param duration: Duration of the audio in seconds
     :param performer: Performer
     :param title: Track name
@@ -2048,9 +2202,10 @@ def send_audio(chat_id, audio,
 
     :type chat_id: int
     :type audio: InputFile or str
-    :param duration: int
-    :param performer: str
-    :param title: str
+    :type caption: str
+    :type duration: int
+    :type performer: str
+    :type title: str
     :type reply_to_message_id: int
     :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
 
@@ -2073,6 +2228,7 @@ def send_audio(chat_id, audio,
     # optional args
     params.update(
         _clean_params(
+            caption=caption,
             duration=duration,
             performer=performer,
             title=title,
@@ -2092,8 +2248,8 @@ def send_document(chat_id, document,
     Use this method to send general files.
 
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
-    :param document: File to send. You can either pass a file_id as String to resend a file that is already on
-                     the Telegram servers, or upload a new file using multipart/form-data.
+    :param document: File to send. Pass a file_id as String to send a file that exists on the Telegram servers (recommended),
+                     pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data.
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
                          instructions to hide keyboard or to force a reply from the user.
@@ -2139,8 +2295,8 @@ def send_sticker(chat_id, sticker,
                  **kwargs):
     """
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
-    :param sticker: Sticker to send. You can either pass a file_id as String to resend a sticker
-                    that is already on the Telegram servers, or upload a new sticker using multipart/form-data.
+    :param sticker: Sticker to send. Pass a file_id as String to send a file that exists on the Telegram servers (recommended),
+                    pass an HTTP URL as a String for Telegram to get a .webp file from the Internet, or upload a new one using multipart/form-data.
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
                          instructions to hide keyboard or to force a reply from the user.
@@ -2188,9 +2344,8 @@ def send_video(chat_id, video,
     Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as Document).
 
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
-    :param video: Video to send. You can either pass a file_id as String to resend a
-                  video that is already on the Telegram servers, or upload a new video
-                  using multipart/form-data.
+    :param video: Video to send. Pass a file_id as String to send a video that exists on the Telegram servers (recommended),
+                  pass an HTTP URL as a String for Telegram to get a video from the Internet, or upload a new video using multipart/form-data.
     :param duration: Duration of sent video in seconds
     :param caption: Video caption (may also be used when resending videos by file_id)
     :param reply_to_message_id: If the message is a reply, ID of the original message
@@ -2239,7 +2394,7 @@ def send_video(chat_id, video,
 
 
 def send_voice(chat_id, voice,
-               duration=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
+               caption=None, duration=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
                **kwargs):
     """
     Use this method to send audio files, if you want Telegram clients to display the file as a playable voice
@@ -2250,8 +2405,9 @@ def send_voice(chat_id, voice,
     size, this limit may be changed in the future.
 
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
-    :param voice: Audio file to send. You can either pass a file_id as String to resend an audio that is already on
-                  the Telegram servers, or upload a new audio file using multipart/form-data.
+    :param voice: Audio file to send. Pass a file_id as String to send a file that exists on the Telegram servers (recommended),
+                  pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data.
+    :param caption: Voice message caption, 0-200 characters
     :param duration: Duration of sent audio in seconds
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
@@ -2261,6 +2417,7 @@ def send_voice(chat_id, voice,
 
     :type chat_id: int
     :type voice: InputFile or str
+    :type caption: str
     :type duration: int
     :type reply_to_message_id: int
     :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
@@ -2284,6 +2441,8 @@ def send_voice(chat_id, voice,
     # optional args
     params.update(
         _clean_params(
+            caption=caption,
+            duration=duration,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
             disable_notification=disable_notification,
@@ -2665,7 +2824,7 @@ def get_chat_members_count(chat_id, **kwargs):
         return TelegramBotRPCRequest('getChatMembersCount', params=params, on_result=lambda result: result, **kwargs)
 
 
-def answer_callback_query(callback_query_id, text=None, show_alert=None, **kwargs):
+def answer_callback_query(callback_query_id, text=None, show_alert=None, url=None, **kwargs):
         """
         Use this method to send answers to callback queries sent from inline keyboards. The answer will be displayed
         to the user as a notification at the top of the chat screen or as an alert.
@@ -2675,10 +2834,14 @@ def answer_callback_query(callback_query_id, text=None, show_alert=None, **kwarg
         :param text: Text of the notification. If not specified, nothing will be shown to the user
         :param show_alert: If true, an alert will be shown by the client instead of a notificaiton at the top of
                            the chat screen. Defaults to false.
+        :param url: URL that will be opened by the user's client. If you have created a Game and accepted the conditions via @Botfather,
+                    specify the URL that opens your game – note that this will only work if the query comes from a callback_game button.
+                    Otherwise, you may use links like telegram.me/your_bot?start=XXXX that open your bot with a parameter.
         :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
         :type callback_query_id: str
         :type text: str
+        :type url: str
         :type show_alert: bool
 
         :returns: Returns True on success.
@@ -2695,6 +2858,7 @@ def answer_callback_query(callback_query_id, text=None, show_alert=None, **kwarg
             _clean_params(
                 text=text,
                 show_alert=show_alert,
+                url=url
             )
         )
 
@@ -2973,6 +3137,140 @@ def get_file(file_id, **kwargs):
                                  on_result=File.from_result, **kwargs)
 
 
+def send_game(chat_id, game_name_short,
+              disable_notification=False, reply_to_message_id=None, reply_markup=None, **kwargs):
+    """
+    Use this method to send a game.
+
+
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param game_name_short: Short name of the game, serves as the unique identifier for the game. Set up your games via Botfather.
+    :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
+    :param reply_to_message_id: If the message is a reply, ID of the original message
+    :param reply_markup: A JSON-serialized object for an inline keyboard.
+    :param *\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type chat_id: str
+    :type game_name_short: str
+    :type disable_notification: bool
+    :type reply_to_message_id: int
+    :type reply_markup: InlineKeyboardMarkup
+
+    :return: On success, the sent Message is returned.
+    :rtype: TelegramBotRPCRequest
+    """
+
+    # required args
+    params = dict(chat_id=chat_id,
+                  game_name_short=game_name_short)
+
+    # optional args
+    params.update(
+        _clean_params(
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+        )
+    )
+
+    return TelegramBotRPCRequest('sendGame', params=params,
+                                 on_result=Message.from_result, **kwargs)
+
+
+def set_game_score(user_id, score,
+                   force=False, disable_edit_message=False, chat_id=None, message_id=None, inline_message_id=None,
+                   **kwargs):
+    """
+    Use this method to set the score of the specified user in a game.
+
+    :param user_id: User identifier
+    :param score: New score, must be non-negative
+    :param force: Pass True, if the high score is allowed to decrease. This can be useful when fixing mistakes or banning cheaters
+    :param disable_edit_message: Pass True, if the game message should not be automatically edited to include the current scoreboard
+    :param chat_id: Required if inline_message_id is not specified. Unique identifier for the target chat (or username of the
+                    target channel in the format @channelusername)
+    :param message_id: Required if inline_message_id is not specified. Identifier of the sent message
+    :param inline_message_id: Required if chat_id and message_id are not specified. Identifier of the inline message
+    :param *\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type user_id: int
+    :type score: int
+    :type force: bool
+    :type disable_edit_message: bool
+    :type chat_id: int or str
+    :type message_id: int
+    :type inline_message_id: str
+
+    :return: On success, if the message was sent by the bot, returns the edited Message, otherwise returns True. Returns an error, if the new score is not
+             greater than the user's current score in the chat and force is False.
+    """
+
+    if not chat_id and not message_id and not inline_message_id:
+        raise ValueError("Must specify chat_id and message_id or inline_message_id")
+    if (chat_id and not message_id) or (not chat_id and message_id):
+        raise ValueError("Must specify chat_id and message_id together")
+
+
+    # required args
+    params = dict(user_id=user_id,
+                  score=score)
+
+    # optional args
+    params.update(
+        _clean_params(
+            force=force,
+            disable_edit_message=disable_edit_message,
+            chat_id=chat_id,
+            message_id=message_id,
+            inline_message_id=inline_message_id,
+        )
+    )
+
+    return TelegramBotRPCRequest('setGameScore', params=params,
+                                 on_result=Message.from_result, **kwargs)
+
+
+def get_game_high_scores(user_id,
+                         chat_id=None, message_id=None, inline_message_id=None,
+                         **kwargs):
+    """
+    Use this method to get data for high score tables. Will return the score of the specified user and several of his
+    neighbors in a game. On success, returns an Array of GameHighScore objects.
+
+    This method will currently return scores for the target user, plus two of his closest neighbors on each side.
+    Will also return the top three users if the user and his neighbors are not among them. Please note that this behavior is subject to change.
+
+    :param user_id: Target user id
+    :param chat_id: Required if inline_message_id is not specified. Unique identifier for the target chat (or username of the
+                    target channel in the format @channelusername)
+    :param message_id: Required if inline_message_id is not specified. Identifier of the sent message
+    :param inline_message_id: Required if chat_id and message_id are not specified. Identifier of the inline message
+    :param *\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type user_id: int
+    :type chat_id: int or str
+    :type message_id: int
+    :type inline_message_id: str
+
+    :return:
+    """
+
+    # required args
+    params = dict(user_id=user_id)
+
+    # optional args
+    params.update(
+        _clean_params(
+            chat_id=chat_id,
+            message_id=message_id,
+            inline_message_id=inline_message_id,
+        )
+    )
+
+    return TelegramBotRPCRequest('getGameHighScores', params=params,
+                                 on_result=GameHighScore.from_array_result, **kwargs)
+
+
 def get_updates(offset=None, limit=None, timeout=None,
                 **kwargs):
     """
@@ -3041,6 +3339,18 @@ def set_webhook(url=None, certificate=None, **kwargs):
     params = _clean_params(url=url, certificate=certificate)
 
     return TelegramBotRPCRequest('setWebhook', params=params, on_result=lambda result: result, **kwargs)
+
+def get_webhook_info(**kwargs):
+    """
+    Use this method to get current webhook status. Requires no parameters.
+
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :return: On success, returns a WebhookInfo object. If the bot is using getUpdates, will return an object with the url field empty.
+    :rtype: WebhookInfo
+    """
+
+    return TelegramBotRPCRequest('getWebhookInfo', on_result=WebhookInfo.from_result, **kwargs)
 
 
 def download_file(file_path, out_file, **kwargs):

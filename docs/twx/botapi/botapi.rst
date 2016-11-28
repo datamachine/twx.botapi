@@ -128,6 +128,20 @@ KeyboardButton
 
 .. autoclass:: KeyboardButton
 
+Game
+^^^^
+
+.. autoclass:: Game
+
+Animation
+^^^^^^^^^
+
+.. autoclass:: Animation
+
+WebhookInfo
+^^^^^^^^^^^
+
+.. autoclass:: WebhookInfo
 
 Inline Types
 ------------
@@ -460,12 +474,33 @@ download_file
 
 .. autofunction:: download_file(file_path, out_file, **kwargs)
 
+send_game
+^^^^^^^^^
+
+.. autofunction:: send_game(chat_id, game_name_short, disable_notification=False, reply_to_message_id=None, reply_markup=None, **kwargs)
+
+set_game_score
+^^^^^^^^^^^^^^
+
+.. autofunction:: set_game_score(user_id, score, force=False, disable_edit_message=False, chat_id=None, message_id=None, inline_message_id=None, **kwargs)
+
+
+get_game_high_scores
+^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: get_game_high_scores(user_id, chat_id=None, message_id=None, inline_message_id=None, **kwargs)
+
 get_updates
 ^^^^^^^^^^^
 
-.. autofunction:: get_updates(offset=None, limit=None, timeout=None, *, request_args, **kwargs)
+.. autofunction:: get_updates(offset=None, limit=None, timeout=None, **kwargs)
 
 set_webhook
 ^^^^^^^^^^^
 
-.. autofunction:: set_webhook(url=None, *, request_args=None, **kwargs)
+.. autofunction:: set_webhook(url=None,certificate=None, **kwargs)
+
+get_webhook_info
+^^^^^^^^^^^^^^^^
+
+.. autofunction:: get_webhook_info(**kwargs)
