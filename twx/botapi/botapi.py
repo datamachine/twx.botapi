@@ -127,7 +127,7 @@ class Message(_MessageBase):
 
     Attributes:
         message_id       (int)                           :Unique message identifier
-        from             (User)                          :*Optional.* Sender, can be empty for messages sent to channels
+        sender           (User)                          :*Optional.* Sender, can be empty for messages sent to channels
         date             (int)                           :Date the message was sent in Unix time
         chat             (Chat)                          :Conversation the message belongs to
         forward_from     (User)                          :*Optional.* For forwarded messages, sender of the original message
