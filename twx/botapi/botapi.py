@@ -210,6 +210,7 @@ class Message(_MessageBase):
             chat=Chat.from_result(result.get('chat')),
             forward_from=User.from_result(result.get('forward_from')),
             forward_from_chat=Chat.from_result(result.get('forward_from_chat')),
+            forward_from_message_id=Message.from_result(result.get('forward_from_message_id')),
             forward_date=result.get('forward_date'),
             reply_to_message=Message.from_result(result.get('reply_to_message')),
             text=result.get('text'),
@@ -681,6 +682,8 @@ class Update(_UpdateBase):
         return Update(message_update.get('update_id'),
                       Message.from_result(message_update.get('message')),
                       Message.from_result(message_update.get('edited_message')),
+                      Message.from_result(message_update.get('channel_post')),
+                      Message.from_result(message_update.get('edited_channel_post')),
                       InlineQuery.from_result(message_update.get('inline_query')),
                       ChosenInlineResult.from_result(message_update.get('chosen_inline_result')),
                       CallbackQuery.from_result(message_update.get('callback_query')))
