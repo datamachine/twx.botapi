@@ -2258,7 +2258,7 @@ def send_audio(chat_id, audio,
     return TelegramBotRPCRequest('sendAudio', params=params, files=files, on_result=Message.from_result, **kwargs)
 
 
-def send_document(chat_id, document,
+def send_document(chat_id, document, caption,
                   reply_to_message_id=None, reply_markup=None, disable_notification=False,
                   **kwargs):
     """
@@ -2267,6 +2267,7 @@ def send_document(chat_id, document,
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
     :param document: File to send. Pass a file_id as String to send a file that exists on the Telegram servers (recommended),
                      pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data.
+    :param caption: Document caption (may also be used when resending documents by file_id), 0-200 characters
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
                          instructions to hide keyboard or to force a reply from the user.
@@ -2292,7 +2293,8 @@ def send_document(chat_id, document,
     # required args
     params = dict(
         chat_id=chat_id,
-        document=document
+        document=document,
+        caption=caption
     )
 
     # optional args
