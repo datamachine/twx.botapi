@@ -1,6 +1,16 @@
 import twx.botapi
 import re
 import logging
+from enum import Enum
+
+class Scope(Enum):
+    Group = 1
+    PM = 2
+
+class Permission(Enum):
+    User = 1
+    Admin = 2
+
 
 class UpdateLoop:
     """
@@ -17,7 +27,7 @@ class UpdateLoop:
         self.logger = logging.getLogger("twx.botapi.UpdateLoop")
         self.command_registry = dict()
 
-    def register_command(self, name, function, permission=None, scope=None):
+    def register_command(self, name, function, permission=Permission.User, scope=Scope.Group):
         self.command_registry[name.lower()] = {
             'func': function,
             'permission': permission,
@@ -48,7 +58,7 @@ class UpdateLoop:
                 self.logger.warning("Command received for another bot: {}".format(msg.text))
 
             try:
-                self.command_registry[command]['func'](self.bot, msg)
+                self.command_registry[command]['func'](self.bot, msg, match.group('arguments'))
             except KeyError:
                 self.logger.debug("Unregistered command called: " + command)
         else:
