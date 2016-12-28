@@ -61,7 +61,7 @@ class ChatMember(_ChatMemberBase):
         if result is None:
             return None
 
-        return User(
+        return ChatMember(
             user=User.from_result(result.get('user')),
             status=result.get('status'),
             )
@@ -2797,7 +2797,7 @@ def get_chat_administrators(chat_id, **kwargs):
         return TelegramBotRPCRequest('getChatAdministrators', params=params, on_result=lambda result: ChatMember.from_result_list(result), **kwargs)
 
 
-def get_chat_member(chat_id, **kwargs):
+def get_chat_member(chat_id, user_id, **kwargs):
 
         """
         Use this method to get information about a member of a chat
@@ -2816,6 +2816,7 @@ def get_chat_member(chat_id, **kwargs):
         # required args
         params = dict(
             chat_id=chat_id,
+            user_id=user_id,
         )
 
         return TelegramBotRPCRequest('getChatMember', params=params, on_result=lambda result: ChatMember.from_result(result), **kwargs)
@@ -3486,6 +3487,10 @@ class TelegramBot(object):
     def get_user_profile_photos(self, *args, **kwargs):
         """See :func:`get_user_profile_photos`"""
         return get_user_profile_photos(*args, **self._merge_overrides(**kwargs)).run()
+
+    def get_chat_member(self, *args, **kwargs):
+        """See :func:`get_chat_member`"""
+        return get_chat_member(*args, **self._merge_overrides(**kwargs)).run()
 
     def get_file(self, *args, **kwargs):
         """See :func:`get_file`"""
