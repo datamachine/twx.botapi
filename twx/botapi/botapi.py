@@ -1123,7 +1123,7 @@ class InlineKeyboardButton:
     def __init__(self, text, url=None, callback_data=None, switch_inline_query=None, switch_inline_query_current_chat=None, callback_game=None):
         self.text = text
         self.url = url
-        self.callback_data = callback_data
+        self.callback_data = str(callback_data)
         self.switch_inline_query = switch_inline_query
         self.switch_inline_query_current_chat = switch_inline_query_current_chat
         self.callback_game = callback_game
