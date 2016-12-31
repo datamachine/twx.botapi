@@ -3436,6 +3436,9 @@ class TelegramBot(object):
     def answer_inline_query(self, *args, **kwargs):
         return answer_inline_query(*args, **self._merge_overrides(**kwargs)).run()
 
+    def answer_callback_query(self, *args, **kwargs):
+        return answer_callback_query(*args, **self._merge_overrides(**kwargs)).run()
+
     def send_message(self, *args, **kwargs):
         """See :func:`send_message`"""
         return send_message(*args, **self._merge_overrides(**kwargs)).run()

@@ -72,33 +72,40 @@ class UpdateLoop:
 
                 if match:
                     command = match.group('command').lower()
-                    if self.command_registry[command]["permission"] == Permission.Admin and member.status not in ["creator", "administrator"]:
-                        self.bot.send_message(chat_id=msg.chat.id, text="Sorry, this command is only available to group admins.", reply_to_message_id=msg.message_id)
+                    try:
+                        if self.command_registry[command]["permission"] == Permission.Admin and member.status not in ["creator", "administrator"]:
+                            self.bot.send_message(chat_id=msg.chat.id, text="Sorry, this command is only available to group admins.", reply_to_message_id=msg.message_id)
 
-                    else:
-                        if match.group('bot_name') and match.group('bot_name').lower() != self.bot.username.lower():
-                            self.logger.warning("Command received for another bot: {}".format(msg.text))
-
-                        try:
-                            self.command_registry[command]['func'](msg, match.group('arguments'))
-                        except KeyError:
-                            self.logger.debug("Unregistered command called: " + command)
+                        else:
+                            if match.group('bot_name') and match.group('bot_name').lower() != self.bot.username.lower():
+                                self.logger.warning("Command received for another bot: {}".format(msg.text))
+                            else:
+                                self.command_registry[command]['func'](msg, match.group('arguments'))
+                    except KeyError:
+                        self.logger.debug("Unregistered command called: " + command)
                 else:
                     self.logger.warning("Got a message that doesn't match a command.")  # TODO: Support this warning optionally
 
         elif update.callback_query is not None:
             original_msg = update.callback_query.message
-            cb = self.inline_registry[original_msg.message_id]
+            cb = self.inline_registry.get(original_msg.message_id, None)
 
             if not cb:
+                self.inline_error_handler(update.callback_query, "Error finding original request, bot may have restarted.")
                 return # No callback registered
 
             if original_msg.message_id in self.inline_registry:
                 if cb['permission'] == Permission.Admin:
                     member = self.bot.get_chat_member(chat_id=original_msg.chat.id, user_id=update.callback_query.sender.id).join().result
                     if member.status not in ["creator", "administrator"]:
+                        self.inline_error_handler(update.callback_query, "Must be an admin to select this choice.")
                         return # Ignore button press
                 elif cb['permission'] == Permission.SameUser:
                     if cb['srcmsg'].sender.id != update.callback_query.sender.id:
+                        self.inline_error_handler(update.callback_query, "Must be the original requestor to select this choice.")
                         return  # Ignore button press
                 cb['func'](update.callback_query, update.callback_query.data)
+
+
+    def inline_error_handler(self, callback_query, err_msg):
+        self.bot.answer_callback_query(callback_query_id=callback_query.id, text=err_msg)
