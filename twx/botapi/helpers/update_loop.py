@@ -61,7 +61,7 @@ class UpdateLoop:
         if update.message is not None:
             msg = update.message
             if msg.reply_to_message and msg.reply_to_message.message_id in self.reply_registry:
-                self.reply_registry[msg.reply_to_message.message_id](msg, None)
+                self.reply_registry[msg.reply_to_message.message_id](msg)
                 self.reply_registry.pop(msg.reply_to_message.message_id)
             else:
                 member = self.bot.get_chat_member(chat_id=msg.chat.id, user_id=msg.sender.id).join().result
