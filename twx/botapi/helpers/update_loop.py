@@ -29,6 +29,7 @@ class UpdateLoop:
         self.command_registry = dict()
         self.reply_registry = dict()
         self.inline_registry = dict()
+        self.inline_query_handler = None
 
     def register_command(self, name, function, permission=Permission.User, scope=Scope.Group):
         self.command_registry[name.lower()] = {
@@ -47,6 +48,9 @@ class UpdateLoop:
             'srcmsg': srcmsg
         }
 
+    def register_inline_query_handler(self, function):
+        self.inline_query_handler = function
+
     def run(self):
         while True:
             twx.botapi.get_updates(offset=self.update_offset, timeout=300,
@@ -61,7 +65,7 @@ class UpdateLoop:
         if update.message is not None:
             msg = update.message
             if msg.reply_to_message and msg.reply_to_message.message_id in self.reply_registry:
-                self.reply_registry[msg.reply_to_message.message_id](msg, None)
+                self.reply_registry[msg.reply_to_message.message_id](msg)
                 self.reply_registry.pop(msg.reply_to_message.message_id)
             else:
                 member = self.bot.get_chat_member(chat_id=msg.chat.id, user_id=msg.sender.id).join().result
@@ -105,6 +109,8 @@ class UpdateLoop:
                         self.inline_error_handler(update.callback_query, "Must be the original requestor to select this choice.")
                         return  # Ignore button press
                 cb['func'](update.callback_query, update.callback_query.data)
+        elif update.inline_query is not None and self.inline_query_handler is not None:
+            self.inline_query_handler(update.inline_query)
 
 
     def inline_error_handler(self, callback_query, err_msg):
