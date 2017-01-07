@@ -1083,6 +1083,9 @@ class InlineKeyboardMarkup:
         self.inline_keyboard = inline_keyboard
 
     def serialize(self):
+        return json.dumps(self.asdict())
+
+    def asdict(self):
         inline_keyboard = []
 
         for button_list in self.inline_keyboard:
@@ -1091,9 +1094,7 @@ class InlineKeyboardMarkup:
                 temp_list.append(button.serialize())
             inline_keyboard.append(temp_list)
 
-        reply_markup = dict(inline_keyboard=inline_keyboard)
-
-        return json.dumps(reply_markup)
+        return dict(inline_keyboard=inline_keyboard)
 
 class InlineKeyboardButton:
     """ This object represents one button of an inline keyboard. You must use exactly one of the optional fields.
@@ -3065,24 +3066,17 @@ def answer_inline_query(inline_query_id, results, cache_time=None, is_personal=N
     :rtype: bool
     """
 
+    if next_offset is None:
+        next_offset = ""
+
     json_results = []
     for result in results:
         result_dict = dict((k, v) for k, v in result.__dict__.items() if v)  # Don't serialize None keys.
         result_dict['input_message_content'] = dict((k, v) for k, v in result_dict['input_message_content'].__dict__.items() if v)  # Serialize InputMessageContent
 
-        keyboard_buttons = result_dict['reply_markup'].inline_keyboard
-        serialized_buttons = []
+        if 'reply_markup' in result_dict:
+            result_dict['reply_markup'] = result_dict['reply_markup'].asdict()
 
-        for row in keyboard_buttons:
-            new_row = []
-            for column in row:
-                serialized_button = dict((k, v) for k, v in column._asdict().items() if v)
-                new_row.append(serialized_button)
-            serialized_buttons.append(new_row)
-
-        result_dict['reply_markup'] = {
-            'inline_keyboard': serialized_buttons
-        }
         json_results.append(result_dict)
 
     # required args
@@ -3102,7 +3096,7 @@ def answer_inline_query(inline_query_id, results, cache_time=None, is_personal=N
         )
     )
 
-    return TelegramBotRPCRequest('answerInlineQuery', params=params, on_result=Message.from_result, **kwargs)
+    return TelegramBotRPCRequest('answerInlineQuery', params=params, on_result=lambda result: result, **kwargs)
 
 
 def get_user_profile_photos(user_id,
