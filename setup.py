@@ -1,7 +1,7 @@
 from setuptools import setup
 import sys
 
-__version__ = '3.2.0.dev0'
+__version__ = '3.2.0.dev1'
 
 github_tag = __version__
 if 'dev' in __version__:

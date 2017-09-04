@@ -3489,9 +3489,33 @@ class TelegramBot(object):
         """See :func:`get_chat_member`"""
         return get_chat_member(*args, **self._merge_overrides(**kwargs)).run()
 
+    def get_chat_members_count(self, *args, **kwargs):
+        """See :func:`get_chat_members_count`"""
+        return get_chat_members_count(*args, **self._merge_overrides(**kwargs)).run()
+
+    def get_chat_administrators(self, *args, **kwargs):
+        """See :func:`get_chat_administrators`"""
+        return get_chat_administrators(*args, **self._merge_overrides(**kwargs)).run()
+
+    def leave_chat(self, *args, **kwargs):
+        """See :func:`leave_chat_member`"""
+        return leave_chat(*args, **self._merge_overrides(**kwargs)).run()
+
     def get_file(self, *args, **kwargs):
         """See :func:`get_file`"""
         return get_file(*args, **self._merge_overrides(**kwargs)).run()
+
+    def send_game(self, *args, **kwargs):
+        """See :func:`send_game`"""
+        return send_game(*args, **self._merge_overrides(**kwargs)).run()
+    
+    def get_game_high_scores(self, *args, **kwargs):
+        """See :func:`get_game_high_scores`"""
+        return get_game_high_scores(*args, **self._merge_overrides(**kwargs)).run()
+    
+    def set_game_high_scores(self, *args, **kwargs):
+        """See :func:`set_game_high_scores`"""
+        return set_game_high_scores(*args, **self._merge_overrides(**kwargs)).run()
 
     def edit_message_text(self, *args, **kwargs):
         """See :func:`edit_message_text`"""
