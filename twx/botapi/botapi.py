@@ -1946,14 +1946,14 @@ class TelegramBotRPCRequest:
         self.thread.join(timeout)
         return self
 
-    def wait(self):
+    def wait(self, timeout=None):
         """
         Wait for the request to finish and return the result or error when finished
 
         :returns: result or error
         :type: result tyoe or Error
         """
-        self.thread.join()
+        self.thread.join(timeout)
         if self.error is not None:
             return self.error
         return self.result
