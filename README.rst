@@ -5,7 +5,7 @@ twx.botapi
 
 :contributions: Please join https://github.com/datamachine/twx.botapi
 :issues: Please use https://github.com/datamachine/twx.botapi/issues
-:Python version supported: 2.7, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5b
+:Python version supported: 2.7, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6
 
 **twx.botapi** is a python interface for the Telegram bot API. It supports
 making synchronous and asynchronous calls and converts the response
