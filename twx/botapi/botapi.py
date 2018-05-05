@@ -5,6 +5,7 @@
    http://google.github.io/styleguide/pyguide.html
 
 """
+import os
 
 from requests import Request, Session
 from collections import namedtuple
@@ -1910,6 +1911,7 @@ class TelegramBotRPCRequest:
         self.response = None
 
         s = Session()
+        s.proxies = {'http': os.environ['http_proxy'], 'https': os.environ['https_proxy']}  # Respect env proxy settings in new sessions.
         request = self._get_request()
         resp = s.send(request)
 
