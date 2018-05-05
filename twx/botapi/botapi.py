@@ -18,17 +18,18 @@ import json
 """
 Telegram Bot API Types as defined at https://core.telegram.org/bots/api#available-types
 """
-_UserBase = namedtuple('User', ['id', 'first_name', 'last_name', 'username'])
+_UserBase = namedtuple('User', ['id', 'is_bot', 'first_name', 'last_name', 'username', 'language_code'])
 class User(_UserBase):
 
     """This object represents a Telegram user or bot.
 
     Attributes:
         id (int): Unique identifier for this user or bot
+        is_bot(bool): True, if this user is a bot
         first_name (str): User‘s or bot’s first name
         last_name (Optional[str]): User‘s or bot’s last name
         username (Optional[str]): User‘s or bot’s username
-
+        username (Optional[str]): IETF language tag of the user's language
     """
     __slots__ = ()
 
@@ -39,19 +40,39 @@ class User(_UserBase):
 
         return User(
             id=result.get('id'),
+            is_bot=result.get('is_bot'),
             first_name=result.get('first_name'),
             last_name=result.get('last_name'),
-            username=result.get('username')
+            username=result.get('username'),
+            language_code=result.get('language_code'),
             )
 
 
-_ChatMemberBase = namedtuple('ChatMember', ['user', 'status'])
+_ChatMemberBase = namedtuple('ChatMember', ['user', 'status', 'until_date', 'can_be_edited', 'can_change_info',
+                                            'can_post_messages', 'can_edit_messages', 'can_delete_messages', 'can_invite_users',
+                                            'can_restrict_members', 'can_pin_messages', 'can_promote_members', 'can_send_messages',
+                                            'can_send_media_messages', 'can_send_other_messages', 'can_add_web_page_previews'])
 class ChatMember(_ChatMemberBase):
     """This object contains information about one member of the chat.
 
     Attributes:
         user (User): Information about the user
         status (str): The member's status in the chat. Can be “creator”, “administrator”, “member”, “left” or “kicked”
+        can_be_edited	 (bool):	*Optional.* Administrators only. True, if the bot is allowed to edit administrator privileges of that user
+        can_change_info	 (bool):	*Optional.* Administrators only. True, if the administrator can change the chat title, photo and other settings
+        can_post_messages	 (bool):	*Optional.* Administrators only. True, if the administrator can post in the channel, channels only
+        can_edit_messages	 (bool):	*Optional.* Administrators only. True, if the administrator can edit messages of other users and can pin messages, channels only
+        can_delete_messages	 (bool):	*Optional.* Administrators only. True, if the administrator can delete messages of other users
+        can_invite_users	 (bool):	*Optional.* Administrators only. True, if the administrator can invite new users to the chat
+        can_restrict_members	 (bool):	*Optional.* Administrators only. True, if the administrator can restrict, ban or unban chat members
+        can_pin_messages	 (bool):	*Optional.* Administrators only. True, if the administrator can pin messages, supergroups only
+        can_promote_members	 (bool):	*Optional.* Administrators only. True, if the administrator can add new administrators with a subset of his own privileges or demote
+                                                    administrators that he has promoted, directly or indirectly (promoted by administrators that were appointed by the user)
+        can_send_messages	 (bool):	*Optional.* Restricted only. True, if the user can send text messages, contacts, locations and venues
+        can_send_media_messages	 (bool):	*Optional.* Restricted only. True, if the user can send audios, documents, photos, videos, video notes and voice notes, implies
+                                                        can_send_messages
+        can_send_other_messages	 (bool):	*Optional.* Restricted only. True, if the user can send animations, games, stickers and use inline bots, implies can_send_media_messages
+        can_add_web_page_previews	 (bool):	*Optional.* Restricted only. True, if user may add web page previews to his messages, implies can_send_media_messages
 
 
     """
@@ -65,7 +86,21 @@ class ChatMember(_ChatMemberBase):
         return ChatMember(
             user=User.from_result(result.get('user')),
             status=result.get('status'),
-            )
+            until_date=result.get('until_date'),
+            can_be_edited=result.get('can_be_edited'),
+            can_change_info=result.get('can_change_info'),
+            can_post_messages=result.get('can_post_messages'),
+            can_edit_messages=result.get('can_edit_messages'),
+            can_delete_messages=result.get('can_delete_messages'),
+            can_invite_users=result.get('can_invite_users'),
+            can_restrict_members=result.get('can_restrict_members'),
+            can_pin_messages=result.get('can_pin_messages'),
+            can_promote_members=result.get('can_promote_members'),
+            can_send_messages=result.get('can_send_messages'),
+            can_send_media_messages=result.get('can_send_media_messages'),
+            can_send_other_messages=result.get('can_send_other_messages'),
+            can_add_web_page_previews=result.get('can_add_web_page_previews'),
+        )
 
     @staticmethod
     def from_result_list(results):
@@ -75,16 +110,31 @@ class ChatMember(_ChatMemberBase):
         ret = []
         for result in results:
             ret.append(
-                User(
+                ChatMember(
                     user=User.from_result(result.get('user')),
                     status=result.get('status'),
+                    until_date=result.get('until_date'),
+                    can_be_edited=result.get('can_be_edited'),
+                    can_change_info=result.get('can_change_info'),
+                    can_post_messages=result.get('can_post_messages'),
+                    can_edit_messages=result.get('can_edit_messages'),
+                    can_delete_messages=result.get('can_delete_messages'),
+                    can_invite_users=result.get('can_invite_users'),
+                    can_restrict_members=result.get('can_restrict_members'),
+                    can_pin_messages=result.get('can_pin_messages'),
+                    can_promote_members=result.get('can_promote_members'),
+                    can_send_messages=result.get('can_send_messages'),
+                    can_send_media_messages=result.get('can_send_media_messages'),
+                    can_send_other_messages=result.get('can_send_other_messages'),
+                    can_add_web_page_previews=result.get('can_add_web_page_previews'),
                 )
             )
 
         return ret
 
 
-_ChatBase = namedtuple('Chat', ['id', 'type', 'title', 'username', 'first_name', 'last_name', 'all_members_are_administrators'])
+_ChatBase = namedtuple('Chat', ['id', 'type', 'title', 'username', 'first_name', 'last_name', 'all_members_are_administrators',
+                                'photo', 'description', 'invite_link', 'pinned_message', 'sticker_set_name', 'can_set_sticker_set'])
 class Chat(_ChatBase):
     """This object represents a chat.
 
@@ -95,7 +145,13 @@ class Chat(_ChatBase):
         username	(str)	:*Optional.* Username, for private chats and channels if available
         first_name	(str)	:*Optional.* First name of the other party in a private chat
         last_name	(str)	:*Optional.* Last name of the other party in a private chat
+        photo	(ChatPhoto)	:*Optional.* Chat photo. Returned only in getChat.
+        description	(str)	:*Optional.* Description, for supergroups and channel chats. Returned only in getChat.
         all_members_are_administrators (bool) :*Optional.* True if a group has ‘All Members Are Admins’ enabled.
+        invite_link	(str)	:*Optional.* Chat invite link, for supergroups and channel chats. Returned only in getChat.
+        pinned_message	(Message) 	:*Optional.* Pinned message, for supergroups and channel chats. Returned only in getChat.
+        sticker_set_name	(str)	:*Optional.* For supergroups, name of group sticker set. Returned only in getChat.
+        can_set_sticker_set	(bool)  :*Optional.* True, if the bot can change the group sticker set. Returned only in getChat.
     """
 
     __slots__ = ()
@@ -113,12 +169,16 @@ class Chat(_ChatBase):
             first_name=result.get('first_name'),
             last_name=result.get('last_name'),
             all_members_are_administrators=result.get('all_members_are_administrators'),
+            invite_link=result.get('invite_link'),
+            pinned_message=result.get('pinned_message'),
+            sticker_set_name=result.get('sticker_set_name'),
+            can_set_sticker_set=result.get('can_set_sticker_set'),
         )
 
 _MessageBase = namedtuple('Message', [
     'message_id', 'sender', 'date', 'edit_date', 'chat', 'forward_from', 'forward_from_chat', 'forward_from_message_id', 'forward_date',
     'reply_to_message', 'text', 'entities', 'audio', 'document', 'photo', 'sticker',
-    'video', 'voice', 'caption', 'contact', 'location', 'venue', 'new_chat_member',
+    'video', 'video_note', 'voice', 'caption', 'contact', 'location', 'venue', 'new_chat_members',
     'left_chat_member', 'new_chat_title', 'new_chat_photo', 'delete_chat_photo',
     'group_chat_created', 'supergroup_chat_created', 'channel_chat_created', 'migrate_to_chat_id',
     'migrate_from_chat_id', 'pinned_message'])
@@ -150,6 +210,7 @@ class Message(_MessageBase):
         photo            (Sequence[PhotoSize])           :*Optional.* Message is a photo, available sizes of the photo
         sticker          (Sticker)                       :*Optional.* Message is a sticker, information about the sticker
         video            (Video)                         :*Optional.* Message is a video, information about the video
+        video_note       (VideoNote)                     :*Optional.* Message is a video note, information about the video message
         voice            (Voice)                         :*Optional.* Message is a voice message, information about the file
         caption          (str)                           :*Optional.* Caption for the photo or video
         contact          (Contact)                       :*Optional.* Message is a shared contact, information about
@@ -157,8 +218,8 @@ class Message(_MessageBase):
         location         (Location)                     :*Optional.* Message is a shared location, information about the
                                                                      location
         venue           (Venue)                         :*Optional.* Message is a venue, information about the venue
-        new_chat_member    (User)                       :*Optional.* A new member was added to the group, information about
-                                                                     them (this member may be bot itself)
+        new_chat_members    (User)                      :*Optional.* New members that were added to the group or supergroup
+                                                        and information about them (the bot itself may be one of these members)
         left_chat_member   (User)                       :*Optional.* A member was removed from the group, information about
                                                                      them (this member may be bot itself)
         new_chat_title          (str)                   :*Optional.* A group title was changed to this value
@@ -179,9 +240,9 @@ class Message(_MessageBase):
     __slots__ = ()
 
     @property
-    def new_chat_participant(self):
-        print("DEPRECATED: new_chat_participant is now new_chat_member")
-        return self.new_chat_member
+    def new_chat_member(self):
+        print("DEPRECATED: new_chat_member is now new_chat_members")
+        return self.new_chat_members
 
     @property
     def left_chat_participant(self):
@@ -226,7 +287,7 @@ class Message(_MessageBase):
             contact=Contact.from_result(result.get('contact')),
             location=Location.from_result(result.get('location')),
             venue=Venue.from_result(result.get('venue')),
-            new_chat_member=User.from_result(result.get('new_chat_member')),
+            new_chat_members=User.from_result(result.get('new_chat_members')),
             left_chat_member=User.from_result(result.get('left_chat_member')),
             new_chat_title=result.get('new_chat_title'),
             new_chat_photo=result.get('new_chat_photo'),
@@ -568,7 +629,7 @@ class Game(_GameBase):
 
 
 _AnimationBase = namedtuple('Animation', ['file_id', 'thumb', 'file_name', 'mime_type', 'file_size'])
-class Animation(_GameBase):
+class Animation(_AnimationBase):
     """You can provide an animation for your game so that it looks stylish in chats. This object represents an animation file to be
     displayed in the message containing a game.
 
@@ -1120,9 +1181,12 @@ class InlineKeyboardButton:
         callback_game (str) :*Optional.*  Description of the game that will be launched when the user presses the button.
 
                                           NOTE: This type of button must always be the first button in the first row.
+        pay (bool)          :*Optional.*  Specify True, to send a Pay button.
+
+                                          NOTE: This type of button must always be the first button in the first row.
     """
 
-    def __init__(self, text, url=None, callback_data=None, switch_inline_query=None, switch_inline_query_current_chat=None, callback_game=None):
+    def __init__(self, text, url=None, callback_data=None, switch_inline_query=None, switch_inline_query_current_chat=None, callback_game=None, pay=None):
         self.text = text
         self.url = url
         self.callback_data = str(callback_data)
@@ -1130,7 +1194,7 @@ class InlineKeyboardButton:
         self.switch_inline_query_current_chat = switch_inline_query_current_chat
         self.callback_game = callback_game
 
-        if url is None and callback_data is None and switch_inline_query is None:
+        if sum(map(bool, [url, callback_data, switch_inline_query, switch_inline_query_current_chat, callback_game])) != 1:
             raise ValueError("You must use exactly one of the optional fields.")
 
     def serialize(self):
@@ -1145,7 +1209,8 @@ class InlineKeyboardButton:
             reply_markup['switch_inline_query'] = self.switch_inline_query
         if self.switch_inline_query_current_chat is not None:
             reply_markup['switch_inline_query_current_chat'] = self.switch_inline_query_current_chat
-
+        if self.callback_game is not None:
+            reply_markup['callback_game'] = self.callback_game
         return reply_markup
 
 """
@@ -1260,6 +1325,7 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_url                     (str)    :A valid URL for the GIF file. File size must not exceed 1MB
         gif_width                   (int)    :*Optional.* Width of the GIF
         gif_height                  (int)    :*Optional.* Height of the GIF
+        gif_duration                (int)    :*Optional.* Duration of the GIF
         thumb_url                   (str)    :*Optional.* URL of a static thumbnail for the result (jpeg or gif)
         title                       (str)    :*Optional.* Title for the result
         caption                     (str)    :*Optional.* Caption of the GIF file to be sent, 0-200 characters
@@ -1270,13 +1336,14 @@ class InlineQueryResultGif(InlineQueryResult):
     """
 
     def __init__(self, id, gif_url,
-                 gif_width=None, gif_height=None, thumb_url=None, title=None,
+                 gif_width=None, gif_height=None, gif_duration=None, thumb_url=None, title=None,
                  caption=None, input_message_content=None, reply_markup=None):
         self.type = "gif"
         self.id = id
         self.gif_url = gif_url
         self.gif_width = gif_width
         self.gif_height = gif_height
+        self.gif_duration = gif_duration
         self.thumb_url = thumb_url
         self.title = title
         self.caption = caption
@@ -1321,6 +1388,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_url                 (str)    :A valid URL for the mp4 file. File size must not exceed 1MB
         mpeg4_width               (int)    :*Optional.* Width of the mp4
         mpeg4_height              (int)    :*Optional.* Height of the mp4
+        mpeg4_duration            (int)    :*Optional.* Duration of the mp4
         thumb_url                 (str)    :*Optional.* URL of a static thumbnail for the result (jpeg or mpeg4)
         title                     (str)    :*Optional.* Title for the result
         caption                   (str)    :*Optional.* Caption of the mp4 file to be sent, 0-200 characters
@@ -2047,6 +2115,158 @@ Telegram Bot API Methods as defined at https://core.telegram.org/bots/api#availa
 """
 
 
+def export_chat_invite_link(chat_id, **kwargs):
+    """
+    Use this method to generate a new invite link for a chat; any previously generated link is revoked.
+    The bot must be an administrator in the chat for this to work and must have the appropriate admin rights.
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :return: Returns the new invite link as String on success.
+    :rtype: str
+    """
+
+    # required args
+    params = dict(chat_id=chat_id)
+
+    return TelegramBotRPCRequest('exportChatInviteLink', params=params, on_result=lambda result: result, **kwargs)
+
+
+def set_chat_photo(chat_id, photo, **kwargs):
+    """
+    Use this method to set a new profile photo for the chat. Photos can't be changed for private chats. The bot must be an administrator
+    in the chat for this to work and must have the appropriate admin rights.
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param photo: New chat photo, uploaded using multipart/form-data
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :return: Returns True on success.
+    :rtype: bool
+    """
+
+    files = None
+    if isinstance(photo, InputFile):
+        files = [photo]
+        photo = None
+    elif not isinstance(photo, str):
+        raise Exception('photo must be instance of InputFile or str')
+
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        photo=photo
+    )
+
+    return TelegramBotRPCRequest('setChatPhoto', params=params, files=files, on_result=lambda result: result, **kwargs)
+
+def delete_chat_photo(chat_id, **kwargs):
+    """
+    Use this method to delete a chat photo. Photos can't be changed for private chats. The bot must be an administrator in the chat
+    for this to work and must have the appropriate admin rights.
+
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :return: Returns True on success.
+    :rtype: bool
+    """
+
+    # required args
+    params = dict(chat_id=chat_id)
+    return TelegramBotRPCRequest('deleteChatPhoto', params=params, on_result=lambda result: result, **kwargs)
+
+def set_chat_title(chat_id, title, **kwargs):
+    """
+    Use this method to change the title of a chat. Titles can't be changed for private chats. The bot must be an administrator in the chat
+    for this to work and must have the appropriate admin rights.
+
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param title: New chat title, 1-255 characters
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :return: Returns True on success.
+    :rtype: bool
+    """
+
+    if len(title) > 255 or len(title) < 1:
+        raise ValueError("Chat title must be 1 - 255 characters.")
+
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        title=title
+    )
+
+    return TelegramBotRPCRequest('setChatTitle', params=params, on_result=lambda result: result, **kwargs)
+
+def set_chat_description(chat_id, description, **kwargs):
+    """
+    Use this method to change the description of a supergroup or a channel. The bot must be an administrator in the
+    chat for this to work and must have the appropriate admin rights. Returns True on success.
+
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param description: New chat description, 0-255 characters
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :return: Returns True on success.
+    :rtype: bool
+    """
+
+    if len(description) > 255:
+        raise ValueError("Chat description must be less than 255 characters.")
+
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        description=description
+    )
+
+    return TelegramBotRPCRequest('setChatTitle', params=params, on_result=lambda result: result, **kwargs)
+
+
+
+def pin_chat_message(chat_id, message_id, disable_notification=None, **kwargs):
+    """
+    Use this method to pin a message in a supergroup or a channel. The bot must be an administrator in the chat for this to work and
+    must have the ‘can_pin_messages’ admin right in the supergroup or ‘can_edit_messages’ admin right in the channel.
+
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param message_id: Identifier of a message to pin
+    :param disable_notification: Pass True, if it is not necessary to send a notification to all chat members about the new pinned message.
+                                 Notifications are always disabled in channels.
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :return: Returns True on success.
+    :rtype: bool
+    """
+
+
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        message_id=message_id
+    )
+
+    params.update(
+        _clean_params(
+            disable_notification=disable_notification,
+        )
+    )
+
+    return TelegramBotRPCRequest('pinChatMessage', params=params, on_result=lambda result: result, **kwargs)
+
+def unpin_chat_message(chat_id, **kwargs):
+    """
+    Use this method to unpin a message in a supergroup or a channel. The bot must be an administrator in the chat for this to
+    work and must have the ‘can_pin_messages’ admin right in the supergroup or ‘can_edit_messages’ admin right in the channel.
+
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :return: Returns True on success.
+    :rtype: bool
+    """
+
+
+    # required args
+    params = dict(chat_id=chat_id)
+    return TelegramBotRPCRequest('unpinChatMessage', params=params, on_result=lambda result: result, **kwargs)
+
+
+
 def get_me(**kwargs):
     """
     A simple method for testing your bot's auth token. Requires no parameters.
@@ -2414,6 +2634,61 @@ def send_video(chat_id, video,
 
     return TelegramBotRPCRequest('sendVideo', params=params, files=files, on_result=Message.from_result, **kwargs)
 
+def send_video_note(chat_id, video_note,
+               duration=None, length=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
+               **kwargs):
+    """
+    Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as Document).
+
+    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param video_note: Video to send. Pass a file_id as String to send a video that exists on the Telegram servers (recommended),
+                  pass an HTTP URL as a String for Telegram to get a video from the Internet, or upload a new video using multipart/form-data.
+    :param duration: Duration of sent video in seconds
+    :param length: Video width and height
+    :param reply_to_message_id: If the message is a reply, ID of the original message
+    :param reply_markup: Additional interface options. A JSON-serialized object for a
+                         custom reply keyboard, instructions to hide keyboard or to
+                         force a reply from the user.
+    :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
+                                 will receive a notification with no sound. Other apps coming soon.
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type chat_id: int
+    :type video: InputFile or str
+    :type duration: int
+    :type caption: str
+    :type reply_to_message_id: int
+    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+
+    :returns: On success, the sent Message is returned.
+    :rtype:  TelegramBotRPCRequest
+    """
+    files = None
+    if isinstance(video_note, InputFile):
+        files = [video_note]
+        video = None
+    elif not isinstance(video_note, str):
+        raise Exception('video must be instance of InputFile or str')
+
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        video_note=video_note
+    )
+
+    # optional args
+    params.update(
+        _clean_params(
+            duration=duration,
+            length=length,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            disable_notification=disable_notification,
+        )
+    )
+
+    return TelegramBotRPCRequest('sendVideoNote', params=params, files=files, on_result=Message.from_result, **kwargs)
+
 
 def send_voice(chat_id, voice,
                caption=None, duration=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
@@ -2653,10 +2928,10 @@ def send_chat_action(chat_id, action,
     We only recommend using this method when a response from the bot will take a noticeable amount of time to arrive.
 
     :param chat_id: Unique identifier for the message recipient — User or GroupChat id
-    :param action: Type of action to broadcast.  Choose one, depending on what the user is about to receive:
+    :param action: Type of action to broadcast. Choose one, depending on what the user is about to receive:
                    typing for text messages, upload_photo for photos, record_video or upload_video for videos,
                    record_audio or upload_audio for audio files, upload_document for general files,
-                   find_location for location data.
+                   find_location for location data, record_video_note or upload_video_note for video notes.
     :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int
@@ -2674,222 +2949,365 @@ def send_chat_action(chat_id, action,
     return TelegramBotRPCRequest('sendChatAction', params=params, on_result=lambda result: result, **kwargs)
 
 
-def kick_chat_member(chat_id, user_id, **kwargs):
+def kick_chat_member(chat_id, user_id, until_date=None, **kwargs):
 
-        """
-        Use this method to kick a user from a group or a supergroup. In the case of supergroups, the user will not
-        be able to return to the group on their own using invite links, etc., unless unbanned first. The bot must
-        be an administrator in the group for this to work. Returns True on success.
+    """
+    Use this method to kick a user from a group or a supergroup. In the case of supergroups, the user will not
+    be able to return to the group on their own using invite links, etc., unless unbanned first. The bot must
+    be an administrator in the group for this to work. Returns True on success.
 
-        Note: This will method only work if the ‘All Members Are Admins’ setting is off in the target group. Otherwise
-        members may only be removed by the group's creator or by the member that added them.
+    Note: This will method only work if the ‘All Members Are Admins’ setting is off in the target group. Otherwise
+    members may only be removed by the group's creator or by the member that added them.
 
-        :param chat_id: Unique identifier for the target group or username of the target supergroup (in the format @supergroupusername)
-        :param user_id: Unique identifier of the target user
-        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param chat_id: Unique identifier for the target group or username of the target supergroup (in the format @supergroupusername)
+    :param user_id: Unique identifier of the target user
+    :param until_date: *Optional.* Date when the user will be unbanned, unix time. If user is banned for more than 366 days or less than 30 seconds
+                    from the current time they are considered to be banned forever
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-        :type chat_id: int or str
-        :type user_id: int
+    :type chat_id: int or str
+    :type user_id: int
 
-        :returns: Returns True on success.
-        :rtype: bool
-        """
+    :returns: Returns True on success.
+    :rtype: bool
+    """
 
-        # required args
-        params = dict(
-            chat_id=chat_id,
-            user_id=user_id,
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        user_id=user_id,
+    )
+
+
+    # optional args
+    params.update(
+        _clean_params(
+            until_date=until_date
         )
+    )
 
-        return TelegramBotRPCRequest('kickChatMember', params=params, on_result=lambda result: result, **kwargs)
+    return TelegramBotRPCRequest('kickChatMember', params=params, on_result=lambda result: result, **kwargs)
+
+def restrict_chat_member(chat_id, user_id, until_date=None,
+                         can_send_messages=None, can_send_media_messages=None, can_send_other_messages=None, can_add_web_page_previews=None, **kwargs):
+
+    """
+    Use this method to kick a user from a group or a supergroup. In the case of supergroups, the user will not
+    be able to return to the group on their own using invite links, etc., unless unbanned first. The bot must
+    be an administrator in the group for this to work. Returns True on success.
+
+    Note: This will method only work if the ‘All Members Are Admins’ setting is off in the target group. Otherwise
+    members may only be removed by the group's creator or by the member that added them.
+
+    :param chat_id: Unique identifier for the target group or username of the target supergroup (in the format @supergroupusername)
+    :param user_id: Unique identifier of the target user
+    :param until_date: *Optional.* Date when the user will be unbanned, unix time. If user is banned for more than 366 days or less than 30 seconds
+                    from the current time they are considered to be banned forever
+    :param can_send_messages: *Optional.*  Pass True, if the user can send text messages, contacts, locations and venues
+    :param can_send_media_message: *Optional.* Pass True, if the user can send audios, documents, photos, videos, video notes and voice notes, implies can_send_messages
+    :param can_send_other_messages: *Optional.* Pass True, if the user can send animations, games, stickers and use inline bots, implies can_send_media_messages
+    :param can_add_web_page_previews: *Optional.* Pass True, if the user may add web page previews to their messages, implies can_send_media_messages
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type chat_id: int or str
+    :type user_id: int
+
+    :returns: Returns True on success.
+    :rtype: bool
+    """
+
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        user_id=user_id,
+    )
+
+
+    # optional args
+    params.update(
+        _clean_params(
+            until_date=until_date,
+            can_send_messages=can_send_messages,
+            can_send_media_messages=can_send_media_messages,
+            can_send_other_messages=can_send_other_messages,
+            can_add_web_page_previews=can_add_web_page_previews
+        )
+    )
+
+    return TelegramBotRPCRequest('restrictChatMember', params=params, on_result=lambda result: result, **kwargs)
+
+
+def promote_chat_member(chat_id, user_id,
+                        can_change_info=None, can_post_messages=None, can_edit_messages=None, can_delete_messages=None,
+                        can_invite_users=None, can_restrict_members=None, can_pin_messages=None, can_promote_members=None,
+                        **kwargs):
+
+    """
+    Use this method to kick a user from a group or a supergroup. In the case of supergroups, the user will not
+    be able to return to the group on their own using invite links, etc., unless unbanned first. The bot must
+    be an administrator in the group for this to work. Returns True on success.
+
+    Note: This will method only work if the ‘All Members Are Admins’ setting is off in the target group. Otherwise
+    members may only be removed by the group's creator or by the member that added them.
+
+    :param chat_id: Unique identifier for the target group or username of the target supergroup (in the format @supergroupusername)
+    :param user_id: Unique identifier of the target user
+
+    :param can_change_info: *Optional.*  Pass True, if the administrator can change chat title, photo and other settings
+    :param can_post_messages: *Optional.* Pass True, if the administrator can create channel posts, channels only
+    :param can_edit_messages: *Optional.* Pass True, if the administrator can edit messages of other users and can pin messages, channels only
+    :param can_delete_messages: *Optional.* Pass True, if the administrator can delete messages of other users
+
+    :param can_invite_users: *Optional.*  Pass True, if the administrator can invite new users to the chat
+    :param can_restrict_members: *Optional.* Pass True, if the administrator can restrict, ban or unban chat members
+    :param can_pin_messages: *Optional.* Pass True, if the administrator can pin messages, supergroups only
+    :param can_promote_members: *Optional.* Pass True, if the administrator can add new administrators with a subset of his own privileges
+                                            or demote administrators that he has promoted, directly or indirectly
+                                            (promoted by administrators that were appointed by him)
+
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type chat_id: int or str
+    :type user_id: int
+
+    :returns: Returns True on success.
+    :rtype: bool
+    """
+
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        user_id=user_id,
+    )
+
+
+    # optional args
+    params.update(
+        _clean_params(
+            can_change_info=can_change_info,
+            can_post_messages=can_post_messages,
+            can_edit_messages=can_edit_messages,
+            can_delete_messages=can_delete_messages,
+            can_invite_users=can_invite_users,
+            can_restrict_members=can_restrict_members,
+            can_pin_messages=can_pin_messages,
+            can_promote_members=can_promote_members
+        )
+    )
+
+    return TelegramBotRPCRequest('promoteChatMember', params=params, on_result=lambda result: result, **kwargs)
 
 def unban_chat_member(chat_id, user_id, **kwargs):
 
-        """
-        Use this method to unban a previously kicked user in a supergroup. The user will not return to the group automatically,
-        but will be able to join via link, etc. The bot must be an administrator in the group for this to work
+    """
+    Use this method to unban a previously kicked user in a supergroup. The user will not return to the group automatically,
+    but will be able to join via link, etc. The bot must be an administrator in the group for this to work
 
-        :param chat_id: Unique identifier for the target group or username of the target supergroup (in the format @supergroupusername)
-        :param user_id: Unique identifier of the target user
-        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param chat_id: Unique identifier for the target group or username of the target supergroup (in the format @supergroupusername)
+    :param user_id: Unique identifier of the target user
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-        :type chat_id: int or str
-        :type user_id: int
+    :type chat_id: int or str
+    :type user_id: int
 
-        :returns: Returns True on success.
-        :rtype: bool
-        """
+    :returns: Returns True on success.
+    :rtype: bool
+    """
 
-        # required args
-        params = dict(
-            chat_id=chat_id,
-            user_id=user_id,
-        )
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        user_id=user_id,
+    )
 
-        return TelegramBotRPCRequest('unbanChatMember', params=params, on_result=lambda result: result, **kwargs)
+    return TelegramBotRPCRequest('unbanChatMember', params=params, on_result=lambda result: result, **kwargs)
 
 
 def get_chat(chat_id, **kwargs):
 
-        """
-        Use this method to get up to date information about the chat (current name of the user for one-on-one conversations, current username
-        of a user, group or channel, etc.).
+    """
+    Use this method to get up to date information about the chat (current name of the user for one-on-one conversations, current username
+    of a user, group or channel, etc.).
 
 
-        :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
-        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-        :type chat_id: int or str
+    :type chat_id: int or str
 
-        :returns: Returns a Chat object on success.
-        :rtype: Chat
-        """
+    :returns: Returns a Chat object on success.
+    :rtype: Chat
+    """
 
-        # required args
-        params = dict(
-            chat_id=chat_id,
-        )
+    # required args
+    params = dict(
+        chat_id=chat_id,
+    )
 
-        return TelegramBotRPCRequest('getChat', params=params, on_result=lambda result: Chat.from_result(result), **kwargs)
+    return TelegramBotRPCRequest('getChat', params=params, on_result=lambda result: Chat.from_result(result), **kwargs)
 
 
 def leave_chat(chat_id, **kwargs):
 
-        """
-        Use this method for your bot to leave a group, supergroup or channel.
+    """
+    Use this method for your bot to leave a group, supergroup or channel.
 
-        :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
-        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-        :type chat_id: int or str
+    :type chat_id: int or str
 
-        :returns: Returns true on success.
-        :rtype: bool
-        """
+    :returns: Returns true on success.
+    :rtype: bool
+    """
 
-        # required args
-        params = dict(
-            chat_id=chat_id,
-        )
+    # required args
+    params = dict(
+        chat_id=chat_id,
+    )
 
-        return TelegramBotRPCRequest('leaveChat', params=params, on_result=lambda result: result, **kwargs)
+    return TelegramBotRPCRequest('leaveChat', params=params, on_result=lambda result: result, **kwargs)
 
 
 def get_chat_administrators(chat_id, **kwargs):
 
-        """
-        Use this method to get a list of administrators in a chat. On success, returns an Array of ChatMember objects that
-        contains information about all chat administrators except other bots. If the chat is a group or a supergroup and no
-        administrators were appointed, only the creator will be returned.
+    """
+    Use this method to get a list of administrators in a chat. On success, returns an Array of ChatMember objects that
+    contains information about all chat administrators except other bots. If the chat is a group or a supergroup and no
+    administrators were appointed, only the creator will be returned.
 
 
-        :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
-        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-        :type chat_id: int or str
+    :type chat_id: int or str
 
-        :returns: List of Chat Members on success.
-        :rtype: list[ChatMember]
-        """
+    :returns: List of Chat Members on success.
+    :rtype: list[ChatMember]
+    """
 
-        # required args
-        params = dict(
-            chat_id=chat_id,
-        )
+    # required args
+    params = dict(
+        chat_id=chat_id,
+    )
 
-        return TelegramBotRPCRequest('getChatAdministrators', params=params, on_result=lambda result: ChatMember.from_result_list(result), **kwargs)
+    return TelegramBotRPCRequest('getChatAdministrators', params=params, on_result=lambda result: ChatMember.from_result_list(result), **kwargs)
 
 
 def get_chat_member(chat_id, user_id, **kwargs):
 
-        """
-        Use this method to get information about a member of a chat
+    """
+    Use this method to get information about a member of a chat
 
-        :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
-        :param user_id: Unique identifier of the target user
-        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
+    :param user_id: Unique identifier of the target user
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-        :type chat_id: int or str
-        :type user_id: int
+    :type chat_id: int or str
+    :type user_id: int
 
-        :returns: Returns ChatMember on success.
-        :rtype: ChatMember
-        """
+    :returns: Returns ChatMember on success.
+    :rtype: ChatMember
+    """
 
-        # required args
-        params = dict(
-            chat_id=chat_id,
-            user_id=user_id,
-        )
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        user_id=user_id,
+    )
 
-        return TelegramBotRPCRequest('getChatMember', params=params, on_result=lambda result: ChatMember.from_result(result), **kwargs)
+    return TelegramBotRPCRequest('getChatMember', params=params, on_result=lambda result: ChatMember.from_result(result), **kwargs)
 
 
 def get_chat_members_count(chat_id, **kwargs):
 
-        """
-        Use this method to get the number of members in a chat.
+    """
+    Use this method to get the number of members in a chat.
 
-        :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
-        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-        :type chat_id: int or str
+    :type chat_id: int or str
 
-        :returns: Returns count on success.
-        :rtype: int
-        """
+    :returns: Returns count on success.
+    :rtype: int
+    """
 
-        # required args
-        params = dict(
-            chat_id=chat_id,
-        )
+    # required args
+    params = dict(
+        chat_id=chat_id,
+    )
 
-        return TelegramBotRPCRequest('getChatMembersCount', params=params, on_result=lambda result: result, **kwargs)
+    return TelegramBotRPCRequest('getChatMembersCount', params=params, on_result=lambda result: result, **kwargs)
 
 
 def answer_callback_query(callback_query_id, text=None, show_alert=None, url=None, cache_time=0, **kwargs):
-        """
-        Use this method to send answers to callback queries sent from inline keyboards. The answer will be displayed
-        to the user as a notification at the top of the chat screen or as an alert.
+    """
+    Use this method to send answers to callback queries sent from inline keyboards. The answer will be displayed
+    to the user as a notification at the top of the chat screen or as an alert.
 
 
-        :param callback_query_id: Unique identifier for the query to be answered
-        :param text: Text of the notification. If not specified, nothing will be shown to the user
-        :param show_alert: If true, an alert will be shown by the client instead of a notificaiton at the top of
-                           the chat screen. Defaults to false.
-        :param url: URL that will be opened by the user's client. If you have created a Game and accepted the conditions via @Botfather,
-                    specify the URL that opens your game – note that this will only work if the query comes from a callback_game button.
-                    Otherwise, you may use links like telegram.me/your_bot?start=XXXX that open your bot with a parameter.
-        :param cache_time: The maximum amount of time in seconds that the result of the callback query may be cached client-side. Telegram
-                           apps will support caching starting in version 3.14. Defaults to 0.
-        :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param callback_query_id: Unique identifier for the query to be answered
+    :param text: Text of the notification. If not specified, nothing will be shown to the user
+    :param show_alert: If true, an alert will be shown by the client instead of a notificaiton at the top of
+                       the chat screen. Defaults to false.
+    :param url: URL that will be opened by the user's client. If you have created a Game and accepted the conditions via @Botfather,
+                specify the URL that opens your game – note that this will only work if the query comes from a callback_game button.
+                Otherwise, you may use links like telegram.me/your_bot?start=XXXX that open your bot with a parameter.
+    :param cache_time: The maximum amount of time in seconds that the result of the callback query may be cached client-side. Telegram
+                       apps will support caching starting in version 3.14. Defaults to 0.
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-        :type callback_query_id: str
-        :type text: str
-        :type url: str
-        :type show_alert: bool
-        :type cache_time: int
+    :type callback_query_id: str
+    :type text: str
+    :type url: str
+    :type show_alert: bool
+    :type cache_time: int
 
-        :returns: Returns True on success.
-        :rtype: bool
-        """
+    :returns: Returns True on success.
+    :rtype: bool
+    """
 
-        # required args
-        params = dict(
-            callback_query_id=callback_query_id,
+    # required args
+    params = dict(
+        callback_query_id=callback_query_id,
+    )
+
+    # optional args
+    params.update(
+        _clean_params(
+            text=text,
+            show_alert=show_alert,
+            url=url,
+            cache_time=cache_time,
         )
+    )
 
-        # optional args
-        params.update(
-            _clean_params(
-                text=text,
-                show_alert=show_alert,
-                url=url,
-                cache_time=cache_time,
-            )
-        )
+    return TelegramBotRPCRequest('answerCallbackQuery', params=params, on_result=lambda result: result, **kwargs)
 
-        return TelegramBotRPCRequest('answerCallbackQuery', params=params, on_result=lambda result: result, **kwargs)
+def delete_message(chat_id, message_id, **kwargs):
+    """
+    Use this method to delete a message, including service messages, with the following limitations:
+    - A message can only be deleted if it was sent less than 48 hours ago.
+    - Bots can delete outgoing messages in groups and supergroups.
+    - Bots granted can_post_messages permissions can delete outgoing messages in channels.
+    - If the bot is an administrator of a group, it can delete any message there.
+    - If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
+
+
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param message_id: Identifier of the message to delete
+    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :return: Returns True on success.
+    """
+
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        message_id=message_id
+    )
+
+    return TelegramBotRPCRequest('deleteMessage', params=params, on_result=lambda result: result, **kwargs)
 
 
 def edit_message_text(text, chat_id=None, message_id=None, inline_message_id=None,
@@ -3291,7 +3709,7 @@ def get_game_high_scores(user_id,
                                  on_result=GameHighScore.from_array_result, **kwargs)
 
 
-def get_updates(offset=None, limit=None, timeout=None,
+def get_updates(offset=None, limit=None, timeout=None, allowed_updates=None,
                 **kwargs):
     """
     Use this method to receive incoming updates using long polling.
@@ -3301,6 +3719,14 @@ def get_updates(offset=None, limit=None, timeout=None,
         1. This method will not work if an outgoing webhook is set up.
         2. In order to avoid getting duplicate updates, recalculate offset after each server response.
 
+    :param allowed_updates: List the types of updates you want your bot to receive. For example, specify
+                            [“message”, “edited_channel_post”, “callback_query”] to only receive updates
+                            of these types. See Update for a complete list of available update types.
+                            Specify an empty list to receive all updates regardless of type (default).
+                            If not specified, the previous setting will be used.
+
+                            Please note that this parameter doesn't affect updates created before the call
+                            to the getUpdates, so unwanted updates may be received for a short period of time.
     :param offset: Identifier of the first update to be returned. Must be
                    greater by one than the highest among the identifiers of
                    previously received updates. By default, updates starting
@@ -3324,13 +3750,14 @@ def get_updates(offset=None, limit=None, timeout=None,
     params = _clean_params(
             offset=offset,
             limit=limit,
-            timeout=timeout
+            timeout=timeout,
+            allowed_updates=allowed_updates,
         )
 
     return TelegramBotRPCRequest('getUpdates', params=params, on_result=Update.from_result, **kwargs)
 
 
-def set_webhook(url=None, certificate=None, **kwargs):
+def set_webhook(url, certificate=None, max_connections=None, allowed_updates=None, **kwargs):
     """
     Use this method to specify a url and receive incoming updates via an outgoing webhook.
     Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a
@@ -3344,9 +3771,21 @@ def set_webhook(url=None, certificate=None, **kwargs):
 
     Ports currently supported for Webhooks: 443, 80, 88, 8443.
 
+
+
     :param url: HTTPS url to send updates to. Use an empty string to remove webhook integration
     :param certificate: Upload your public key certificate so that the root certificate in use can be checked.
                         See telegram's self-signed guide for details (https://core.telegram.org/bots/self-signed).
+    :param max_connections: Maximum allowed number of simultaneous HTTPS connections to the webhook for update delivery, 1-100.
+                            Defaults to 40. Use lower values to limit the load on your bot‘s server, and higher values to
+                            increase your bot’s throughput.
+    :param allowed_updates: List the types of updates you want your bot to receive. For example, specify
+                            [“message”, “edited_channel_post”, “callback_query”] to only receive updates of these types.
+                            See Update for a complete list of available update types. Specify an empty list to receive all
+                            updates regardless of type (default). If not specified, the previous setting will be used.
+
+                            Please note that this parameter doesn't affect updates created before the call to the setWebhook,
+                            so unwanted updates may be received for a short period of time.
     :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type url: str
@@ -3356,7 +3795,7 @@ def set_webhook(url=None, certificate=None, **kwargs):
     :rtype:  TelegramBotRPCRequest
     """
     # optional args
-    params = _clean_params(url=url, certificate=certificate)
+    params = _clean_params(url=url, certificate=certificate, max_connections=max_connections, allowed_updates=allowed_updates)
 
     return TelegramBotRPCRequest('setWebhook', params=params, on_result=lambda result: result, **kwargs)
 
@@ -3435,6 +3874,34 @@ class TelegramBot(object):
     def answer_callback_query(self, *args, **kwargs):
         return answer_callback_query(*args, **self._merge_overrides(**kwargs)).run()
 
+    def export_chat_invite_link(self, *args, **kwargs):
+        """See :func:`export_chat_invite_link`"""
+        return export_chat_invite_link(*args, **self._merge_overrides(**kwargs)).run()
+
+    def set_chat_photo(self, *args, **kwargs):
+        """See :func:`set_chat_photo`"""
+        return set_chat_photo(*args, **self._merge_overrides(**kwargs)).run()
+
+    def delete_chat_photo(self, *args, **kwargs):
+        """See :func:`delete_chat_photo`"""
+        return delete_chat_photo(*args, **self._merge_overrides(**kwargs)).run()
+
+    def set_chat_title(self, *args, **kwargs):
+        """See :func:`set_chat_title`"""
+        return set_chat_title(*args, **self._merge_overrides(**kwargs)).run()
+
+    def set_chat_description(self, *args, **kwargs):
+        """See :func:`set_chat_description`"""
+        return set_chat_description(*args, **self._merge_overrides(**kwargs)).run()
+
+    def pin_chat_message(self, *args, **kwargs):
+        """See :func:`pin_chat_message`"""
+        return pin_chat_message(*args, **self._merge_overrides(**kwargs)).run()
+
+    def unpin_chat_message(self, *args, **kwargs):
+        """See :func:`unpin_chat_message`"""
+        return unpin_chat_message(*args, **self._merge_overrides(**kwargs)).run()
+
     def send_message(self, *args, **kwargs):
         """See :func:`send_message`"""
         return send_message(*args, **self._merge_overrides(**kwargs)).run()
@@ -3462,6 +3929,10 @@ class TelegramBot(object):
     def send_video(self, *args, **kwargs):
         """See :func:`send_video`"""
         return send_video(*args, **self._merge_overrides(**kwargs)).run()
+
+    def send_video_note(self, *args, **kwargs):
+        """See :func:`send_video`"""
+        return send_video_note(*args, **self._merge_overrides(**kwargs)).run()
 
     def send_voice(self, *args, **kwargs):
         """See :func:`send_voice`"""
@@ -3510,14 +3981,14 @@ class TelegramBot(object):
     def send_game(self, *args, **kwargs):
         """See :func:`send_game`"""
         return send_game(*args, **self._merge_overrides(**kwargs)).run()
-    
+
     def get_game_high_scores(self, *args, **kwargs):
         """See :func:`get_game_high_scores`"""
         return get_game_high_scores(*args, **self._merge_overrides(**kwargs)).run()
-    
-    def set_game_high_scores(self, *args, **kwargs):
-        """See :func:`set_game_high_scores`"""
-        return set_game_high_scores(*args, **self._merge_overrides(**kwargs)).run()
+
+    def delete_message(self, *args, **kwargs):
+        """See :func:`edit_message_text`"""
+        return edit_message_text(*args, **self._merge_overrides(**kwargs)).run()
 
     def edit_message_text(self, *args, **kwargs):
         """See :func:`edit_message_text`"""
@@ -3534,6 +4005,14 @@ class TelegramBot(object):
     def unban_chat_member(self, *args, **kwargs):
         """See :func:`unban_chat_member`"""
         return unban_chat_member(*args, **self._merge_overrides(**kwargs)).run()
+
+    def restrict_chat_member(self, *args, **kwargs):
+        """See :func:`restrict_chat_member`"""
+        return restrict_chat_member(*args, **self._merge_overrides(**kwargs)).run()
+
+    def promote_chat_member(self, *args, **kwargs):
+        """See :func:`promote_chat_member`"""
+        return promote_chat_member(*args, **self._merge_overrides(**kwargs)).run()
 
     def edit_message_reply_markup(self, *args, **kwargs):
         """See :func:`edit_message_reply_markup`"""
