@@ -133,6 +133,25 @@ class ChatMember(_ChatMemberBase):
 
         return ret
 
+_ChatPhotoBase = namedtuple('ChatPhoto', ['small_file_id', 'big_file_id'])
+class ChatPhoto(_ChatPhotoBase):
+    """
+    This object represents a chat photo.
+
+    Attributes:
+        small_file_id	(str)	:*Optional.* Unique file identifier of small (160x160) chat photo. This file_id can be used only for photo download.
+        big_file_id     (str)	:*Optional.* Unique file identifier of big (640x640) chat photo. This file_id can be used only for photo download.
+    """
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return ChatPhoto(
+            small_file_id=result.get('small_file_id'),
+            big_file_id=result.get('big_file_id')
+        )
 
 _ChatBase = namedtuple('Chat', ['id', 'type', 'title', 'username', 'first_name', 'last_name', 'all_members_are_administrators',
                                 'photo', 'description', 'invite_link', 'pinned_message', 'sticker_set_name', 'can_set_sticker_set'])
@@ -174,6 +193,8 @@ class Chat(_ChatBase):
             pinned_message=result.get('pinned_message'),
             sticker_set_name=result.get('sticker_set_name'),
             can_set_sticker_set=result.get('can_set_sticker_set'),
+            photo=ChatPhoto.from_result(result.get('photo')),
+            description=result.get('description'),
         )
 
 _MessageBase = namedtuple('Message', [
@@ -271,6 +292,10 @@ class Message(_MessageBase):
         if entities is not None:
             entities = [MessageEntity.from_result(entity) for entity in entities]
 
+        caption_entities = result.get('caption_entities')
+        if caption_entities is not None:
+            caption_entities = [MessageEntity.from_result(entity) for entity in caption_entities]
+
         return Message(
             message_id=result.get('message_id'),
             sender=User.from_result(result.get('from')),
@@ -287,11 +312,13 @@ class Message(_MessageBase):
             reply_to_message=Message.from_result(result.get('reply_to_message')),
             text=result.get('text'),
             entities=entities,
+            caption_entities=caption_entities,
             audio=Audio.from_result(result.get('audio')),
             document=Document.from_result(result.get('document')),
             photo=photo,
             sticker=Sticker.from_result(result.get('sticker')),
             video=Video.from_result(result.get('video')),
+            video_note=VideoNote.from_result(result.get('video_note')),
             voice=Voice.from_result(result.get('voice')),
             caption=result.get('caption'),
             contact=Contact.from_result(result.get('contact')),
@@ -491,6 +518,39 @@ class Video(_VideoBase):
             mime_type=result.get('mime_type'),
             file_size=result.get('file_size')
             )
+
+
+_VideoNoteBase = namedtuple('VideoNote', [
+    'file_id', 'width', 'height', 'duration', 'thumb', 'file_size'])
+class VideoNote(_VideoNoteBase):
+
+    """This object represents a video message (available in Telegram apps as of v.4.0).
+
+    Attributes:
+        file_id     (str)       :Unique identifier for this file
+        width       (int)       :Video width as defined by sender
+        height      (int)       :Video height as defined by sender
+        duration    (int)       :Duration of the video in seconds as defined by sender
+        thumb       (PhotoSize) :*Optional.* Video thumbnail
+        file_size   (int)       :*Optional.* File size
+
+    """
+    __slots__ = ()
+
+    @staticmethod
+    def from_result(result):
+        if result is None:
+            return None
+
+        return Video(
+            file_id=result.get('file_id'),
+            width=result.get('width'),
+            height=result.get('height'),
+            duration=result.get('duration'),
+            thumb=PhotoSize.from_result(result.get('thumb')),
+            file_size=result.get('file_size')
+            )
+
 
 
 _VoiceBase = namedtuple('Voice', ['file_id', 'duration', 'mime_type', 'file_size'])
@@ -2041,7 +2101,8 @@ class TelegramBotRPCRequest:
         self.response = None
 
         s = Session()
-        s.proxies = {'http': os.environ['http_proxy'], 'https': os.environ['https_proxy']}  # Respect env proxy settings in new sessions.
+        if 'http_proxy' in os.environ and 'https_proxy' in os.environ:
+            s.proxies = {'http': os.environ['http_proxy'], 'https': os.environ['https_proxy']}  # Respect env proxy settings in new sessions.
         request = self._get_request()
         resp = s.send(request)
 

@@ -1,7 +1,7 @@
 from setuptools import setup
 import sys
 
-__version__ = '3.2.0.dev1'
+__version__ = '3.6.0.dev1'
 
 github_tag = __version__
 if 'dev' in __version__:
@@ -10,14 +10,10 @@ if 'dev' in __version__:
 download_url = 'https://github.com/datamachine/twx.botapi/archive/{}.zip'
 download_url = download_url.format(github_tag)
 
-print(download_url)
-
 requirements = ['requests', 'attrs']
 
 if sys.version_info < (3, 4, 0):
     requirements.append('enum34')
-
-print(requirements)
 
 setup(name='twx.botapi',
       packages=['twx', 'twx.botapi'],
