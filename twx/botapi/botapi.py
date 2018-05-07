@@ -12,6 +12,7 @@ from collections import namedtuple
 from abc import ABCMeta, abstractmethod
 from threading import Thread
 from enum import Enum
+import attr
 
 import json
 
@@ -176,12 +177,12 @@ class Chat(_ChatBase):
         )
 
 _MessageBase = namedtuple('Message', [
-    'message_id', 'sender', 'date', 'edit_date', 'chat', 'forward_from', 'forward_from_chat', 'forward_from_message_id', 'forward_date',
-    'reply_to_message', 'text', 'entities', 'audio', 'document', 'photo', 'sticker',
-    'video', 'video_note', 'voice', 'caption', 'contact', 'location', 'venue', 'new_chat_members',
-    'left_chat_member', 'new_chat_title', 'new_chat_photo', 'delete_chat_photo',
-    'group_chat_created', 'supergroup_chat_created', 'channel_chat_created', 'migrate_to_chat_id',
-    'migrate_from_chat_id', 'pinned_message'])
+    'message_id', 'sender', 'date', 'edit_date', 'author_signature', 'chat', 'forward_from', 'forward_from_chat',
+    'forward_from_message_id', 'forward_signature', 'forward_date', 'media_group_id', 'reply_to_message', 'text',
+    'entities', 'caption_entities', 'audio', 'document', 'photo', 'sticker',  'video', 'video_note', 'voice', 'caption',
+    'contact', 'location', 'venue', 'new_chat_members', 'left_chat_member', 'new_chat_title',
+    'new_chat_photo', 'delete_chat_photo', 'group_chat_created', 'supergroup_chat_created',
+    'channel_chat_created', 'migrate_to_chat_id', 'migrate_from_chat_id', 'pinned_message', 'connected_website'])
 class Message(_MessageBase):
 
     """This object represents a message.
@@ -196,14 +197,19 @@ class Message(_MessageBase):
                                                                       the original channel
         forward_from_message_id (int)                    :*Optional.* For forwarded channel posts, identifier of the original message in the channel
         forward_date     (int)                           :*Optional.* For forwarded messages, date the original message was
-                                                                     sent in Unix time
+                                                                      sent in Unix time
+        forward_signature (String)                       :*Optional.* For messages forwarded from channels, signature of the post author if present
         reply_to_message (Message)                       :*Optional.* For replies, the original message. Note that the
                                                                       Message object in this field will not contain further
                                                                       reply_to_message fields even if it itself is a reply.
         edit_date        (int)                           :*Optional.* Date the message was last edited in Unix time
+        media_group_id   (str)                           :*Optional.* The unique identifier of a media message group this message belongs to
+        author_signature (int)                           :*Optional.* Signature of the post author for messages in channels
         text             (str)                           :*Optional.* For text messages, the actual UTF-8 text of the message
-        entities         (Sequence[MessageEntity])       :*Optional.*For text messages, special entities like usernames,
-                                                                     URLs, bot commands, etc. that appear in the text
+        entities         (Sequence[MessageEntity])       :*Optional.* For text messages, special entities like usernames,
+                                                                      URLs, bot commands, etc. that appear in the text
+        caption_entities (Sequence[MessageEntity])       :*Optional.* For messages with a caption, special entities like usernames,
+                                                                      URLs, bot commands, etc. that appear in the caption
         audio            (Audio)                         :*Optional.* Message is an audio file, information about the file
         document         (Document)                      :*Optional.* Message is a general file, information about the file
         game             (Game)                          :*Optional.* Message is a game, information about the game.
@@ -235,6 +241,7 @@ class Message(_MessageBase):
         pinned_message          (Message)               :*Optional.* Specified message was pinned. Note that the Message object in this
                                                                      field will not contain further reply_to_message fields even if it
                                                                      is itself a reply.
+        connected_website       (str)                   :*Optional.* The domain name of the website on which the user has logged in.
 
     """
     __slots__ = ()
@@ -274,6 +281,9 @@ class Message(_MessageBase):
             forward_from_chat=Chat.from_result(result.get('forward_from_chat')),
             forward_from_message_id=Message.from_result(result.get('forward_from_message_id')),
             forward_date=result.get('forward_date'),
+            forward_signature=result.get('forward_signature'),
+            author_signature=result.get('author_signature'),
+            media_group_id=result.get('media_group_id'),
             reply_to_message=Message.from_result(result.get('reply_to_message')),
             text=result.get('text'),
             entities=entities,
@@ -297,7 +307,8 @@ class Message(_MessageBase):
             channel_chat_created=result.get('channel_chat_created'),
             migrate_to_chat_id=result.get('migrate_to_chat_id'),
             migrate_from_chat_id=result.get('migrate_from_chat_id'),
-            pinned_message=Message.from_result(result.get('pinned_message'))
+            pinned_message=Message.from_result(result.get('pinned_message')),
+            connected_website=Message.from_result(result.get('connected_website')),
         )
 
 
@@ -772,6 +783,7 @@ class InputFileInfo(_InputFileInfoBase):
     __slots__ = ()
 
 
+
 _InputFileBase = namedtuple('InputFile', ['form', 'file_info'])
 class InputFile(_InputFileBase):
     """This object represents the contents of a file to be uploaded. Must be posted using multipart/form-data
@@ -788,9 +800,9 @@ class InputFile(_InputFileBase):
                 fp = open('foo.png', 'rb')
                 file_info = InputFileInfo('foo.png', fp, 'image/png')
 
-                InputFile('photo', file_info)
+                photo = InputFile('photo', file_info)
 
-                bot.send_photo(chat_id=12345678, photo=InputFile)
+                bot.send_photo(chat_id=12345678, photo=photo)
 
             .. note::
 
@@ -800,7 +812,56 @@ class InputFile(_InputFileBase):
     """
     __slots__ = ()
 
+@attr.s
+class InputMedia(object):
+    """This object represents the content of a media message to be sent. It should be one of
 
+    InputMediaPhoto
+    InputMediaVideo"""
+    media = attr.ib()
+    caption = attr.ib()
+    parse_mode = attr.ib()
+
+
+
+@attr.s
+class InputMediaPhoto(InputMedia):
+    """
+    Represents a photo to be sent.
+
+        Attributes:
+        media      (str or :class:`InputFile`)        :File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended),
+                                                       pass an HTTP URL for Telegram to get a file from the Internet, or pass a :class:`InputFileInfo` object
+                                                       to upload a new one.
+        caption    (str)                              :*Optional.* Caption of the photo to be sent, 0-200 characters
+        parse_mode (str)                              :*Optional.* Send Markdown or HTML, if you want Telegram apps to show bold, italic,
+                                                       fixed-width text or inline URLs in the media caption.
+    """
+    type = attr.ib(default="photo")
+
+
+
+class InputMediaVideo(InputMedia):
+    """
+    Represents a video to be sent.
+
+        Attributes:
+        media      (str or :class:`InputFile`)        :File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended),
+                                                       pass an HTTP URL for Telegram to get a file from the Internet, or pass a :class:`InputFileInfo` object
+                                                       to upload a new one.
+        caption    (str)                              :*Optional.* Caption of the video to be sent, 0-200 characters
+        parse_mode (str)                              :*Optional.* Send Markdown or HTML, if you want Telegram apps to show bold, italic,
+                                                       fixed-width text or inline URLs in the media caption.
+        width      (int)                              :*Optional.* Video width
+        height     (int)                              :*Optional.* Video height
+        duration   (int)                              :*Optional.* Video duration
+        support_streaming (bool)                      :*Optional.* Pass True, if the uploaded video is suitable for streaming
+    """
+    type = attr.ib(default="video")
+    width = attr.ib()
+    height = attr.ib()
+    duration = attr.ib()
+    support_streaming = attr.ib()
 
 
 _UserProfilePhotosBase = namedtuple('UserProfilePhotos', ['total_count', 'photos'])
@@ -853,6 +914,7 @@ class File(_FileBase):
             file_size=result.get('file_size'),
             file_path=result.get('file_path')
         )
+
 
 
 class ReplyMarkup:
@@ -1762,7 +1824,7 @@ class InlineQueryResultContact(InlineQueryResult):
         self.thumb_height = thumb_height
 
 
-class InlineQueryResultContact(InlineQueryResult):
+class InlineQueryResultCachedSticker(InlineQueryResult):
     """ Represents a link to a sticker stored on the Telegram servers. By default, this sticker will be sent by the
     user. Alternatively, you can use input_message_content to send a message with the specified content instead
     of the sticker.
@@ -1928,7 +1990,7 @@ class TelegramBotRPCRequest:
     .. note::
 
         Typically you do not have to interact with this class directly. However, you may override any of these
-        arguments by specifiying it in the the `\*\*kwargs` of any api method.
+        arguments by specifiying it in the the `kwargs` of any api method.
     """
 
     api_url_base = 'https://api.telegram.org/bot'
@@ -2120,7 +2182,7 @@ def export_chat_invite_link(chat_id, **kwargs):
     Use this method to generate a new invite link for a chat; any previously generated link is revoked.
     The bot must be an administrator in the chat for this to work and must have the appropriate admin rights.
     :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
     :return: Returns the new invite link as String on success.
     :rtype: str
     """
@@ -2137,7 +2199,7 @@ def set_chat_photo(chat_id, photo, **kwargs):
     in the chat for this to work and must have the appropriate admin rights.
     :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param photo: New chat photo, uploaded using multipart/form-data
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
     :return: Returns True on success.
     :rtype: bool
     """
@@ -2163,7 +2225,7 @@ def delete_chat_photo(chat_id, **kwargs):
     for this to work and must have the appropriate admin rights.
 
     :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
     :return: Returns True on success.
     :rtype: bool
     """
@@ -2179,7 +2241,7 @@ def set_chat_title(chat_id, title, **kwargs):
 
     :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param title: New chat title, 1-255 characters
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
     :return: Returns True on success.
     :rtype: bool
     """
@@ -2202,7 +2264,7 @@ def set_chat_description(chat_id, description, **kwargs):
 
     :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param description: New chat description, 0-255 characters
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
     :return: Returns True on success.
     :rtype: bool
     """
@@ -2229,7 +2291,7 @@ def pin_chat_message(chat_id, message_id, disable_notification=None, **kwargs):
     :param message_id: Identifier of a message to pin
     :param disable_notification: Pass True, if it is not necessary to send a notification to all chat members about the new pinned message.
                                  Notifications are always disabled in channels.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
     :return: Returns True on success.
     :rtype: bool
     """
@@ -2255,7 +2317,7 @@ def unpin_chat_message(chat_id, **kwargs):
     work and must have the ‘can_pin_messages’ admin right in the supergroup or ‘can_edit_messages’ admin right in the channel.
 
     :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
     :return: Returns True on success.
     :rtype: bool
     """
@@ -2265,14 +2327,12 @@ def unpin_chat_message(chat_id, **kwargs):
     params = dict(chat_id=chat_id)
     return TelegramBotRPCRequest('unpinChatMessage', params=params, on_result=lambda result: result, **kwargs)
 
-
-
 def get_me(**kwargs):
     """
     A simple method for testing your bot's auth token. Requires no parameters.
     Returns basic information about the bot in form of a User object.
 
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :returns: Returns basic information about the bot in form of a User object.
     :rtype: User
@@ -2286,7 +2346,7 @@ def send_message(chat_id, text,
     """
     Use this method to send text messages.
 
-    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param text: Text of the message to be sent
     :param parse_mode: Send ``"Markdown"``, if you want Telegram apps to show bold,
                        italic and inline URLs in your bot's message.
@@ -2297,9 +2357,9 @@ def send_message(chat_id, text,
                          force a reply from the user.
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-    :type chat_id: int
+    :type chat_id: int or str
     :type text: str
     :type disable_web_page_preview: bool
     :type reply_to_message_id: int
@@ -2331,15 +2391,15 @@ def forward_message(chat_id, from_chat_id, message_id, disable_notification=Fals
     """
     Use this method to forward messages of any kind.
 
-    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param from_chat_id: Unique identifier for the chat where the original message was sent — User or
                          GroupChat id
     :param message_id: Unique message identifier
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-    :type chat_id: int
+    :type chat_id: int or str
     :type from_chat_id: int
     :type message_id: int
 
@@ -2364,7 +2424,7 @@ def send_photo(chat_id,  photo,
     """
     Use this method to send photos.
 
-    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param photo: Pass a file_id as String to send a photo that exists on the Telegram servers (recommended),
                   pass an HTTP URL as a String for Telegram to get a photo from the Internet, or upload a new
                   photo using multipart/form-data.
@@ -2375,9 +2435,9 @@ def send_photo(chat_id,  photo,
                          force a reply from the user.
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-    :type chat_id: int
+    :type chat_id: int or str
     :type photo: InputFile or str
     :type caption: str
     :type reply_to_message_id: int
@@ -2427,7 +2487,7 @@ def send_audio(chat_id, audio,
     be in an .ogg file encoded with OPUS. This behavior will be phased out in the future. For sending voice
     messages, use the sendVoice method instead.
 
-    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param audio: Audio file to send. Pass a file_id as String to send an audio file that exists on the Telegram servers (recommended),
                   pass an HTTP URL as a String for Telegram to get an audio file from the Internet, or upload a new one using multipart/form-data.
     :param caption: Audio caption, 0-200 characters
@@ -2438,9 +2498,9 @@ def send_audio(chat_id, audio,
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-    :type chat_id: int
+    :type chat_id: int or str
     :type audio: InputFile or str
     :type caption: str
     :type duration: int
@@ -2487,7 +2547,7 @@ def send_document(chat_id, document, caption,
     """
     Use this method to send general files.
 
-    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param document: File to send. Pass a file_id as String to send a file that exists on the Telegram servers (recommended),
                      pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data.
     :param caption: Document caption (may also be used when resending documents by file_id), 0-200 characters
@@ -2496,9 +2556,9 @@ def send_document(chat_id, document, caption,
                          instructions to hide keyboard or to force a reply from the user.
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-    :type chat_id: int
+    :type chat_id: int or str
     :type document: InputFile or str
     :type reply_to_message_id: int
     :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
@@ -2536,7 +2596,7 @@ def send_sticker(chat_id, sticker,
                  reply_to_message_id=None, reply_markup=None, disable_notification=False,
                  **kwargs):
     """
-    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param sticker: Sticker to send. Pass a file_id as String to send a file that exists on the Telegram servers (recommended),
                     pass an HTTP URL as a String for Telegram to get a .webp file from the Internet, or upload a new one using multipart/form-data.
     :param reply_to_message_id: If the message is a reply, ID of the original message
@@ -2544,9 +2604,9 @@ def send_sticker(chat_id, sticker,
                          instructions to hide keyboard or to force a reply from the user.
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-    :type chat_id: int
+    :type chat_id: int or str
     :type sticker: InputFile or str
     :type reply_to_message_id: int
     :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
@@ -2585,7 +2645,7 @@ def send_video(chat_id, video,
     """
     Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as Document).
 
-    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param video: Video to send. Pass a file_id as String to send a video that exists on the Telegram servers (recommended),
                   pass an HTTP URL as a String for Telegram to get a video from the Internet, or upload a new video using multipart/form-data.
     :param duration: Duration of sent video in seconds
@@ -2596,9 +2656,9 @@ def send_video(chat_id, video,
                          force a reply from the user.
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-    :type chat_id: int
+    :type chat_id: int or str
     :type video: InputFile or str
     :type duration: int
     :type caption: str
@@ -2640,7 +2700,7 @@ def send_video_note(chat_id, video_note,
     """
     Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as Document).
 
-    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param video_note: Video to send. Pass a file_id as String to send a video that exists on the Telegram servers (recommended),
                   pass an HTTP URL as a String for Telegram to get a video from the Internet, or upload a new video using multipart/form-data.
     :param duration: Duration of sent video in seconds
@@ -2651,9 +2711,9 @@ def send_video_note(chat_id, video_note,
                          force a reply from the user.
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-    :type chat_id: int
+    :type chat_id: int or str
     :type video: InputFile or str
     :type duration: int
     :type caption: str
@@ -2701,7 +2761,7 @@ def send_voice(chat_id, voice,
     Document). On success, the sent Message is returned. Bots can currently send voice messages of up to 50 MB in
     size, this limit may be changed in the future.
 
-    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param voice: Audio file to send. Pass a file_id as String to send a file that exists on the Telegram servers (recommended),
                   pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data.
     :param caption: Voice message caption, 0-200 characters
@@ -2710,9 +2770,9 @@ def send_voice(chat_id, voice,
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-    :type chat_id: int
+    :type chat_id: int or str
     :type voice: InputFile or str
     :type caption: str
     :type duration: int
@@ -2749,26 +2809,73 @@ def send_voice(chat_id, voice,
     return TelegramBotRPCRequest('sendVoice', params=params, files=files, on_result=Message.from_result, **kwargs)
 
 
+def send_media_group(chat_id, media,
+                     reply_to_message_id=None, disable_notification=False,
+                     **kwargs):
+    """
+    Use this method to send a group of photos or videos as an album. On success, an array of the sent Messages is returned.
+
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param media: A list of InputMedia objects to be sent, must include 2–10 items
+    :param reply_to_message_id: If the message is a reply, ID of the original message
+    :param disable_notification: Sends the messages silently. Users will receive a notification with no sound.
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type chat_id: int or str
+    :type media: `list` of :class:`InputMedia`
+    :type reply_to_message_id: int
+
+    :returns: On success, an array of the sent Messages is returned.
+    :rtype: TelegramBotRPCRequest
+    """
+
+    files = []
+    if len(media) < 2 or len(media) > 10:
+        raise ValueError('media must contain between 2 and 10 InputMedia items')
+
+    for i, entry in media:
+        if isinstance(entry.media, InputFile):
+            files.append(entry.media)  # Queue for multipart/form-data POSTING
+            media[i].media = "attach://{}".format(entry[1][0])  # Replace with file name and add to attachments
+
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        media=json.dumps(media)
+    )
+
+    # optional args
+    params.update(
+        _clean_params(
+            reply_to_message_id=reply_to_message_id,
+            disable_notification=disable_notification,
+        )
+    )
+
+    return TelegramBotRPCRequest('sendMediaGroup', params=params, files=files, on_result=lambda result: [Message.from_result(message) for message in result], **kwargs)
+
 def send_location(chat_id, latitude, longitude,
-                  reply_to_message_id=None, reply_markup=None, disable_notification=False,
+                  live_period=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
                   **kwargs):
     """
     Use this method to send point on the map.
 
-    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param latitude: Latitude of location.
     :param longitude: Longitude of location.
+    :param live_period: Period in seconds for which the location will be updated (see Live Locations, should be between 60 and 86400.)
     :param reply_to_message_id: If the message is a reply, ID of the original message
     :param reply_markup: Additional interface options. A JSON-serialized object for a
                          custom reply keyboard, instructions to hide keyboard or to
                          force a reply from the user.
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-    :type chat_id: int
+    :type chat_id: int or str
     :type latitude: float
     :type longitude: float
+    :type live_period: int
     :type reply_to_message_id: int
     :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
 
@@ -2786,6 +2893,7 @@ def send_location(chat_id, latitude, longitude,
     # optional args
     params.update(
         _clean_params(
+            live_period=live_period,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
             disable_notification=disable_notification,
@@ -2794,6 +2902,102 @@ def send_location(chat_id, latitude, longitude,
 
     return TelegramBotRPCRequest('sendLocation', params=params, on_result=Message.from_result, **kwargs)
 
+def edit_message_live_location(latitude, longitude,
+                  chat_id=None, message_id=None, inline_message_id=None, reply_markup=None,
+                  **kwargs):
+    """
+    Use this method to edit live location messages sent by the bot or via the bot (for inline bots).
+    A location can be edited until its live_period expires or editing is explicitly disabled by a call
+    to stopMessageLiveLocation.
+    On success, if the edited message was sent by the bot, the edited Message is returned, otherwise True is returned.
+
+    :param latitude: Latitude of location.
+    :param longitude: Longitude of location.
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param message_id: Required if inline_message_id is not specified. Identifier of the sent message
+    :param inline_message_id: Required if chat_id and message_id are not specified. Identifier of the inline message
+    :param reply_markup: Additional interface options. A JSON-serialized object for a
+                         custom reply keyboard, instructions to hide keyboard or to
+                         force a reply from the user.
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type chat_id: int or str
+    :type latitude: float
+    :type longitude: float
+    :type message_id: Integer
+    :type inline_message_id: string
+    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+
+    :returns: On success, if the edited message was sent by the bot, the edited Message is returned, otherwise True is returned.
+    :rtype:  TelegramBotRPCRequest or Bool
+    """
+
+    if not chat_id and not message_id and not inline_message_id:
+        raise ValueError("Must specify chat_id and message_id or inline_message_id")
+    if (chat_id and not message_id) or (not chat_id and message_id):
+        raise ValueError("Must specify chat_id and message_id together")
+
+    # required args
+    params = dict(
+        latitude=latitude,
+        longitude=longitude
+    )
+
+    # optional args
+    params.update(
+        _clean_params(
+            chat_id=chat_id,
+            message_id=message_id,
+            inline_message_id=inline_message_id,
+            reply_markup=reply_markup,
+        )
+    )
+
+    return TelegramBotRPCRequest('editMessageLiveLocation', params=params, on_result=Message.from_result, **kwargs)
+
+
+def stop_message_live_location(chat_id=None, message_id=None, inline_message_id=None, reply_markup=None,
+                               **kwargs):
+    """
+    Use this method to stop updating a live location message sent by the bot or via the bot (for inline bots) before
+    live_period expires.
+    On success, if the message was sent by the bot, the sent Message is returned, otherwise True is returned.
+
+
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param message_id: Required if inline_message_id is not specified. Identifier of the sent message
+    :param inline_message_id: Required if chat_id and message_id are not specified. Identifier of the inline message
+    :param reply_markup: Additional interface options. A JSON-serialized object for a
+                         custom reply keyboard, instructions to hide keyboard or to
+                         force a reply from the user.
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type chat_id: int or str
+    :type message_id: Integer
+    :type inline_message_id: string
+    :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+
+    :returns: On success, if the edited message was sent by the bot, the edited Message is returned, otherwise True is returned.
+    :rtype:  TelegramBotRPCRequest or Bool
+    """
+
+    if not chat_id and not message_id and not inline_message_id:
+        raise ValueError("Must specify chat_id and message_id or inline_message_id")
+    if (chat_id and not message_id) or (not chat_id and message_id):
+        raise ValueError("Must specify chat_id and message_id together")
+
+    # optional args
+    params = dict(
+        _clean_params(
+            chat_id=chat_id,
+            message_id=message_id,
+            inline_message_id=inline_message_id,
+            reply_markup=reply_markup,
+        )
+    )
+
+    return TelegramBotRPCRequest('stopMessageLiveLocation', params=params, on_result=Message.from_result, **kwargs)
+
 def send_venue(chat_id, latitude, longitude, title, address,
                foursquare_id=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
                **kwargs):
@@ -2801,7 +3005,7 @@ def send_venue(chat_id, latitude, longitude, title, address,
     """
     Use this method to send information about a venue.
 
-    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param latitude: Latitude of location.
     :param longitude: Longitude of location.
     :param title: Name of the venue.
@@ -2813,9 +3017,9 @@ def send_venue(chat_id, latitude, longitude, title, address,
                          force a reply from the user.
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-    :type chat_id: int
+    :type chat_id: int or str
     :type latitude: float
     :type longitude: float
     :type title: str
@@ -2870,9 +3074,9 @@ def send_contact(chat_id, phone_number, first_name,
                          force a reply from the user.
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-    :type chat_id: int
+    :type chat_id: int or str
     :type phone_number: str
     :type first_name: str
     :type last_name: str
@@ -2927,14 +3131,14 @@ def send_chat_action(chat_id, action,
 
     We only recommend using this method when a response from the bot will take a noticeable amount of time to arrive.
 
-    :param chat_id: Unique identifier for the message recipient — User or GroupChat id
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param action: Type of action to broadcast. Choose one, depending on what the user is about to receive:
                    typing for text messages, upload_photo for photos, record_video or upload_video for videos,
                    record_audio or upload_audio for audio files, upload_document for general files,
                    find_location for location data, record_video_note or upload_video_note for video notes.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
-    :type chat_id: int
+    :type chat_id: int or str
     :type action: ChatAction
 
     :returns: Returns True on success.
@@ -2959,11 +3163,11 @@ def kick_chat_member(chat_id, user_id, until_date=None, **kwargs):
     Note: This will method only work if the ‘All Members Are Admins’ setting is off in the target group. Otherwise
     members may only be removed by the group's creator or by the member that added them.
 
-    :param chat_id: Unique identifier for the target group or username of the target supergroup (in the format @supergroupusername)
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param user_id: Unique identifier of the target user
     :param until_date: *Optional.* Date when the user will be unbanned, unix time. If user is banned for more than 366 days or less than 30 seconds
                     from the current time they are considered to be banned forever
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int or str
     :type user_id: int
@@ -2999,7 +3203,7 @@ def restrict_chat_member(chat_id, user_id, until_date=None,
     Note: This will method only work if the ‘All Members Are Admins’ setting is off in the target group. Otherwise
     members may only be removed by the group's creator or by the member that added them.
 
-    :param chat_id: Unique identifier for the target group or username of the target supergroup (in the format @supergroupusername)
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param user_id: Unique identifier of the target user
     :param until_date: *Optional.* Date when the user will be unbanned, unix time. If user is banned for more than 366 days or less than 30 seconds
                     from the current time they are considered to be banned forever
@@ -3007,7 +3211,7 @@ def restrict_chat_member(chat_id, user_id, until_date=None,
     :param can_send_media_message: *Optional.* Pass True, if the user can send audios, documents, photos, videos, video notes and voice notes, implies can_send_messages
     :param can_send_other_messages: *Optional.* Pass True, if the user can send animations, games, stickers and use inline bots, implies can_send_media_messages
     :param can_add_web_page_previews: *Optional.* Pass True, if the user may add web page previews to their messages, implies can_send_media_messages
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int or str
     :type user_id: int
@@ -3050,7 +3254,7 @@ def promote_chat_member(chat_id, user_id,
     Note: This will method only work if the ‘All Members Are Admins’ setting is off in the target group. Otherwise
     members may only be removed by the group's creator or by the member that added them.
 
-    :param chat_id: Unique identifier for the target group or username of the target supergroup (in the format @supergroupusername)
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param user_id: Unique identifier of the target user
 
     :param can_change_info: *Optional.*  Pass True, if the administrator can change chat title, photo and other settings
@@ -3065,7 +3269,7 @@ def promote_chat_member(chat_id, user_id,
                                             or demote administrators that he has promoted, directly or indirectly
                                             (promoted by administrators that were appointed by him)
 
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int or str
     :type user_id: int
@@ -3103,9 +3307,9 @@ def unban_chat_member(chat_id, user_id, **kwargs):
     Use this method to unban a previously kicked user in a supergroup. The user will not return to the group automatically,
     but will be able to join via link, etc. The bot must be an administrator in the group for this to work
 
-    :param chat_id: Unique identifier for the target group or username of the target supergroup (in the format @supergroupusername)
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param user_id: Unique identifier of the target user
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int or str
     :type user_id: int
@@ -3130,8 +3334,8 @@ def get_chat(chat_id, **kwargs):
     of a user, group or channel, etc.).
 
 
-    :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int or str
 
@@ -3152,8 +3356,8 @@ def leave_chat(chat_id, **kwargs):
     """
     Use this method for your bot to leave a group, supergroup or channel.
 
-    :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int or str
 
@@ -3177,8 +3381,8 @@ def get_chat_administrators(chat_id, **kwargs):
     administrators were appointed, only the creator will be returned.
 
 
-    :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int or str
 
@@ -3199,9 +3403,9 @@ def get_chat_member(chat_id, user_id, **kwargs):
     """
     Use this method to get information about a member of a chat
 
-    :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param user_id: Unique identifier of the target user
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int or str
     :type user_id: int
@@ -3224,8 +3428,8 @@ def get_chat_members_count(chat_id, **kwargs):
     """
     Use this method to get the number of members in a chat.
 
-    :param chat_id: Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int or str
 
@@ -3240,6 +3444,53 @@ def get_chat_members_count(chat_id, **kwargs):
 
     return TelegramBotRPCRequest('getChatMembersCount', params=params, on_result=lambda result: result, **kwargs)
 
+def set_chat_sticker_set(chat_id, sticker_set_name, **kwargs):
+
+    """
+    Use this method to set a new group sticker set for a supergroup. The bot must be an administrator in the chat for this to work
+    and must have the appropriate admin rights. Use the field can_set_sticker_set optionally returned in getChat requests to check
+    if the bot can use this method. Returns True on success.
+
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param sticker_set_name: Name of the sticker set to be set as the group sticker set
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type chat_id: int or str
+    :type sticker_set_name: str
+    :returns: Returns count on success.
+    :rtype: int
+    """
+
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        sticker_set_name=sticker_set_name
+    )
+
+    return TelegramBotRPCRequest('setChatStickerSet', params=params, on_result=lambda result: result, **kwargs)
+
+def delete_chat_sticker_set(chat_id, sticker_set_name, **kwargs):
+
+    """
+    Use this method to set a new group sticker set for a supergroup. The bot must be an administrator in the chat
+    for this to work and must have the appropriate admin rights. Use the field can_set_sticker_set optionally returned
+    in getChat requests to check if the bot can use this method. Returns True on success.
+
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+
+    :type chat_id: int or str
+    :returns: Returns count on success.
+    :rtype: int
+    """
+
+    # required args
+    params = dict(
+        chat_id=chat_id,
+        sticker_set_name=sticker_set_name
+    )
+
+    return TelegramBotRPCRequest('deleteChatStickerSet', params=params, on_result=lambda result: result, **kwargs)
 
 def answer_callback_query(callback_query_id, text=None, show_alert=None, url=None, cache_time=0, **kwargs):
     """
@@ -3256,7 +3507,7 @@ def answer_callback_query(callback_query_id, text=None, show_alert=None, url=Non
                 Otherwise, you may use links like telegram.me/your_bot?start=XXXX that open your bot with a parameter.
     :param cache_time: The maximum amount of time in seconds that the result of the callback query may be cached client-side. Telegram
                        apps will support caching starting in version 3.14. Defaults to 0.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type callback_query_id: str
     :type text: str
@@ -3297,7 +3548,7 @@ def delete_message(chat_id, message_id, **kwargs):
 
     :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
     :param message_id: Identifier of the message to delete
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
     :return: Returns True on success.
     """
 
@@ -3316,7 +3567,7 @@ def edit_message_text(text, chat_id=None, message_id=None, inline_message_id=Non
     Use this method to edit text messages sent by the bot or via the bot (for inline bots).
 
     :param text: New text of the message
-    :param chat_id: Required if inline_message_id is not specified. Unique identifier for the target chat or username of
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
                     the target channel (in the format @channelusername)
     :param message_id: Required if inline_message_id is not specified. Unique identifier of the sent message
     :param inline_message_id: Required if chat_id and message_id are not specified. Identifier of the inline message
@@ -3325,7 +3576,7 @@ def edit_message_text(text, chat_id=None, message_id=None, inline_message_id=Non
     :param disable_web_page_preview: Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width
                                      text or inline URLs in your bot's message.
     :param reply_markup: A JSON-serialized object for an inline keyboard.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type text: str
     :type chat_id: str or int
@@ -3368,7 +3619,7 @@ def edit_message_caption(caption, chat_id=None, message_id=None, inline_message_
     Use this method to edit text messages sent by the bot or via the bot (for inline bots).
 
     :param caption : New caption of the message
-    :param chat_id: Required if inline_message_id is not specified. Unique identifier for the target chat or username of
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
                     the target channel (in the format @channelusername)
     :param message_id: Required if inline_message_id is not specified. Unique identifier of the sent message
     :param inline_message_id: Required if chat_id and message_id are not specified. Identifier of the inline message
@@ -3412,7 +3663,7 @@ def edit_message_reply_markup(chat_id=None, message_id=None, inline_message_id=N
     """
     Use this method to edit text messages sent by the bot or via the bot (for inline bots).
 
-    :param chat_id: Required if inline_message_id is not specified. Unique identifier for the target chat or username of
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
                     the target channel (in the format @channelusername)
     :param message_id: Required if inline_message_id is not specified. Unique identifier of the sent message
     :param inline_message_id: Required if chat_id and message_id are not specified. Identifier of the inline message
@@ -3471,7 +3722,7 @@ def answer_inline_query(inline_query_id, results, cache_time=None, is_personal=N
                                 a start parameter that instructs the bot to return an oauth link. Once done, the bot can
                                 offer a switch_inline button so that the user can easily return to the chat where they
                                 wanted to use the bot's inline capabilities.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type inline_query_id: str
     :type results: InlineQueryResult[]
@@ -3528,7 +3779,7 @@ def get_user_profile_photos(user_id,
     :param user_id: Unique identifier of the target user
     :param offset: Sequential number of the first photo to be returned. By default, all photos are returned.
     :param limit: Limits the number of photos to be retrieved. Values between 1—100 are accepted. Defaults to 100.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type user_id: int
     :type offset: int
@@ -3625,7 +3876,7 @@ def set_game_score(user_id, score,
     :param score: New score, must be non-negative
     :param force: Pass True, if the high score is allowed to decrease. This can be useful when fixing mistakes or banning cheaters
     :param disable_edit_message: Pass True, if the game message should not be automatically edited to include the current scoreboard
-    :param chat_id: Required if inline_message_id is not specified. Unique identifier for the target chat (or username of the
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
                     target channel in the format @channelusername)
     :param message_id: Required if inline_message_id is not specified. Identifier of the sent message
     :param inline_message_id: Required if chat_id and message_id are not specified. Identifier of the inline message
@@ -3679,7 +3930,7 @@ def get_game_high_scores(user_id,
     Will also return the top three users if the user and his neighbors are not among them. Please note that this behavior is subject to change.
 
     :param user_id: Target user id
-    :param chat_id: Required if inline_message_id is not specified. Unique identifier for the target chat (or username of the
+    :param chat_id: Unique identifier for the target chat or username of the target channel (in the format @channelusername)
                     target channel in the format @channelusername)
     :param message_id: Required if inline_message_id is not specified. Identifier of the sent message
     :param inline_message_id: Required if chat_id and message_id are not specified. Identifier of the inline message
@@ -3737,7 +3988,7 @@ def get_updates(offset=None, limit=None, timeout=None, allowed_updates=None,
                   1—100 are accepted. Defaults to 100
     :param timeout: Timeout in seconds for long polling. Defaults to 0, i.e.
                     usual short polling
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type offset: int
     :type limit: int
@@ -3786,7 +4037,7 @@ def set_webhook(url, certificate=None, max_connections=None, allowed_updates=Non
 
                             Please note that this parameter doesn't affect updates created before the call to the setWebhook,
                             so unwanted updates may be received for a short period of time.
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type url: str
     :type certificate: InputFile
@@ -3803,7 +4054,7 @@ def get_webhook_info(**kwargs):
     """
     Use this method to get current webhook status. Requires no parameters.
 
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :return: On success, returns a WebhookInfo object. If the bot is using getUpdates, will return an object with the url field empty.
     :rtype: WebhookInfo
@@ -3820,7 +4071,7 @@ def download_file(file_path, out_file, **kwargs):
 
     :param file_path: The remote file path received via :func:`get_file`
     :param out_file: File to save to. Can be a file path (str) or a file-like object
-    :param \*\*kwargs: Args that get passed down to :class:`TelegramDownloadRequest`
+    :param kwargs: Args that get passed down to :class:`TelegramDownloadRequest`
 
     :type file_path: str
     :type out_file: str or file-like object
@@ -3938,9 +4189,21 @@ class TelegramBot(object):
         """See :func:`send_voice`"""
         return send_voice(*args, **self._merge_overrides(**kwargs)).run()
 
+    def send_media_group(self, *args, **kwargs):
+        """See :func:`send_media_group`"""
+        return send_media_group(*args, **self._merge_overrides(**kwargs)).run()
+
     def send_location(self, *args, **kwargs):
         """See :func:`send_location`"""
         return send_location(*args, **self._merge_overrides(**kwargs)).run()
+
+    def edit_message_live_location(self, *args, **kwargs):
+        """See :func:`edit_message_live_location`"""
+        return edit_message_live_location(*args, **self._merge_overrides(**kwargs)).run()
+
+    def stop_message_live_location(self, *args, **kwargs):
+        """See :func:`stop_message_live_location`"""
+        return stop_message_live_location(*args, **self._merge_overrides(**kwargs)).run()
 
     def send_venue(self, *args, **kwargs):
         """See :func:`send_venue`"""

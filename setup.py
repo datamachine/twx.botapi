@@ -12,7 +12,7 @@ download_url = download_url.format(github_tag)
 
 print(download_url)
 
-requirements = ['requests']
+requirements = ['requests', 'attrs']
 
 if sys.version_info < (3, 4, 0):
     requirements.append('enum34')
