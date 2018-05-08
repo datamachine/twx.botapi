@@ -20,8 +20,9 @@ import json
 Telegram Bot API Types as defined at https://core.telegram.org/bots/api#available-types
 """
 _UserBase = namedtuple('User', ['id', 'is_bot', 'first_name', 'last_name', 'username', 'language_code'])
-class User(_UserBase):
 
+
+class User(_UserBase):
     """This object represents a Telegram user or bot.
 
     Attributes:
@@ -46,13 +47,15 @@ class User(_UserBase):
             last_name=result.get('last_name'),
             username=result.get('username'),
             language_code=result.get('language_code'),
-            )
+        )
 
 
 _ChatMemberBase = namedtuple('ChatMember', ['user', 'status', 'until_date', 'can_be_edited', 'can_change_info',
                                             'can_post_messages', 'can_edit_messages', 'can_delete_messages', 'can_invite_users',
                                             'can_restrict_members', 'can_pin_messages', 'can_promote_members', 'can_send_messages',
                                             'can_send_media_messages', 'can_send_other_messages', 'can_add_web_page_previews'])
+
+
 class ChatMember(_ChatMemberBase):
     """This object contains information about one member of the chat.
 
@@ -133,7 +136,10 @@ class ChatMember(_ChatMemberBase):
 
         return ret
 
+
 _ChatPhotoBase = namedtuple('ChatPhoto', ['small_file_id', 'big_file_id'])
+
+
 class ChatPhoto(_ChatPhotoBase):
     """
     This object represents a chat photo.
@@ -153,8 +159,11 @@ class ChatPhoto(_ChatPhotoBase):
             big_file_id=result.get('big_file_id')
         )
 
+
 _ChatBase = namedtuple('Chat', ['id', 'type', 'title', 'username', 'first_name', 'last_name', 'all_members_are_administrators',
                                 'photo', 'description', 'invite_link', 'pinned_message', 'sticker_set_name', 'can_set_sticker_set'])
+
+
 class Chat(_ChatBase):
     """This object represents a chat.
 
@@ -197,15 +206,17 @@ class Chat(_ChatBase):
             description=result.get('description'),
         )
 
+
 _MessageBase = namedtuple('Message', [
     'message_id', 'sender', 'date', 'edit_date', 'author_signature', 'chat', 'forward_from', 'forward_from_chat',
     'forward_from_message_id', 'forward_signature', 'forward_date', 'media_group_id', 'reply_to_message', 'text',
-    'entities', 'caption_entities', 'audio', 'document', 'photo', 'sticker',  'video', 'video_note', 'voice', 'caption',
+    'entities', 'caption_entities', 'audio', 'document', 'photo', 'sticker', 'video', 'video_note', 'voice', 'caption',
     'contact', 'location', 'venue', 'new_chat_members', 'left_chat_member', 'new_chat_title',
     'new_chat_photo', 'delete_chat_photo', 'group_chat_created', 'supergroup_chat_created',
     'channel_chat_created', 'migrate_to_chat_id', 'migrate_from_chat_id', 'pinned_message', 'connected_website'])
-class Message(_MessageBase):
 
+
+class Message(_MessageBase):
     """This object represents a message.
 
     Attributes:
@@ -340,6 +351,8 @@ class Message(_MessageBase):
 
 
 _MessageEntityBase = namedtuple('MessageEntity', ['type', 'offset', 'length', 'url', 'user'])
+
+
 class MessageEntity(_MessageEntityBase):
     """This object represents a chat.
 
@@ -370,8 +383,9 @@ class MessageEntity(_MessageEntityBase):
 
 
 _PhotoSizeBase = namedtuple('PhotoSize', ['file_id', 'width', 'height', 'file_size'])
-class PhotoSize(_PhotoSizeBase):
 
+
+class PhotoSize(_PhotoSizeBase):
     """This object represents one size of a photo or a file / sticker thumbnail.
 
     Attributes:
@@ -392,12 +406,13 @@ class PhotoSize(_PhotoSizeBase):
             width=result.get('width'),
             height=result.get('height'),
             file_size=result.get('file_size')
-            )
+        )
 
 
 _AudioBase = namedtuple('Audio', ['file_id', 'duration', 'performer', 'title', 'mime_type', 'file_size'])
-class Audio(_AudioBase):
 
+
+class Audio(_AudioBase):
     """This object represents a generic audio file (not voice note).
 
     Attributes:
@@ -423,12 +438,13 @@ class Audio(_AudioBase):
             title=result.get('title'),
             mime_type=result.get('mime_type'),
             file_size=result.get('file_size')
-            )
+        )
 
 
 _DocumentBase = namedtuple('Document', ['file_id', 'thumb', 'file_name', 'mime_type', 'file_size'])
-class Document(_DocumentBase):
 
+
+class Document(_DocumentBase):
     """This object represents a general file (as opposed to photos and audio files).
 
     Attributes:
@@ -452,12 +468,13 @@ class Document(_DocumentBase):
             file_name=result.get('file_name'),
             mime_type=result.get('mime_type'),
             file_size=result.get('file_size')
-            )
+        )
 
 
 _StickerBase = namedtuple('Sticker', ['file_id', 'width', 'height', 'thumb', 'emoji', 'file_size'])
-class Sticker(_StickerBase):
 
+
+class Sticker(_StickerBase):
     """This object represents a sticker.
 
     Attributes:
@@ -483,13 +500,14 @@ class Sticker(_StickerBase):
             thumb=PhotoSize.from_result(result.get('thumb')),
             emoji=result.get('emoji'),
             file_size=result.get('file_size')
-            )
+        )
 
 
 _VideoBase = namedtuple('Video', [
     'file_id', 'width', 'height', 'duration', 'thumb', 'mime_type', 'file_size'])
-class Video(_VideoBase):
 
+
+class Video(_VideoBase):
     """This object represents a video file.
 
     Attributes:
@@ -517,13 +535,14 @@ class Video(_VideoBase):
             thumb=PhotoSize.from_result(result.get('thumb')),
             mime_type=result.get('mime_type'),
             file_size=result.get('file_size')
-            )
+        )
 
 
 _VideoNoteBase = namedtuple('VideoNote', [
     'file_id', 'width', 'height', 'duration', 'thumb', 'file_size'])
-class VideoNote(_VideoNoteBase):
 
+
+class VideoNote(_VideoNoteBase):
     """This object represents a video message (available in Telegram apps as of v.4.0).
 
     Attributes:
@@ -549,13 +568,13 @@ class VideoNote(_VideoNoteBase):
             duration=result.get('duration'),
             thumb=PhotoSize.from_result(result.get('thumb')),
             file_size=result.get('file_size')
-            )
-
+        )
 
 
 _VoiceBase = namedtuple('Voice', ['file_id', 'duration', 'mime_type', 'file_size'])
-class Voice(_VoiceBase):
 
+
+class Voice(_VoiceBase):
     """This object represents an voice node audio file.
 
     Attributes:
@@ -581,8 +600,9 @@ class Voice(_VoiceBase):
 
 
 _ContactBase = namedtuple('Contact', ['phone_number', 'first_name', 'last_name', 'user_id'])
-class Contact(_ContactBase):
 
+
+class Contact(_ContactBase):
     """This object represents a phone contact.
 
     Attributes:
@@ -604,12 +624,13 @@ class Contact(_ContactBase):
             first_name=result.get('first_name'),
             last_name=result.get('last_name'),
             user_id=result.get('user_id')
-            )
+        )
 
 
 _LocationBase = namedtuple('Location', ['longitude', 'latitude'])
-class Location(_LocationBase):
 
+
+class Location(_LocationBase):
     """This object represents a point on the map.
 
     Attributes:
@@ -627,12 +648,13 @@ class Location(_LocationBase):
         return Location(
             longitude=result.get('longitude'),
             latitude=result.get('latitude')
-            )
+        )
 
 
 _VenueBase = namedtuple('Venue', ['location', 'title', 'address', 'foursquare_id'])
-class Venue(_VenueBase):
 
+
+class Venue(_VenueBase):
     """This object represents a venue.
 
     Attributes:
@@ -657,8 +679,9 @@ class Venue(_VenueBase):
 
 
 _GameBase = namedtuple('Game', ['title', 'description', 'photo', 'text', 'text_entities', 'animation'])
-class Game(_GameBase):
 
+
+class Game(_GameBase):
     """This object represents a game. Use BotFather to create and edit games, their short names will act as unique identifiers.
 
 
@@ -700,6 +723,8 @@ class Game(_GameBase):
 
 
 _AnimationBase = namedtuple('Animation', ['file_id', 'thumb', 'file_name', 'mime_type', 'file_size'])
+
+
 class Animation(_AnimationBase):
     """You can provide an animation for your game so that it looks stylish in chats. This object represents an animation file to be
     displayed in the message containing a game.
@@ -724,10 +749,12 @@ class Animation(_AnimationBase):
             file_name=result.get('file_name'),
             mime_type=result.get('mime_type'),
             file_size=result.get('file_size')
-            )
+        )
 
 
 _GameHighScoreBase = namedtuple('GameHighScore', ['position', 'user', 'score'])
+
+
 class GameHighScore(_GameHighScoreBase):
     """
     This object represents one row of the high scores table for a game.
@@ -758,7 +785,10 @@ class GameHighScore(_GameHighScoreBase):
 
         [GameHighScore.from_result(score) for score in result]
 
+
 _WebhookInfoBase = namedtuple('WebhookInfo', ['url', 'has_custom_certificate', 'pending_update_count', 'last_error_date', 'last_error_message'])
+
+
 class WebhookInfo(_WebhookInfoBase):
     """
     Contains information about the current status of a webhook.
@@ -785,9 +815,11 @@ class WebhookInfo(_WebhookInfoBase):
             last_error_message=result.get('last_error_message'),
         )
 
-_UpdateBase = namedtuple('Update', ['update_id', 'message', 'edited_message', 'channel_post', 'edited_channel_post', 'inline_query', 'chosen_inline_result', 'callback_query'])
-class Update(_UpdateBase):
 
+_UpdateBase = namedtuple('Update', ['update_id', 'message', 'edited_message', 'channel_post', 'edited_channel_post', 'inline_query', 'chosen_inline_result', 'callback_query'])
+
+
+class Update(_UpdateBase):
     """This object represents an incoming update.
 
     Attributes:
@@ -830,6 +862,8 @@ class Update(_UpdateBase):
 
 
 _InputFileInfoBase = namedtuple('InputFileInfo', ['file_name', 'fp', 'mime_type'])
+
+
 class InputFileInfo(_InputFileInfoBase):
     """This object represents the contents of a file to be uploaded. Must be posted using multipart/form-data
             in the usual way that files are uploaded via the browser.
@@ -843,8 +877,9 @@ class InputFileInfo(_InputFileInfoBase):
     __slots__ = ()
 
 
-
 _InputFileBase = namedtuple('InputFile', ['form', 'file_info'])
+
+
 class InputFile(_InputFileBase):
     """This object represents the contents of a file to be uploaded. Must be posted using multipart/form-data
         in the usual way that files are uploaded via the browser.
@@ -872,6 +907,7 @@ class InputFile(_InputFileBase):
     """
     __slots__ = ()
 
+
 @attr.s
 class InputMedia(object):
     """This object represents the content of a media message to be sent. It should be one of
@@ -881,7 +917,6 @@ class InputMedia(object):
     media = attr.ib()
     caption = attr.ib()
     parse_mode = attr.ib()
-
 
 
 @attr.s
@@ -898,7 +933,6 @@ class InputMediaPhoto(InputMedia):
                                                        fixed-width text or inline URLs in the media caption.
     """
     type = attr.ib(default="photo")
-
 
 
 class InputMediaVideo(InputMedia):
@@ -925,8 +959,9 @@ class InputMediaVideo(InputMedia):
 
 
 _UserProfilePhotosBase = namedtuple('UserProfilePhotos', ['total_count', 'photos'])
-class UserProfilePhotos(_UserProfilePhotosBase):
 
+
+class UserProfilePhotos(_UserProfilePhotosBase):
     """This object represent a user's profile pictures.
 
     Attributes:
@@ -948,12 +983,13 @@ class UserProfilePhotos(_UserProfilePhotosBase):
         return UserProfilePhotos(
             total_count=result.get('total_count'),
             photos=photos
-            )
+        )
 
 
 _FileBase = namedtuple('File', ['file_id', 'file_size', 'file_path'])
-class File(_FileBase):
 
+
+class File(_FileBase):
     """This object represents a file ready to be downloaded.
 
     Attributes:
@@ -976,7 +1012,6 @@ class File(_FileBase):
         )
 
 
-
 class ReplyMarkup:
     __metaclass__ = ABCMeta
     __slots__ = ()
@@ -987,6 +1022,8 @@ class ReplyMarkup:
 
 
 _KeyboardButtonBase = namedtuple('KeyboardButton', ['text', 'request_contact', 'request_location'])
+
+
 class KeyboardButton(_KeyboardButtonBase):
     """This object represents one button of the reply keyboard. For simple text buttons String can be used instead
        of this object to specify text of the button. Optional fields are mutually exclusive.
@@ -1009,8 +1046,9 @@ class KeyboardButton(_KeyboardButtonBase):
 
 _ReplyKeyboardMarkupBase = namedtuple('ReplyKeyboardMarkup', [
     'keyboard', 'resize_keyboard', 'one_time_keyboard', 'selective'])
-class ReplyKeyboardMarkup(_ReplyKeyboardMarkupBase, ReplyMarkup):
 
+
+class ReplyKeyboardMarkup(_ReplyKeyboardMarkupBase, ReplyMarkup):
     """This object represents a custom keyboard with reply options (see Introduction to bots for details and examples).
 
     Attributes:
@@ -1069,11 +1107,11 @@ class ReplyKeyboardMarkup(_ReplyKeyboardMarkupBase, ReplyMarkup):
         return json.dumps(reply_markup)
 
 
-
 class ReplyKeyboardHide():
     """
     DEPRECATED: ReplyKeyboardHide is now ReplyKeyboardRemove
     """
+
     @staticmethod
     def create(selective=None):
         print("DEPRECATED: ReplyKeyboardHide is now ReplyKeyboardRemove")
@@ -1081,8 +1119,9 @@ class ReplyKeyboardHide():
 
 
 _ReplyKeyboardRemoveBase = namedtuple('ReplyKeyboardRemove', ['remove_keyboard', 'selective'])
-class ReplyKeyboardRemove(_ReplyKeyboardRemoveBase, ReplyMarkup):
 
+
+class ReplyKeyboardRemove(_ReplyKeyboardRemoveBase, ReplyMarkup):
     """Upon receiving a message with this object, Telegram clients will remove the current
        custom keyboard and display the default letter-keyboard. By default, custom keyboards
        are displayed until a new keyboard is sent by a bot. An exception is made for one-time
@@ -1113,7 +1152,7 @@ class ReplyKeyboardRemove(_ReplyKeyboardRemoveBase, ReplyMarkup):
     def serialize(self):
         reply_markup = dict(
             hide_keyboard=True
-            )
+        )
 
         if self.selective is not None:
             reply_markup['selective'] = bool(self.selective)
@@ -1125,7 +1164,6 @@ _ForceReplyBase = namedtuple('ForceReply', ['force_reply', 'selective'])
 
 
 class ForceReply(_ForceReplyBase, ReplyMarkup):
-
     """Upon receiving a message with this object, Telegram clients will display a reply interface to the user
         (act as if the user has selected the bot‘s message and tapped ’Reply'). This can be extremely useful
         if you want to create user-friendly step-by-step interfaces without having to sacrifice privacy mode.
@@ -1166,6 +1204,8 @@ class ForceReply(_ForceReplyBase, ReplyMarkup):
 
 
 _InlineQueryBase = namedtuple('InlineQuery', ['id', 'sender', 'location', 'query', 'offset'])
+
+
 class InlineQuery(_InlineQueryBase):
     """ This object represents an incoming inline query. When the user sends an empty query,
         your bot could return some default or trending results.
@@ -1191,10 +1231,12 @@ class InlineQuery(_InlineQueryBase):
             location=Location.from_result(result.get('location')),
             query=result.get('query'),
             offset=result.get('offset'),
-            )
+        )
 
 
 _ChosenInlineResultBase = namedtuple('ChosenInlineResult', ['result_id', 'sender', 'query'])
+
+
 class ChosenInlineResult(_ChosenInlineResultBase):
     """ This object represents an incoming inline query. When the user sends an empty query,
         your bot could return some default or trending results.
@@ -1222,9 +1264,12 @@ class ChosenInlineResult(_ChosenInlineResultBase):
             location=Location.from_result(result.get('location')),
             inline_message_id=result.get('inline_message_id'),
             query=result.get('query'),
-            )
+        )
+
 
 _CallbackQueryBase = namedtuple('CallbackQuery', ['id', 'sender', 'message', 'inline_message_id', 'data'])
+
+
 class CallbackQuery(_CallbackQueryBase):
     """ This object represents an incoming callback query from a callback button in an inline keyboard. If
         the button that originated the query was attached to a message sent by the bot, the field message
@@ -1256,6 +1301,7 @@ class CallbackQuery(_CallbackQueryBase):
             data=result.get('data'),
         )
 
+
 class InlineKeyboardMarkup:
     """ This object represents an inline keyboard that appears right next to the message it belongs to.
 
@@ -1279,6 +1325,7 @@ class InlineKeyboardMarkup:
             inline_keyboard.append(temp_list)
 
         return dict(inline_keyboard=inline_keyboard)
+
 
 class InlineKeyboardButton:
     """ This object represents one button of an inline keyboard. You must use exactly one of the optional fields.
@@ -1335,9 +1382,11 @@ class InlineKeyboardButton:
             reply_markup['callback_game'] = self.callback_game
         return reply_markup
 
+
 """
 InlineQuery Types
 """
+
 
 class InlineQueryResult:
     pass
@@ -1437,6 +1486,7 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
         self.caption = caption
         self.input_message_content = input_message_content
         self.reply_markup = reply_markup
+
 
 class InlineQueryResultGif(InlineQueryResult):
     """ Represents a link to an animated GIF file. By default, this animated GIF file will be sent by the user with
@@ -1547,6 +1597,7 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
         reply_markup             (InlineKeyboardMarkup) :*Optional.* Inline keyboard attached to the message
         input_message_content    (InputMessageContent) :*Optional.*Content of the message to be sent instead of the video animation
     """
+
     def __init__(self, id, mpeg4_file_id, title=None, caption=None, input_message_content=None, reply_markup=None):
         self.type = "mpeg4_gif"
         self.id = id
@@ -1555,7 +1606,6 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
         self.caption = caption
         self.input_message_content = input_message_content
         self.reply_markup = reply_markup
-
 
 
 class InlineQueryResultVideo(InlineQueryResult):
@@ -1908,6 +1958,7 @@ class InputMessageContent:
     """ This object represents the content of a message to be sent as a result of an inline query. """
     pass
 
+
 class InputTextMessageContent(InputMessageContent):
     """
     Represents the content of a text message to be sent as the result of an inline query.
@@ -1974,16 +2025,15 @@ class InputContactMessageContent(InputMessageContent):
         self.first_name = first_name
         self.last_name = last_name
 
+
 """
 Types added for utility purposes
 """
-
 
 _ErrorBase = namedtuple('Error', ['error_code', 'description'])
 
 
 class Error(_ErrorBase):
-
     """The error code and message returned when a request was successfuly but the method call was invalid
 
     Attributes:
@@ -1998,13 +2048,13 @@ class Error(_ErrorBase):
     def from_result(result):
         return Error(error_code=result.get('error_code'), description=result.get('description'))
 
+
 """
 RPC Objects
 """
 
 
 class RequestMethod(str, Enum):
-
     """Used to specify the HTTP request method.
 
     Attributes:
@@ -2023,7 +2073,6 @@ class RequestMethod(str, Enum):
 
 
 class TelegramBotRPCRequest:
-
     """Class that handles creating the actual RPC request, and sending callbacks based on response
 
     :param api_method: The API method to call. See https://core.telegram.org/bots/api#available-methods
@@ -2153,7 +2202,6 @@ class TelegramBotRPCRequest:
 
 
 class TelegramDownloadRequest(TelegramBotRPCRequest):
-
     """Class that handles downloading files from telegram.
 
     :param file_path: The remote file path received via :func:`get_file`
@@ -2280,6 +2328,7 @@ def set_chat_photo(chat_id, photo, **kwargs):
 
     return TelegramBotRPCRequest('setChatPhoto', params=params, files=files, on_result=lambda result: result, **kwargs)
 
+
 def delete_chat_photo(chat_id, **kwargs):
     """
     Use this method to delete a chat photo. Photos can't be changed for private chats. The bot must be an administrator in the chat
@@ -2294,6 +2343,7 @@ def delete_chat_photo(chat_id, **kwargs):
     # required args
     params = dict(chat_id=chat_id)
     return TelegramBotRPCRequest('deleteChatPhoto', params=params, on_result=lambda result: result, **kwargs)
+
 
 def set_chat_title(chat_id, title, **kwargs):
     """
@@ -2317,6 +2367,7 @@ def set_chat_title(chat_id, title, **kwargs):
     )
 
     return TelegramBotRPCRequest('setChatTitle', params=params, on_result=lambda result: result, **kwargs)
+
 
 def set_chat_description(chat_id, description, **kwargs):
     """
@@ -2342,7 +2393,6 @@ def set_chat_description(chat_id, description, **kwargs):
     return TelegramBotRPCRequest('setChatTitle', params=params, on_result=lambda result: result, **kwargs)
 
 
-
 def pin_chat_message(chat_id, message_id, disable_notification=None, **kwargs):
     """
     Use this method to pin a message in a supergroup or a channel. The bot must be an administrator in the chat for this to work and
@@ -2356,7 +2406,6 @@ def pin_chat_message(chat_id, message_id, disable_notification=None, **kwargs):
     :return: Returns True on success.
     :rtype: bool
     """
-
 
     # required args
     params = dict(
@@ -2372,6 +2421,7 @@ def pin_chat_message(chat_id, message_id, disable_notification=None, **kwargs):
 
     return TelegramBotRPCRequest('pinChatMessage', params=params, on_result=lambda result: result, **kwargs)
 
+
 def unpin_chat_message(chat_id, **kwargs):
     """
     Use this method to unpin a message in a supergroup or a channel. The bot must be an administrator in the chat for this to
@@ -2383,10 +2433,10 @@ def unpin_chat_message(chat_id, **kwargs):
     :rtype: bool
     """
 
-
     # required args
     params = dict(chat_id=chat_id)
     return TelegramBotRPCRequest('unpinChatMessage', params=params, on_result=lambda result: result, **kwargs)
+
 
 def get_me(**kwargs):
     """
@@ -2479,7 +2529,7 @@ def forward_message(chat_id, from_chat_id, message_id, disable_notification=Fals
     return TelegramBotRPCRequest('forwardMessage', params=params, on_result=Message.from_result, **kwargs)
 
 
-def send_photo(chat_id,  photo,
+def send_photo(chat_id, photo,
                caption=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
                **kwargs):
     """
@@ -2755,9 +2805,10 @@ def send_video(chat_id, video,
 
     return TelegramBotRPCRequest('sendVideo', params=params, files=files, on_result=Message.from_result, **kwargs)
 
+
 def send_video_note(chat_id, video_note,
-               duration=None, length=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
-               **kwargs):
+                    duration=None, length=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
+                    **kwargs):
     """
     Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as Document).
 
@@ -2915,6 +2966,7 @@ def send_media_group(chat_id, media,
 
     return TelegramBotRPCRequest('sendMediaGroup', params=params, files=files, on_result=lambda result: [Message.from_result(message) for message in result], **kwargs)
 
+
 def send_location(chat_id, latitude, longitude,
                   live_period=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
                   **kwargs):
@@ -2963,9 +3015,10 @@ def send_location(chat_id, latitude, longitude,
 
     return TelegramBotRPCRequest('sendLocation', params=params, on_result=Message.from_result, **kwargs)
 
+
 def edit_message_live_location(latitude, longitude,
-                  chat_id=None, message_id=None, inline_message_id=None, reply_markup=None,
-                  **kwargs):
+                               chat_id=None, message_id=None, inline_message_id=None, reply_markup=None,
+                               **kwargs):
     """
     Use this method to edit live location messages sent by the bot or via the bot (for inline bots).
     A location can be edited until its live_period expires or editing is explicitly disabled by a call
@@ -3059,10 +3112,10 @@ def stop_message_live_location(chat_id=None, message_id=None, inline_message_id=
 
     return TelegramBotRPCRequest('stopMessageLiveLocation', params=params, on_result=Message.from_result, **kwargs)
 
+
 def send_venue(chat_id, latitude, longitude, title, address,
                foursquare_id=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
                **kwargs):
-
     """
     Use this method to send information about a venue.
 
@@ -3120,7 +3173,6 @@ def send_venue(chat_id, latitude, longitude, title, address,
 def send_contact(chat_id, phone_number, first_name,
                  last_name=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
                  **kwargs):
-
     """
     Use this method to send phone contacts.
 
@@ -3169,6 +3221,7 @@ def send_contact(chat_id, phone_number, first_name,
 
     return TelegramBotRPCRequest('sendContact', params=params, on_result=Message.from_result, **kwargs)
 
+
 class ChatAction(str, Enum):
     TEXT = 'typing'
     PHOTO = 'upload_photo'
@@ -3215,7 +3268,6 @@ def send_chat_action(chat_id, action,
 
 
 def kick_chat_member(chat_id, user_id, until_date=None, **kwargs):
-
     """
     Use this method to kick a user from a group or a supergroup. In the case of supergroups, the user will not
     be able to return to the group on their own using invite links, etc., unless unbanned first. The bot must
@@ -3243,7 +3295,6 @@ def kick_chat_member(chat_id, user_id, until_date=None, **kwargs):
         user_id=user_id,
     )
 
-
     # optional args
     params.update(
         _clean_params(
@@ -3253,9 +3304,9 @@ def kick_chat_member(chat_id, user_id, until_date=None, **kwargs):
 
     return TelegramBotRPCRequest('kickChatMember', params=params, on_result=lambda result: result, **kwargs)
 
+
 def restrict_chat_member(chat_id, user_id, until_date=None,
                          can_send_messages=None, can_send_media_messages=None, can_send_other_messages=None, can_add_web_page_previews=None, **kwargs):
-
     """
     Use this method to kick a user from a group or a supergroup. In the case of supergroups, the user will not
     be able to return to the group on their own using invite links, etc., unless unbanned first. The bot must
@@ -3287,7 +3338,6 @@ def restrict_chat_member(chat_id, user_id, until_date=None,
         user_id=user_id,
     )
 
-
     # optional args
     params.update(
         _clean_params(
@@ -3306,7 +3356,6 @@ def promote_chat_member(chat_id, user_id,
                         can_change_info=None, can_post_messages=None, can_edit_messages=None, can_delete_messages=None,
                         can_invite_users=None, can_restrict_members=None, can_pin_messages=None, can_promote_members=None,
                         **kwargs):
-
     """
     Use this method to kick a user from a group or a supergroup. In the case of supergroups, the user will not
     be able to return to the group on their own using invite links, etc., unless unbanned first. The bot must
@@ -3345,7 +3394,6 @@ def promote_chat_member(chat_id, user_id,
         user_id=user_id,
     )
 
-
     # optional args
     params.update(
         _clean_params(
@@ -3362,8 +3410,8 @@ def promote_chat_member(chat_id, user_id,
 
     return TelegramBotRPCRequest('promoteChatMember', params=params, on_result=lambda result: result, **kwargs)
 
-def unban_chat_member(chat_id, user_id, **kwargs):
 
+def unban_chat_member(chat_id, user_id, **kwargs):
     """
     Use this method to unban a previously kicked user in a supergroup. The user will not return to the group automatically,
     but will be able to join via link, etc. The bot must be an administrator in the group for this to work
@@ -3389,7 +3437,6 @@ def unban_chat_member(chat_id, user_id, **kwargs):
 
 
 def get_chat(chat_id, **kwargs):
-
     """
     Use this method to get up to date information about the chat (current name of the user for one-on-one conversations, current username
     of a user, group or channel, etc.).
@@ -3413,7 +3460,6 @@ def get_chat(chat_id, **kwargs):
 
 
 def leave_chat(chat_id, **kwargs):
-
     """
     Use this method for your bot to leave a group, supergroup or channel.
 
@@ -3435,7 +3481,6 @@ def leave_chat(chat_id, **kwargs):
 
 
 def get_chat_administrators(chat_id, **kwargs):
-
     """
     Use this method to get a list of administrators in a chat. On success, returns an Array of ChatMember objects that
     contains information about all chat administrators except other bots. If the chat is a group or a supergroup and no
@@ -3460,7 +3505,6 @@ def get_chat_administrators(chat_id, **kwargs):
 
 
 def get_chat_member(chat_id, user_id, **kwargs):
-
     """
     Use this method to get information about a member of a chat
 
@@ -3485,7 +3529,6 @@ def get_chat_member(chat_id, user_id, **kwargs):
 
 
 def get_chat_members_count(chat_id, **kwargs):
-
     """
     Use this method to get the number of members in a chat.
 
@@ -3505,8 +3548,8 @@ def get_chat_members_count(chat_id, **kwargs):
 
     return TelegramBotRPCRequest('getChatMembersCount', params=params, on_result=lambda result: result, **kwargs)
 
-def set_chat_sticker_set(chat_id, sticker_set_name, **kwargs):
 
+def set_chat_sticker_set(chat_id, sticker_set_name, **kwargs):
     """
     Use this method to set a new group sticker set for a supergroup. The bot must be an administrator in the chat for this to work
     and must have the appropriate admin rights. Use the field can_set_sticker_set optionally returned in getChat requests to check
@@ -3530,8 +3573,8 @@ def set_chat_sticker_set(chat_id, sticker_set_name, **kwargs):
 
     return TelegramBotRPCRequest('setChatStickerSet', params=params, on_result=lambda result: result, **kwargs)
 
-def delete_chat_sticker_set(chat_id, sticker_set_name, **kwargs):
 
+def delete_chat_sticker_set(chat_id, sticker_set_name, **kwargs):
     """
     Use this method to set a new group sticker set for a supergroup. The bot must be an administrator in the chat
     for this to work and must have the appropriate admin rights. Use the field can_set_sticker_set optionally returned
@@ -3552,6 +3595,7 @@ def delete_chat_sticker_set(chat_id, sticker_set_name, **kwargs):
     )
 
     return TelegramBotRPCRequest('deleteChatStickerSet', params=params, on_result=lambda result: result, **kwargs)
+
 
 def answer_callback_query(callback_query_id, text=None, show_alert=None, url=None, cache_time=0, **kwargs):
     """
@@ -3596,6 +3640,7 @@ def answer_callback_query(callback_query_id, text=None, show_alert=None, url=Non
     )
 
     return TelegramBotRPCRequest('answerCallbackQuery', params=params, on_result=lambda result: result, **kwargs)
+
 
 def delete_message(chat_id, message_id, **kwargs):
     """
@@ -3674,6 +3719,7 @@ def edit_message_text(text, chat_id=None, message_id=None, inline_message_id=Non
     )
 
     return TelegramBotRPCRequest('editMessageText', params=params, on_result=Message.from_result, **kwargs)
+
 
 def edit_message_caption(caption, chat_id=None, message_id=None, inline_message_id=None, reply_markup=None, **kwargs):
     """
@@ -3960,7 +4006,6 @@ def set_game_score(user_id, score,
     if (chat_id and not message_id) or (not chat_id and message_id):
         raise ValueError("Must specify chat_id and message_id together")
 
-
     # required args
     params = dict(user_id=user_id,
                   score=score)
@@ -4060,11 +4105,11 @@ def get_updates(offset=None, limit=None, timeout=None, allowed_updates=None,
     """
     # optional parameters
     params = _clean_params(
-            offset=offset,
-            limit=limit,
-            timeout=timeout,
-            allowed_updates=allowed_updates,
-        )
+        offset=offset,
+        limit=limit,
+        timeout=timeout,
+        allowed_updates=allowed_updates,
+    )
 
     return TelegramBotRPCRequest('getUpdates', params=params, on_result=Update.from_result, **kwargs)
 
@@ -4111,6 +4156,7 @@ def set_webhook(url, certificate=None, max_connections=None, allowed_updates=Non
 
     return TelegramBotRPCRequest('setWebhook', params=params, on_result=lambda result: result, **kwargs)
 
+
 def get_webhook_info(**kwargs):
     """
     Use this method to get current webhook status. Requires no parameters.
@@ -4144,7 +4190,6 @@ def download_file(file_path, out_file, **kwargs):
 
 
 class TelegramBot(object):
-
     """A `TelegramBot` object represents a specific regisitered bot user as identified by its token. The bot
     object also helps try to maintain state and simplify interaction for library users.
 
