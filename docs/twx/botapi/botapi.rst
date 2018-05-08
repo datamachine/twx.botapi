@@ -5,6 +5,11 @@
 
 .. py:currentmodule:: twx.botapi
 
+
+Primary Bot Class
+-----------------
+.. autoclass:: TelegramBot
+
 Telegram Bot API Types
 ----------------------
 
@@ -59,6 +64,11 @@ Video
 
 .. autoclass:: Video
 
+VideoNote
+^^^^^
+
+.. autoclass:: VideoNote
+
 Voice
 ^^^^^
 
@@ -94,6 +104,20 @@ InputFileInfo
 
 .. autoclass:: InputFileInfo
 
+InputMedia
+^^^^^^^^^^^^^
+
+.. autoclass:: InputMedia
+
+InputMediaPhoto
+^^^^^^^^^^^^^
+
+.. autoclass:: InputMediaPhoto
+
+InputMediaVideo
+^^^^^^^^^^^^^
+
+.. autoclass:: InputMediaVideo
 
 UserProfilePhotos
 ^^^^^^^^^^^^^^^^^
@@ -132,6 +156,11 @@ Game
 ^^^^
 
 .. autoclass:: Game
+
+GameHighScore
+^^^^
+
+.. autoclass:: GameHighScore
 
 Animation
 ^^^^^^^^^
@@ -313,8 +342,6 @@ InputContactMessageContent
 .. autoclass:: InputContactMessageContent
 
 
-
-
 Additional Types
 ----------------
 
@@ -333,174 +360,253 @@ Request Objects
 Telegram Bot API Methods
 ------------------------
 
-get_me
-^^^^^^
+export_chat_invite_link
+^^^^^^^^^^^
 
-.. autofunction:: get_me(*, request_args=None, **kwargs)
+.. autofunction:: export_chat_invite_link
+
+set_chat_photo
+^^^^^^^^^^^
+
+.. autofunction:: set_chat_photo
+
+delete_chat_photo
+^^^^^^^^^^^
+
+.. autofunction:: delete_chat_photo
+
+set_chat_title
+^^^^^^^^^^^
+
+.. autofunction:: set_chat_title
+
+set_chat_description
+^^^^^^^^^^^
+
+.. autofunction:: set_chat_description
+
+pin_chat_message
+^^^^^^^^^^^
+
+.. autofunction:: pin_chat_message
+
+unpin_chat_message
+^^^^^^^^^^^
+
+.. autofunction:: unpin_chat_message
+
+get_me
+^^^^^^^^^^^
+
+.. autofunction:: get_me
 
 send_message
-^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: send_message(chat_id, text, disable_web_page_preview=None, reply_to_message_id=None, reply_markup, *, request_args=None, **kwargs)
+.. autofunction:: send_message
 
 forward_message
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: forward_message(chat_id, from_chat_id, message_id, *, request_args=None, **kwargs)
+.. autofunction:: forward_message
 
 send_photo
-^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: send_photo(chat_id, photo, caption=None, reply_to_message_id=None, reply_markup, *, request_args=None, **kwargs)
+.. autofunction:: send_photo
 
 send_audio
-^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: send_audio(chat_id, audio, duration=None, performer=None, title=None, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
+.. autofunction:: send_audio
 
 send_document
-^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: send_document(chat_id, document, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
+.. autofunction:: send_document
 
 send_sticker
-^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: send_sticker(chat_id, sticker, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
+.. autofunction:: send_sticker
 
 send_video
-^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: send_video(chat_id, video, duration=None, caption=None, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
+.. autofunction:: send_video
+
+send_video_note
+^^^^^^^^^^^
+
+.. autofunction:: send_video_note
 
 send_voice
-^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: send_voice(chat_id, voice, duration=None, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
+.. autofunction:: send_voice
+
+send_media_group
+^^^^^^^^^^^
+
+.. autofunction:: send_media_group
 
 send_location
-^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: send_location(chat_id, latitude, longitude, reply_to_message_id=None, reply_markup=None, *, request_args=None, **kwargs)
+.. autofunction:: send_location
+
+edit_message_live_location
+^^^^^^^^^^^
+
+.. autofunction:: edit_message_live_location
+
+stop_message_live_location
+^^^^^^^^^^^
+
+.. autofunction:: stop_message_live_location
 
 send_venue
-^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: send_venue(chat_id, latitude, longitude, title, address, foursquare_id=None, reply_to_message_id=None, reply_markup=None, disable_notification=False, **kwargs)
+.. autofunction:: send_venue
 
 send_contact
-^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: send_contact(chat_id, phone_number, first_name, last_name=None, reply_to_message_id=None, reply_markup=None, disable_notification=False, **kwargs)
+.. autofunction:: send_contact
 
 send_chat_action
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: send_chat_action(chat_id, action, *, request_args=None, **kwargs)
+.. autofunction:: send_chat_action
 
 kick_chat_member
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: kick_chat_member(chat_id, user_id, **kwargs)
+.. autofunction:: kick_chat_member
+
+restrict_chat_member
+^^^^^^^^^^^
+
+.. autofunction:: restrict_chat_member
+
+promote_chat_member
+^^^^^^^^^^^
+
+.. autofunction:: promote_chat_member
 
 unban_chat_member
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: unban_chat_member(chat_id, user_id, **kwargs)
+.. autofunction:: unban_chat_member
 
 get_chat
-^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: get_chat(chat_id, **kwargs)
+.. autofunction:: get_chat
 
 leave_chat
-^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: leave_chat(chat_id, **kwargs)
+.. autofunction:: leave_chat
 
 get_chat_administrators
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: get_chat_administrators(chat_id, **kwargs)
-
+.. autofunction:: get_chat_administrators
 
 get_chat_member
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: get_chat_member(chat_id, **kwargs)
+.. autofunction:: get_chat_member
 
 get_chat_members_count
-^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: get_chat_members_count(chat_id, **kwargs)
+.. autofunction:: get_chat_members_count
+
+set_chat_sticker_set
+^^^^^^^^^^^
+
+.. autofunction:: set_chat_sticker_set
+
+delete_chat_sticker_set
+^^^^^^^^^^^
+
+.. autofunction:: delete_chat_sticker_set
 
 answer_callback_query
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: answer_callback_query(callback_query_id, text=None, show_alert=None, **kwargs)
+.. autofunction:: answer_callback_query
+
+delete_message
+^^^^^^^^^^^
+
+.. autofunction:: delete_message
 
 edit_message_text
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: edit_message_text(text, chat_id=None, message_id=None, inline_message_id=None, parse_mode=None, disable_web_page_preview=None, reply_markup=None, **kwargs)
+.. autofunction:: edit_message_text
 
 edit_message_caption
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: edit_message_caption(caption, chat_id=None, message_id=None, inline_message_id=None, reply_markup=None, **kwargs)
+.. autofunction:: edit_message_caption
 
 edit_message_reply_markup
-^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: edit_message_reply_markup(chat_id=None, message_id=None, inline_message_id=None, reply_markup=None, **kwargs)
+.. autofunction:: edit_message_reply_markup
 
 answer_inline_query
-^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: answer_inline_query(inline_query_id, results, cache_time=None, is_personal=None, next_offset=None, switch_pm_text=None, switch_pm_parameter=None, **kwargs)
+.. autofunction:: answer_inline_query
 
 get_user_profile_photos
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: get_user_profile_photos(user_id, offset=None, limit=None, *, request_args=None, **kwargs)
+.. autofunction:: get_user_profile_photos
 
 get_file
-^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: get_file(file_id, **kwargs)
-
-download_file
-^^^^^^^^^^^^^
-
-.. autofunction:: download_file(file_path, out_file, **kwargs)
+.. autofunction:: get_file
 
 send_game
-^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: send_game(chat_id, game_name_short, disable_notification=False, reply_to_message_id=None, reply_markup=None, **kwargs)
+.. autofunction:: send_game
 
 set_game_score
-^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: set_game_score(user_id, score, force=False, disable_edit_message=False, chat_id=None, message_id=None, inline_message_id=None, **kwargs)
-
+.. autofunction:: set_game_score
 
 get_game_high_scores
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: get_game_high_scores(user_id, chat_id=None, message_id=None, inline_message_id=None, **kwargs)
+.. autofunction:: get_game_high_scores
 
 get_updates
 ^^^^^^^^^^^
 
-.. autofunction:: get_updates(offset=None, limit=None, timeout=None, **kwargs)
+.. autofunction:: get_updates
 
 set_webhook
 ^^^^^^^^^^^
 
-.. autofunction:: set_webhook(url=None,certificate=None, **kwargs)
+.. autofunction:: set_webhook
 
 get_webhook_info
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
-.. autofunction:: get_webhook_info(**kwargs)
+.. autofunction:: get_webhook_info
+
+download_file
+^^^^^^^^^^^
+
+.. autofunction:: download_file
+

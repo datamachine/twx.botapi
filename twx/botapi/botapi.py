@@ -363,7 +363,7 @@ class MessageEntity(_MessageEntityBase):
         offset	(int)	:Offset in UTF-16 code units to the start of the entity
         length	(int)	:Length of the entity in UTF-16 code units
         url	    (str)	:*Optional.* For “text_link” only, url that will be opened after user taps on the text
-        user    (User0  :*Optional.* For “text_mention” only, the mentioned user
+        user    (User)  :*Optional.* For “text_mention” only, the mentioned user
     """
 
     __slots__ = ()
@@ -1234,7 +1234,7 @@ class InlineQuery(_InlineQueryBase):
         )
 
 
-_ChosenInlineResultBase = namedtuple('ChosenInlineResult', ['result_id', 'sender', 'query'])
+_ChosenInlineResultBase = namedtuple('ChosenInlineResult', ['result_id', 'sender', 'query', 'location', 'inline_message_id'])
 
 
 class ChosenInlineResult(_ChosenInlineResultBase):
