@@ -49,6 +49,13 @@ class User(_UserBase):
             language_code=result.get('language_code'),
         )
 
+    @staticmethod
+    def from_array_result(result):
+        if result is None:
+            return None
+
+        return [User.from_result(user) for user in result]
+
 
 _ChatMemberBase = namedtuple('ChatMember', ['user', 'status', 'until_date', 'can_be_edited', 'can_change_info',
                                             'can_post_messages', 'can_edit_messages', 'can_delete_messages', 'can_invite_users',
@@ -335,7 +342,7 @@ class Message(_MessageBase):
             contact=Contact.from_result(result.get('contact')),
             location=Location.from_result(result.get('location')),
             venue=Venue.from_result(result.get('venue')),
-            new_chat_members=User.from_result(result.get('new_chat_members')),
+            new_chat_members=User.from_array_result(result.get('new_chat_members')),
             left_chat_member=User.from_result(result.get('left_chat_member')),
             new_chat_title=result.get('new_chat_title'),
             new_chat_photo=result.get('new_chat_photo'),
@@ -783,7 +790,7 @@ class GameHighScore(_GameHighScoreBase):
         if result is None:
             return None
 
-        [GameHighScore.from_result(score) for score in result]
+        return [GameHighScore.from_result(score) for score in result]
 
 
 _WebhookInfoBase = namedtuple('WebhookInfo', ['url', 'has_custom_certificate', 'pending_update_count', 'last_error_date', 'last_error_message'])
