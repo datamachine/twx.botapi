@@ -322,7 +322,7 @@ class Message(_MessageBase):
             chat=Chat.from_result(result.get('chat')),
             forward_from=User.from_result(result.get('forward_from')),
             forward_from_chat=Chat.from_result(result.get('forward_from_chat')),
-            forward_from_message_id=Message.from_result(result.get('forward_from_message_id')),
+            forward_from_message_id=result.get('forward_from_message_id'),
             forward_date=result.get('forward_date'),
             forward_signature=result.get('forward_signature'),
             author_signature=result.get('author_signature'),
