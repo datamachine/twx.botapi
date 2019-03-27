@@ -2537,7 +2537,7 @@ def forward_message(chat_id, from_chat_id, message_id, disable_notification=Fals
 
 
 def send_photo(chat_id, photo,
-               caption=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
+               caption=None, reply_to_message_id=None, reply_markup=None, disable_notification=False, parse_mode=None,
                **kwargs):
     """
     Use this method to send photos.
@@ -2551,6 +2551,8 @@ def send_photo(chat_id, photo,
     :param reply_markup: Additional interface options. A JSON-serialized object for a
                          custom reply keyboard, instructions to hide keyboard or to
                          force a reply from the user.
+    :param parse_mode: Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline
+                      URLs in your bot's message.
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
     :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
@@ -2560,6 +2562,8 @@ def send_photo(chat_id, photo,
     :type caption: str
     :type reply_to_message_id: int
     :type reply_markup: :class:`ReplyKeyboardMarkup` or :class:`ReplyKeyboardHide` or :class:`ForceReply`
+    :type parse_mode: str
+
 
     :returns: On success, the sent Message is returned.
     :rtype: TelegramBotRPCRequest
@@ -2585,6 +2589,7 @@ def send_photo(chat_id, photo,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
             disable_notification=disable_notification,
+            parse_mode=parse_mode,
         )
     )
 
@@ -2593,7 +2598,7 @@ def send_photo(chat_id, photo,
 
 def send_audio(chat_id, audio,
                caption=None, duration=None, performer=None, title=None, reply_to_message_id=None, reply_markup=None,
-               disable_notification=False, **kwargs):
+               disable_notification=False, parse_mode=None, **kwargs):
     """
     Use this method to send audio files, if you want Telegram clients to display them in the music player.
 
@@ -2616,6 +2621,8 @@ def send_audio(chat_id, audio,
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
+    :param parse_mode: Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline
+                      URLs in your bot's message.
     :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int or str
@@ -2626,6 +2633,7 @@ def send_audio(chat_id, audio,
     :type title: str
     :type reply_to_message_id: int
     :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+    :type parse_mode: str
 
     :returns: On success, the sent Message is returned.
     :rtype: TelegramBotRPCRequest
@@ -2653,6 +2661,7 @@ def send_audio(chat_id, audio,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
             disable_notification=disable_notification,
+            parse_mode=parse_mode,
         )
     )
 
@@ -2660,7 +2669,7 @@ def send_audio(chat_id, audio,
 
 
 def send_document(chat_id, document, caption,
-                  reply_to_message_id=None, reply_markup=None, disable_notification=False,
+                  reply_to_message_id=None, reply_markup=None, disable_notification=False, parse_mode=None,
                   **kwargs):
     """
     Use this method to send general files.
@@ -2674,12 +2683,15 @@ def send_document(chat_id, document, caption,
                          instructions to hide keyboard or to force a reply from the user.
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
+    :param parse_mode: Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline
+                      URLs in your bot's message.
     :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int or str
     :type document: InputFile or str
     :type reply_to_message_id: int
     :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+    :type parse_mode: str
 
     :returns: On success, the sent Message is returned.
     :rtype: TelegramBotRPCRequest
@@ -2704,6 +2716,7 @@ def send_document(chat_id, document, caption,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
             disable_notification=disable_notification,
+            parse_mode=parse_mode,
         )
     )
 
@@ -2758,7 +2771,7 @@ def send_sticker(chat_id, sticker,
 
 
 def send_video(chat_id, video,
-               duration=None, caption=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
+               duration=None, caption=None, reply_to_message_id=None, reply_markup=None, disable_notification=False, parse_mode=None,
                **kwargs):
     """
     Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as Document).
@@ -2774,6 +2787,8 @@ def send_video(chat_id, video,
                          force a reply from the user.
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
+    :param parse_mode: Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline
+                      URLs in your bot's message.
     :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int or str
@@ -2782,6 +2797,7 @@ def send_video(chat_id, video,
     :type caption: str
     :type reply_to_message_id: int
     :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+    :type parse_mode: str
 
     :returns: On success, the sent Message is returned.
     :rtype:  TelegramBotRPCRequest
@@ -2807,6 +2823,7 @@ def send_video(chat_id, video,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
             disable_notification=disable_notification,
+            parse_mode=parse_mode,
         )
     )
 
@@ -2870,7 +2887,7 @@ def send_video_note(chat_id, video_note,
 
 
 def send_voice(chat_id, voice,
-               caption=None, duration=None, reply_to_message_id=None, reply_markup=None, disable_notification=False,
+               caption=None, duration=None, reply_to_message_id=None, reply_markup=None, disable_notification=False, parse_mode=None,
                **kwargs):
     """
     Use this method to send audio files, if you want Telegram clients to display the file as a playable voice
@@ -2889,6 +2906,8 @@ def send_voice(chat_id, voice,
     :param reply_markup: Additional interface options. A JSON-serialized object for a custom reply keyboard,
     :param disable_notification: Sends the message silently. iOS users will not receive a notification, Android users
                                  will receive a notification with no sound. Other apps coming soon.
+    :param parse_mode: Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline
+                      URLs in your bot's message.
     :param kwargs: Args that get passed down to :class:`TelegramBotRPCRequest`
 
     :type chat_id: int or str
@@ -2897,6 +2916,7 @@ def send_voice(chat_id, voice,
     :type duration: int
     :type reply_to_message_id: int
     :type reply_markup: ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply
+    :type parse_mode: str
 
     :returns: On success, the sent Message is returned.
     :rtype: TelegramBotRPCRequest
@@ -2922,6 +2942,7 @@ def send_voice(chat_id, voice,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
             disable_notification=disable_notification,
+            parse_mode=parse_mode,
         )
     )
 
