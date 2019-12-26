@@ -1,3 +1,9 @@
+| WARNING: This project is effectively retired, and won't be seeing any dev or support. There may be random commits in the future as we use it for side projects, but it's basically dead. There's plenty of other well maintained and feature rich (or feature lean) python TG libraries so you shouldn't have a problem finding another. Thanks for all the support and use in the past few years! |
+| --- |
+
+
+
+
 twx.botapi
 ==========
 
